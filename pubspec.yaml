@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 0.1.0+1
 
 environment:
-  sdk: 3.11.1
+  sdk: 3.11.3
 
 dependencies:
   flutter:
@@ -15,6 +15,9 @@ dependencies:
 
   #State Management
   provider: any
+
+  #Routing
+  go_router: ^17.1.0
 
 
 dev_dependencies:
