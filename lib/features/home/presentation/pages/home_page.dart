@@ -14,9 +14,12 @@ class HomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(onPressed: (){
-                context.push('/login');
-              }, child: Text("Login"))
+              ElevatedButton(
+                onPressed: () {
+                  context.push('/login');
+                },
+                child: Text("Login"),
+              ),
             ],
           ),
         ),

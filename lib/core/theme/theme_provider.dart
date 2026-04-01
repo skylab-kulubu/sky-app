@@ -1,10 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sky_app/core/theme/theme.dart';
 
 class ThemeProvider with ChangeNotifier {
-  ThemeData _themeData = lightTheme;
+  ThemeData _themeData = darkTheme;
 
   ThemeProvider() {
     _loadTheme();
@@ -30,7 +29,7 @@ class ThemeProvider with ChangeNotifier {
 
   void _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    final isDarkMode = prefs.getBool('isDarkMode') ?? false;
+    final isDarkMode = prefs.getBool('isDarkMode') ?? true;
     themeData = isDarkMode ? darkTheme : lightTheme;
   }
 

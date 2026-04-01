@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_radius.dart';
+import 'package:sky_app/core/constants/app_radiuses.dart';
 
 class SkyButton extends StatelessWidget {
   const SkyButton({super.key});
@@ -9,9 +9,11 @@ class SkyButton extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(AppRadius.buttonRadius)
-        )
+          borderRadius: BorderRadiusGeometry.circular(AppRadiuses.buttonRadius),
+        ),
       ),
-      onPressed: () {  }, child: Text('MOBILAB') );
+      onPressed: () {},
+      child: Text('MOBILAB'),
+    );
   }
 }
