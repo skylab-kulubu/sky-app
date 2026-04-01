@@ -11,16 +11,16 @@ dependencies:
     sdk: flutter
   
   #Storage
-  shared_preferences: 2.5.4
+  shared_preferences: 2.5.5
 
   #State Management
-  provider: any
+  provider: 6.1.5+1
 
   #Routing
-  go_router: ^17.1.0
+  go_router: 17.1.0
 
   #UI
-  flutter_svg: ^2.2.4
+  flutter_svg: 2.2.4
 
 
 dev_dependencies:
