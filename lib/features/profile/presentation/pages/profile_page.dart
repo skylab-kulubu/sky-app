@@ -10,6 +10,9 @@ import 'package:sky_app/features/profile/presentation/widgets/logout_tile.dart';
 import 'package:sky_app/features/profile/presentation/widgets/navigation_tile.dart';
 import 'package:sky_app/features/profile/presentation/widgets/profile_header.dart';
 import 'package:sky_app/features/profile/presentation/widgets/section_header.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:sky_app/features/profile/presentation/pages/profile_webview_page.dart';
 
 part 'profile_pagemodel.dart';
 
@@ -113,7 +116,7 @@ class _ProfilePageState extends ProfilePageModel {
             iconColor: AppColors.primaryColor,
             title: 'YıldızSkylab',
             subtitle: 'SKY LAB resmi web sitesi',
-            onTap: () {},
+            onTap: () => _openWebView('https://yildizskylab.com', 'YıldızSkylab'),
           ),
           _divider(),
           ExternalLinkTile(
@@ -121,7 +124,7 @@ class _ProfilePageState extends ProfilePageModel {
             iconColor: AppColors.red,
             title: 'YıldızPlace',
             subtitle: 'YTÜ kampüs haritası ve mekan rehberi',
-            onTap: () {},
+            onTap: () => _openWebView('https://yildizplace.com', 'YıldızPlace'),
           ),
           _divider(),
           ExternalLinkTile(
@@ -129,7 +132,7 @@ class _ProfilePageState extends ProfilePageModel {
             iconColor: AppColors.green,
             title: 'YTUGuessr',
             subtitle: 'YTÜ kampüsünü keşfet, konumu tahmin et',
-            onTap: () {},
+            onTap: () => _openWebView('https://ytuguessr.com', 'YTUGuessr'),
           ),
           _divider(),
           ExternalLinkTile(
@@ -137,7 +140,7 @@ class _ProfilePageState extends ProfilePageModel {
             iconColor: AppColors.teal,
             title: 'SKYCLOUD',
             subtitle: 'Kulüp dosya paylaşım ve depolama sistemi',
-            onTap: () {},
+            onTap: () => _openWebView('https://cloud.yildizskylab.com', 'SKYCLOUD'),
           ),
           _divider(),
           ExternalLinkTile(
@@ -145,7 +148,7 @@ class _ProfilePageState extends ProfilePageModel {
             iconColor: AppColors.purple,
             title: 'SKYFORMS',
             subtitle: 'Kulüp anket ve form platformu',
-            onTap: () {},
+            onTap: () => _openWebView('https://forms.yildizskylab.com', 'SKYFORMS'),
           ),
           _divider(),
           ExternalLinkTile(
@@ -153,7 +156,7 @@ class _ProfilePageState extends ProfilePageModel {
             iconColor: AppColors.orange,
             title: 'SKYSEC Articles',
             subtitle: 'Siber güvenlik makaleleri ve yazıları',
-            onTap: () {},
+            onTap: () => _openWebView('https://articles.sky-sec.org', 'SKYSEC Articles'),
           ),
           _divider(),
           ExternalLinkTile(
@@ -161,7 +164,7 @@ class _ProfilePageState extends ProfilePageModel {
             iconColor: AppColors.teal,
             title: 'Sky Lab Oda Durumu',
             subtitle: 'Kulüp odasının anlık açık/kapalı durumu',
-            onTap: () {},
+            onTap: () => _openWebView('https://room.yildizskylab.com', 'Oda Durumu'),
           ),
           _divider(),
           ExternalLinkTile(
@@ -169,7 +172,7 @@ class _ProfilePageState extends ProfilePageModel {
             iconColor: AppColors.orange,
             title: 'Sky Lab Sunucu Durumu',
             subtitle: 'Sunucu ve servis erişilebilirlik durumu',
-            onTap: () {},
+            onTap: () => _openWebView('https://status.yildizskylab.com', 'Sunucu Durumu'),
           ),
           _divider(),
           ExternalLinkTile(
@@ -177,7 +180,7 @@ class _ProfilePageState extends ProfilePageModel {
             iconColor: AppColors.pink,
             title: 'SKYPDF',
             subtitle: 'PDF dönüştürme ve düzenleme aracı',
-            onTap: () {},
+            onTap: () => _openWebView('https://pdf.yildizskylab.com', 'SKYPDF'),
           ),
           _divider(),
           ExternalLinkTile(
@@ -185,12 +188,26 @@ class _ProfilePageState extends ProfilePageModel {
             iconColor: AppColors.darkPurple,
             title: 'Stant',
             subtitle: 'Kulüp stant ve tanıtım etkinlikleri',
-            onTap: () {},
+            onTap: () => _openWebView('https://stant.yildizskylab.com', 'Stant'),
           ),
         ],
       ),
     );
   }
+
+  void _openWebView(String url, String title) {
+    if (kIsWeb) {
+      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfileWebViewPage(url: url, title: title),
+        ),
+      );
+    }
+  }
+
 
   Widget _contactSection() {
     return Container(
