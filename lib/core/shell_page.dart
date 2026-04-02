@@ -15,9 +15,10 @@ class ShellPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentLocation = GoRouterState.of(context).matchedLocation;
+    final bool isProfilePage = currentLocation == '/profile';
 
     return Scaffold(
-      appBar: appBar(context),
+      appBar: isProfilePage ? null : appBar(context),
       body: child,
       bottomNavigationBar: navBar(currentLocation, context),
     );
