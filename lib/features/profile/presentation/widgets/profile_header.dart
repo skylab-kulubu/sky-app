@@ -4,13 +4,13 @@ import 'package:sky_app/core/constants/app_colors.dart';
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
     super.key,
-    required this.initials,
     required this.name,
     required this.email,
     required this.teamName,
+    this.avatarUrl,
   });
 
-  final String initials;
+  final String? avatarUrl;
   final String name;
   final String email;
   final String teamName;
@@ -23,35 +23,32 @@ class ProfileHeader extends StatelessWidget {
         color: AppColors.tileBackgroundColor,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Row(
-        children: [
-          _avatar(),
-          const SizedBox(width: 16),
-          _userInfo(),
-        ],
-      ),
+      child: Row(children: [_avatar(), const SizedBox(width: 16), _userInfo()]),
     );
   }
 
   Widget _avatar() {
+    final hasAvatar = avatarUrl != null && avatarUrl!.trim().isNotEmpty;
+
     return Container(
       width: 64,
       height: 64,
       decoration: BoxDecoration(
-        color: AppColors.primaryColor.withValues(alpha: 0.15),
+        color: hasAvatar
+            ? AppColors.tileBackgroundColor
+            : Colors.purple.withValues(alpha: 0.18),
         shape: BoxShape.circle,
       ),
-      child: Center(
-        child: Text(
-          initials,
-          style: const TextStyle(
-            color: AppColors.primaryColor,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Poppins',
-          ),
-        ),
-      ),
+      clipBehavior: Clip.antiAlias,
+      child: hasAvatar
+          ? Image.network(
+              avatarUrl!,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Center(
+                child: Icon(Icons.person, color: Colors.purple, size: 28),
+              ),
+            )
+          : Center(child: Icon(Icons.person, color: Colors.purple, size: 28)),
     );
   }
 

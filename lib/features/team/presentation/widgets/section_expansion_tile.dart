@@ -22,8 +22,10 @@ class SectionExpansionTile extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: ExpansionTile(
         tilePadding: EdgeInsets.symmetric(vertical: 12),
-        shape: const Border(),
-        collapsedShape: const Border(),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        collapsedShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         leading: Container(
           width: 40,
           height: 40,
@@ -36,7 +38,12 @@ class SectionExpansionTile extends StatelessWidget {
         title: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(title, style: context.textTheme.titleMedium),
+            Text(
+              title,
+              style: context.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w300,
+              ),
+            ),
             SizedBox(width: 8),
             notificationCount == null
                 ? const SizedBox.shrink()

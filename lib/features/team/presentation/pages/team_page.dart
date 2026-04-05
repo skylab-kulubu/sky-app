@@ -13,9 +13,8 @@ class TeamPage extends StatefulWidget {
 
 class _TeamPageState extends State<TeamPage> {
   final List<PersonTag> personTags = [
-    PersonTag(title: 'uı/ux Tasarımcı'),
+    PersonTag(title: 'UI/UX Tasarımcı'),
     PersonTag(title: 'Öğrenme Ekibi'),
-    PersonTag(title: 'Mobil Geliştirici'),
   ];
 
   @override
@@ -46,21 +45,18 @@ class _TeamPageState extends State<TeamPage> {
 
               Padding(
                 padding: const EdgeInsets.only(top: 16, bottom: 8),
-                child: Text(
-                  'MOBILAB',
-                  style: context.textTheme.titleLarge?.copyWith(
-                    color: Color(0xfff0F0F0),
-                  ),
-                ),
+                child: Text('MOBILAB', style: context.textTheme.headlineSmall),
               ), //TODO  şimdilik sabit veri çekmiyo
 
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  runSpacing: 6,
                   children: personTags,
                 ),
               ),
+
               SizedBox(height: 16),
               SectionExpansionTile(
                 title: 'Duyurular',

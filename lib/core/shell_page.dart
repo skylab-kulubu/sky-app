@@ -17,6 +17,7 @@ class ShellPage extends StatelessWidget {
     final currentLocation = GoRouterState.of(context).matchedLocation;
 
     return Scaffold(
+      extendBody: true,
       appBar: appBar(context),
       body: child,
       bottomNavigationBar: navBar(currentLocation, context),
@@ -40,7 +41,7 @@ class ShellPage extends StatelessWidget {
           ],
         ),
         child: SizedBox(
-          height: 62,
+          height: 64,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             mainAxisSize: MainAxisSize.max,
@@ -99,6 +100,7 @@ class ShellPage extends StatelessWidget {
 
   AppBar appBar(BuildContext context) {
     return AppBar(
+      surfaceTintColor: Colors.transparent,
       centerTitle: true,
       title: SvgPicture.asset(
         AppAssets.skylab,

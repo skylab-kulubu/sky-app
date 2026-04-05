@@ -1,20 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 
-class ProfileWebViewPage extends StatefulWidget {
-  const ProfileWebViewPage({super.key, required this.url, required this.title});
+class WebviewPage extends StatefulWidget {
+  const WebviewPage({super.key, required this.url, required this.title});
 
   final String url;
   final String title;
 
   @override
-  State<ProfileWebViewPage> createState() => _ProfileWebViewPageState();
+  State<WebviewPage> createState() => _WebviewPageState();
 }
 
-class _ProfileWebViewPageState extends State<ProfileWebViewPage> {
+class _WebviewPageState extends State<WebviewPage> {
   late final WebViewController _controller;
 
   @override
@@ -52,8 +53,12 @@ class _ProfileWebViewPageState extends State<ProfileWebViewPage> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-          onPressed: () => Navigator.pop(context),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+            size: 20,
+          ),
+          onPressed: () => context.pop(),
         ),
       ),
       body: kIsWeb
@@ -61,11 +66,18 @@ class _ProfileWebViewPageState extends State<ProfileWebViewPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.open_in_browser_rounded, color: Colors.white, size: 48),
+                  const Icon(
+                    Icons.open_in_browser_rounded,
+                    color: Colors.white,
+                    size: 48,
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'Web platformunda site dışarıda açıldı.',
-                    style: TextStyle(color: Colors.white, fontFamily: 'Poppins'),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                    ),
                   ),
                   TextButton(
                     onPressed: () => _launchInBrowser(widget.url),
