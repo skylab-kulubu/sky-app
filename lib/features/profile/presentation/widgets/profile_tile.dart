@@ -3,21 +3,25 @@ import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 
-class NavigationTile extends StatelessWidget {
-  const NavigationTile({
+class ProfileTile extends StatelessWidget {
+  const ProfileTile({
     super.key,
     required this.icon,
     required this.iconColor,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.onTap,
+    this.trailingIcon,
+    this.titleColor = AppColors.textWhite,
   });
 
   final IconData icon;
   final Color iconColor;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final VoidCallback onTap;
+  final IconData? trailingIcon;
+  final Color titleColor;
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +36,12 @@ class NavigationTile extends StatelessWidget {
               _iconBox(),
               const SizedBox(width: 16),
               _textSection(),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: AppColors.textGrayDark,
-                size: AppSizes.icon,
-              ),
+              if (trailingIcon != null)
+                Icon(
+                  trailingIcon,
+                  color: AppColors.textGrayDark,
+                  size: 20,
+                ),
             ],
           ),
         ),
@@ -67,22 +72,24 @@ class NavigationTile extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              color: AppColors.textWhite,
+            style: TextStyle(
+              color: titleColor,
               fontSize: 16,
-              fontWeight: FontWeight.w200,
+              fontWeight: FontWeight.w300,
               fontFamily: 'Poppins',
             ),
           ),
-          if (subtitle.isNotEmpty)
+          if (subtitle != null && subtitle!.isNotEmpty)
             Text(
-              subtitle,
+              subtitle!,
               style: const TextStyle(
                 color: AppColors.textGray,
                 fontSize: 12,
                 fontWeight: FontWeight.w300,
                 fontFamily: 'Poppins',
+                overflow: TextOverflow.ellipsis,
               ),
+              maxLines: 1,
             ),
         ],
       ),

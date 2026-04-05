@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
-import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
-import 'package:sky_app/features/profile/presentation/widgets/external_link_tile.dart';
-import 'package:sky_app/features/profile/presentation/widgets/logout_tile.dart';
-import 'package:sky_app/features/profile/presentation/widgets/navigation_tile.dart';
+import 'package:sky_app/features/profile/presentation/widgets/profile_tile.dart';
 import 'package:sky_app/features/profile/presentation/widgets/profile_header.dart';
 import 'package:sky_app/features/profile/presentation/widgets/section_header.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -29,8 +24,6 @@ class _ProfilePageState extends ProfilePageModel {
     return ListView(
       padding: context.mainHorizontalPadding.copyWith(top: 8, bottom: 40),
       children: [
-        _appBranding(),
-        const SizedBox(height: 24),
         const ProfileHeader(
           initials: 'SK',
           name: 'SKY LAB Üyesi',
@@ -44,32 +37,18 @@ class _ProfilePageState extends ProfilePageModel {
         const SizedBox(height: 20),
         _contactSection(),
         const SizedBox(height: 12),
-        LogoutTile(onTap: onLogoutTap),
-      ],
-    );
-  }
-
-  Widget _appBranding() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        SvgPicture.asset(
-          AppAssets.mobilab,
-          width: 32,
-          height: 32,
-          fit: BoxFit.contain,
-        ),
-        SvgPicture.asset(
-          AppAssets.skylab,
-          width: 44,
-          height: 44,
-          fit: BoxFit.contain,
-          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-        ),
-        const Icon(
-          Icons.notifications_none_rounded,
-          color: Colors.white,
-          size: AppSizes.icon,
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.tileBackgroundColor,
+            borderRadius: BorderRadius.circular(AppRadiuses.tile),
+          ),
+          child: ProfileTile(
+            icon: Icons.logout_rounded,
+            iconColor: AppColors.red,
+            title: 'Çıkış Yap',
+            titleColor: AppColors.red,
+            onTap: onLogoutTap,
+          ),
         ),
       ],
     );
@@ -83,19 +62,21 @@ class _ProfilePageState extends ProfilePageModel {
       ),
       child: Column(
         children: [
-          NavigationTile(
+          ProfileTile(
             icon: Icons.people_alt_rounded,
             iconColor: AppColors.primaryColor,
             title: 'Ekipler',
             subtitle: 'Kulüp ekiplerini keşfet',
+            trailingIcon: Icons.chevron_right_rounded,
             onTap: () {},
           ),
           _divider(),
-          NavigationTile(
+          ProfileTile(
             icon: Icons.workspace_premium_rounded,
             iconColor: AppColors.primaryColor,
             title: 'Sertifikalar',
             subtitle: 'Bootcamp ve eğitim sertifikaları',
+            trailingIcon: Icons.chevron_right_rounded,
             onTap: () {},
           ),
         ],
@@ -111,83 +92,93 @@ class _ProfilePageState extends ProfilePageModel {
       ),
       child: Column(
         children: [
-          ExternalLinkTile(
+          ProfileTile(
             icon: Icons.language_rounded,
             iconColor: AppColors.primaryColor,
             title: 'YıldızSkylab',
             subtitle: 'SKY LAB resmi web sitesi',
+            trailingIcon: Icons.open_in_new_rounded,
             onTap: () => _openWebView('https://yildizskylab.com', 'YıldızSkylab'),
           ),
           _divider(),
-          ExternalLinkTile(
+          ProfileTile(
             icon: Icons.location_on_rounded,
             iconColor: AppColors.red,
             title: 'YıldızPlace',
             subtitle: 'YTÜ kampüs haritası ve mekan rehberi',
+            trailingIcon: Icons.open_in_new_rounded,
             onTap: () => _openWebView('https://yildizplace.com', 'YıldızPlace'),
           ),
           _divider(),
-          ExternalLinkTile(
+          ProfileTile(
             icon: Icons.videogame_asset_rounded,
             iconColor: AppColors.green,
             title: 'YTUGuessr',
             subtitle: 'YTÜ kampüsünü keşfet, konumu tahmin et',
+            trailingIcon: Icons.open_in_new_rounded,
             onTap: () => _openWebView('https://ytuguessr.com', 'YTUGuessr'),
           ),
           _divider(),
-          ExternalLinkTile(
+          ProfileTile(
             icon: Icons.cloud_rounded,
             iconColor: AppColors.teal,
             title: 'SKYCLOUD',
             subtitle: 'Kulüp dosya paylaşım ve depolama sistemi',
+            trailingIcon: Icons.open_in_new_rounded,
             onTap: () => _openWebView('https://cloud.yildizskylab.com', 'SKYCLOUD'),
           ),
           _divider(),
-          ExternalLinkTile(
+          ProfileTile(
             icon: Icons.description_rounded,
             iconColor: AppColors.purple,
             title: 'SKYFORMS',
             subtitle: 'Kulüp anket ve form platformu',
+            trailingIcon: Icons.open_in_new_rounded,
             onTap: () => _openWebView('https://forms.yildizskylab.com', 'SKYFORMS'),
           ),
           _divider(),
-          ExternalLinkTile(
+          ProfileTile(
             icon: Icons.shield_rounded,
             iconColor: AppColors.orange,
             title: 'SKYSEC Articles',
             subtitle: 'Siber güvenlik makaleleri ve yazıları',
+            trailingIcon: Icons.open_in_new_rounded,
             onTap: () => _openWebView('https://articles.sky-sec.org', 'SKYSEC Articles'),
           ),
           _divider(),
-          ExternalLinkTile(
+          ProfileTile(
             icon: Icons.meeting_room_rounded,
             iconColor: AppColors.teal,
             title: 'Sky Lab Oda Durumu',
             subtitle: 'Kulüp odasının anlık açık/kapalı durumu',
+            trailingIcon: Icons.open_in_new_rounded,
             onTap: () => _openWebView('https://room.yildizskylab.com', 'Oda Durumu'),
           ),
           _divider(),
-          ExternalLinkTile(
+          ProfileTile(
             icon: Icons.storage_rounded,
             iconColor: AppColors.orange,
             title: 'Sky Lab Sunucu Durumu',
             subtitle: 'Sunucu ve servis erişilebilirlik durumu',
+            trailingIcon: Icons.open_in_new_rounded,
             onTap: () => _openWebView('https://status.yildizskylab.com', 'Sunucu Durumu'),
           ),
           _divider(),
-          ExternalLinkTile(
+          ProfileTile(
             icon: Icons.picture_as_pdf_rounded,
             iconColor: AppColors.pink,
             title: 'SKYPDF',
             subtitle: 'PDF dönüştürme ve düzenleme aracı',
+            trailingIcon: Icons.open_in_new_rounded,
             onTap: () => _openWebView('https://pdf.yildizskylab.com', 'SKYPDF'),
           ),
           _divider(),
-          ExternalLinkTile(
+          ProfileTile(
             icon: Icons.storefront_rounded,
             iconColor: AppColors.darkPurple,
             title: 'Stant',
             subtitle: 'Kulüp stant ve tanıtım etkinlikleri',
+            trailingIcon: Icons.open_in_new_rounded,
             onTap: () => _openWebView('https://stant.yildizskylab.com', 'Stant'),
           ),
         ],
@@ -208,18 +199,17 @@ class _ProfilePageState extends ProfilePageModel {
     }
   }
 
-
   Widget _contactSection() {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.tileBackgroundColor,
         borderRadius: BorderRadius.circular(AppRadiuses.tile),
       ),
-      child: NavigationTile(
+      child: ProfileTile(
         icon: Icons.email_rounded,
         iconColor: AppColors.primaryColor,
         title: 'İletişim',
-        subtitle: '',
+        trailingIcon: Icons.chevron_right_rounded,
         onTap: () {},
       ),
     );
