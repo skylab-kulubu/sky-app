@@ -22,6 +22,10 @@ dependencies:
   #UI
   flutter_svg: 2.2.4
 
+  #Web & External Links
+  webview_flutter: 4.8.0
+  url_launcher: 6.3.0
+
 
 dev_dependencies:
   flutter_test:
