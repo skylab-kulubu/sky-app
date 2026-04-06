@@ -1,14 +1,21 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/shell_page.dart';
 import 'package:sky_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:sky_app/features/calendar/presentation/pages/calendar_page.dart';
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
+import 'package:sky_app/features/profile/presentation/pages/profile_cert_page.dart';
+import 'package:sky_app/features/profile/presentation/pages/profile_contact_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
+import 'package:sky_app/features/profile/presentation/pages/profile_team_page.dart';
 import 'package:sky_app/features/qr/presentation/pages/qr_page.dart';
 import 'package:sky_app/features/team/presentation/pages/team_page.dart';
 
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+
 class RouterManager {
   static final GoRouter router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: '/home',
     routes: [
       GoRoute(path: '/auth', builder: (context, state) => AuthPage()),
@@ -40,6 +47,21 @@ class RouterManager {
             path: '/profile',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: ProfilePage()),
+            routes: [
+              GoRoute(
+                path: 'teams',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) => const ProfileTeamPage(),
+              ),
+              GoRoute(
+                path: 'certificates',
+                builder: (context, state) => const ProfileCertPage(),
+              ),
+              GoRoute(
+                path: 'contact',
+                builder: (context, state) => const ProfileContactPage(),
+              ),
+            ],
           ),
         ],
       ),
