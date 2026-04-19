@@ -7,27 +7,31 @@ class LatestNewsSection extends StatelessWidget {
 
   final List<NewsItem> latestNews;
 
+  static const double _separatorHeight = 8.0;
+  static const double _cardBorderRadius = 24.0;
+  static const Color _cardColor = Color(0xFF303030);
+  static const double _thumbnailSpacing = 12.0;
+
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       itemCount: latestNews.length,
-      separatorBuilder: (context, index) =>
-          SizedBox(height: 8.0), // TODO constant yap
+      separatorBuilder: (context, index) => const SizedBox(height: _separatorHeight),
       itemBuilder: (context, index) {
         final news = latestNews[index];
         return Container(
           padding: AppPaddings.mainPaddingAll,
           decoration: BoxDecoration(
-            color: Colors.grey[850], // TODO constant yap
-            borderRadius: BorderRadius.circular(24.0),
+            color: _cardColor,
+            borderRadius: BorderRadius.circular(_cardBorderRadius),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               NewsThumbnail(news: news),
-              SizedBox(width: 12.0), // TODO constant yap
+              const SizedBox(width: _thumbnailSpacing),
               NewsTitleAndDescription(news: news),
             ],
           ),
@@ -42,6 +46,9 @@ class NewsTitleAndDescription extends StatelessWidget {
 
   final NewsItem news;
 
+  static const Color _descriptionColor = Color(0xFFBDBDBD);
+  static const double _titleDescriptionSpacing = 4.0;
+
   @override
   Widget build(BuildContext context) {
     final title = news.title;
@@ -51,7 +58,7 @@ class NewsTitleAndDescription extends StatelessWidget {
       context,
     ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
     final descriptionStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-      color: Colors.grey[400], // TODO constant yap
+      color: _descriptionColor,
     );
 
     return Expanded(
@@ -59,7 +66,7 @@ class NewsTitleAndDescription extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: titleStyle),
-          SizedBox(height: 4.0), // TODO constant yap
+          const SizedBox(height: _titleDescriptionSpacing),
           Text(
             description,
             style: descriptionStyle,
@@ -77,17 +84,21 @@ class NewsThumbnail extends StatelessWidget {
 
   final NewsItem news;
 
+  static const double _size = 80.0;
+  static const double _borderRadius = 12.0;
+  static const Color _backgroundColor = Color(0xFF303030);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 80,
-      height: 80,
+      width: _size,
+      height: _size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.0), // TODO constant yap
-        color: Colors.grey[850], // TODO constant yap
+        borderRadius: BorderRadius.circular(_borderRadius),
+        color: _backgroundColor,
       ),
       child: Image.network(
-        news.imageUrl, // TODO REAL ICON
+        news.imageUrl,
         fit: BoxFit.cover,
       ),
     );
