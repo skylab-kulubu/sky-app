@@ -9,7 +9,7 @@ import 'package:sky_app/features/team/presentation/pages/team_page.dart';
 
 class RouterManager {
   static final GoRouter router = GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/auth',
     routes: [
       GoRoute(path: '/auth', builder: (context, state) => AuthPage()),
 
