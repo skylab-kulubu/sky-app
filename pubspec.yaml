@@ -21,6 +21,7 @@ dependencies:
 
   #UI
   flutter_svg: 2.2.4
+  carousel_slider: 5.1.2
 
 
 dev_dependencies:
@@ -35,6 +36,7 @@ flutter:
     - assets/
     - assets/images/
     - assets/fonts/
+    - assets/icons/
 
   fonts:
     - family: Poppins
