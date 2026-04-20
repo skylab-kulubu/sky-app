@@ -100,6 +100,7 @@ class ShellPage extends StatelessWidget {
 
   AppBar appBar(BuildContext context) {
     return AppBar(
+      scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
       centerTitle: true,
       title: SvgPicture.asset(
