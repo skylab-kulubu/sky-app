@@ -99,6 +99,7 @@ class ShellPage extends StatelessWidget {
 
   AppBar appBar(BuildContext context) {
     return AppBar(
+      scrolledUnderElevation: 0,
       centerTitle: true,
       title: SvgPicture.asset(
         AppAssets.skylab,
