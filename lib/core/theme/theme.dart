@@ -48,6 +48,7 @@ ThemeData darkTheme = ThemeData(
   textTheme: TextTheme(
     bodyMedium: TextStyle(color: Colors.grey.shade400),
     labelSmall: TextStyle(fontFamily: 'Poppins'),
+    titleMedium: TextStyle(fontFamily: 'Poppins'),
   ),
   snackBarTheme: SnackBarThemeData(
     backgroundColor: Colors.grey.shade800,

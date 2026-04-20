@@ -4,6 +4,7 @@ import 'package:sky_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:sky_app/features/calendar/presentation/pages/calendar_page.dart';
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
+import 'package:sky_app/features/profile/presentation/pages/webview_page.dart';
 import 'package:sky_app/features/qr/presentation/pages/qr_page.dart';
 import 'package:sky_app/features/team/presentation/pages/team_page.dart';
 
@@ -12,6 +13,14 @@ class RouterManager {
     initialLocation: '/home',
     routes: [
       GoRoute(path: '/auth', builder: (context, state) => AuthPage()),
+
+      GoRoute(
+        path: '/webview',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, String>;
+          return WebviewPage(url: extra['url']!, title: extra['title']!);
+        },
+      ),
 
       ShellRoute(
         builder: (context, state, child) => ShellPage(child: child),
