@@ -14,21 +14,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  void _openEditSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useRootNavigator: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => EditShortcutsSheet(
-        allShortcuts: _allShortcuts,
-        visibleIndices: _visibleIndices,
-        onChanged: (updated) => setState(() => _visibleIndices = updated),
-      ),
-    );
-  }
-
+class _HomePageState extends HomePageModel {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,16 +26,16 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 CustomCarouselSlider(items: carouselItems),
-                const SizedBox(height: _sectionSpacing),
+                const SizedBox(height: HomePageModel._sectionSpacing),
                 ShortcutsTitle(),
-                const SizedBox(height: _titleSpacing),
+                const SizedBox(height: HomePageModel._titleSpacing),
                 ShortcutsSection(
                   shortcuts: _visibleShortcuts,
                   onEditTap: _openEditSheet,
                 ),
-                const SizedBox(height: _sectionSpacing),
+                const SizedBox(height: HomePageModel._sectionSpacing),
                 LatestNewsTitle(),
-                const SizedBox(height: _titleSpacing),
+                const SizedBox(height: HomePageModel._titleSpacing),
                 LatestNewsSection(latestNews: latestNews),
               ],
             ),
