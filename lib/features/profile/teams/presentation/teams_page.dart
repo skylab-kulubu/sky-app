@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
-import 'package:sky_app/features/profile/presentation/pages/team_arge_page.dart';
-import 'package:sky_app/features/profile/presentation/pages/team_social_page.dart';
+import 'package:sky_app/features/profile/teams/presentation/team_arge_page.dart';
+import 'package:sky_app/features/profile/teams/presentation/team_social_page.dart';
 import 'package:sky_app/features/profile/presentation/widgets/tab_label.dart';
 
 //revome appbar and bottom navigator bar
-part 'profile_team_pagemodel.dart';
+part 'teams_pagemodel.dart';
 
-class ProfileTeamPage extends StatefulWidget {
-  const ProfileTeamPage({super.key});
+class TeamsPage extends StatefulWidget {
+  const TeamsPage({super.key});
 
   @override
-  State<ProfileTeamPage> createState() => _ProfileTeamPageState();
+  State<TeamsPage> createState() => _TeamsPageState();
 }
 
-class _ProfileTeamPageState extends ProfileTeamPagemodel {
+class _TeamsPageState extends TeamPagesmodel {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,11 +27,38 @@ class _ProfileTeamPageState extends ProfileTeamPagemodel {
   }
 
   AppBar _appBar(BuildContext context) => AppBar(
-    leading: IconButton(
-      icon: const Icon(Icons.arrow_back, color: AppColors.textWhite),
-      onPressed: () => Navigator.pop(context),
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    leadingWidth: 52,
+    leading: Padding(
+      padding: const EdgeInsets.only(left: 16.0),
+      child: InkWell(
+        onTap: () => Navigator.pop(context),
+        borderRadius: AppRadiuses.containerBorderRadius,
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground,
+            borderRadius: AppRadiuses.containerBorderRadius,
+          ),
+          child: const Icon(
+            Icons.arrow_back,
+            color: AppColors.textWhite,
+            size: 18,
+          ),
+        ),
+      ),
     ),
-    title: const Text("Ekipler", style: TextStyle(color: AppColors.textWhite)),
+    titleSpacing: 12,
+    title: const Text(
+      "Ekipler",
+      style: TextStyle(
+        color: AppColors.textWhite,
+        fontSize: 18, // Başlık boyutunu da tutarlı hale getirdik (opsiyonel)
+        fontWeight: FontWeight.w600,
+      ),
+    ),
   );
 
   Widget _tabBarContainer() => Padding(

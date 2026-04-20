@@ -4,10 +4,10 @@ import 'package:sky_app/core/shell_page.dart';
 import 'package:sky_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:sky_app/features/calendar/presentation/pages/calendar_page.dart';
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
-import 'package:sky_app/features/profile/presentation/pages/profile_cert_page.dart';
-import 'package:sky_app/features/profile/presentation/pages/profile_contact_page.dart';
+import 'package:sky_app/features/profile/certificates/presentation/pages/cert_page.dart';
+import 'package:sky_app/features/profile/contact/presentation/pages/contact_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
-import 'package:sky_app/features/profile/presentation/pages/profile_team_page.dart';
+import 'package:sky_app/features/profile/teams/presentation/teams_page.dart';
 import 'package:sky_app/features/qr/presentation/pages/qr_page.dart';
 import 'package:sky_app/features/team/presentation/pages/team_page.dart';
 
@@ -51,15 +51,16 @@ class RouterManager {
               GoRoute(
                 path: 'teams',
                 parentNavigatorKey: _rootNavigatorKey,
-                builder: (context, state) => const ProfileTeamPage(),
+                builder: (context, state) => const TeamsPage(),
               ),
               GoRoute(
                 path: 'certificates',
-                builder: (context, state) => const ProfileCertPage(),
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) => const CertPage(),
               ),
               GoRoute(
                 path: 'contact',
-                builder: (context, state) => const ProfileContactPage(),
+                builder: (context, state) => const ContactPage(),
               ),
             ],
           ),

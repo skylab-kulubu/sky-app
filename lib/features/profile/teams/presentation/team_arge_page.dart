@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
-import 'package:sky_app/core/widgets/team_card.dart';
-import 'package:sky_app/features/profile/presentation/pages/data/models/team_model.dart';
+import 'package:sky_app/features/profile/presentation/widgets/team_card.dart';
+import 'package:sky_app/features/profile/teams/data/models/team_model.dart';
 
 class TeamArgePage extends StatefulWidget {
   const TeamArgePage({super.key});
@@ -69,9 +69,9 @@ class _TeamArgePageState extends State<TeamArgePage> {
       itemCount: argeTeams.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.1,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.85,
       ),
       itemBuilder: (context, index) {
         return TeamCard(team: argeTeams[index]);

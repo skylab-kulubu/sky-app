@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
-import 'package:sky_app/features/profile/presentation/pages/data/models/team_model.dart';
-
+import 'package:sky_app/features/profile/teams/data/models/team_model.dart';
 
 class TeamCard extends StatelessWidget {
   final Team team;
   const TeamCard({super.key, required this.team});
 
+  @override
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -15,24 +15,19 @@ class TeamCard extends StatelessWidget {
         color: AppColors.cardBackground,
         borderRadius: AppRadiuses.cardBorderRadius,
       ),
-      child: Padding(
-        padding: EdgeInsets.all(12),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _teamIconWithBackground(),
-              const SizedBox(height: 12),
-              _teamTitle(),
-              const SizedBox(height: 4),
-              _teamDescription(),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          _teamIconWithBackground(),
+          const SizedBox(height: 8),
+          _teamTitle(),
+          const SizedBox(height: 4),
+          _teamDescription(),
 
-              const Spacer(),
-              _applyButton(),
-            ],
-          ),
-        ),
+          const Spacer(),
+
+          _applyButton(),
+        ],
       ),
     );
   }
