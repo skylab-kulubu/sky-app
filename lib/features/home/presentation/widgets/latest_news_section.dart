@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
-import 'package:sky_app/features/home/presentation/pages/home_page_model.dart';
+import 'package:sky_app/features/home/presentation/pages/home_page.dart';
 
 class LatestNewsSection extends StatelessWidget {
   const LatestNewsSection({super.key, required this.latestNews});

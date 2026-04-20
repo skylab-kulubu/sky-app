@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sky_app/features/home/presentation/pages/home_page_model.dart';
+import 'package:sky_app/features/home/presentation/pages/home_page.dart';
 
 class EditShortcutsSheet extends StatefulWidget {
   final List<ShortcutItem> allShortcuts;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
-import 'package:sky_app/features/home/presentation/pages/home_page_model.dart';
+import 'package:sky_app/features/home/presentation/pages/home_page.dart';
 
 class ShortcutsSection extends StatelessWidget {
   final List<ShortcutItem> shortcuts;
