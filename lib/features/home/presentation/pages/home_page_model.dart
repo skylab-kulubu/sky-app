@@ -12,22 +12,6 @@ class CarouselItem {
   });
 }
 
-class ShortcutItem {
-  final String label;
-  final String name;
-  final String description;
-  final String iconPath;
-  final Color backgroundColor;
-
-  const ShortcutItem({
-    required this.label,
-    required this.name,
-    required this.description,
-    required this.iconPath,
-    required this.backgroundColor,
-  });
-}
-
 class NewsItem {
   final String imageUrl;
   final String title;
@@ -65,64 +49,7 @@ abstract class HomePageModel extends State<HomePage> {
     ),
   ];
 
-  final List<ShortcutItem> _allShortcuts = [
-    ShortcutItem(
-      label: 'SKY LAB',
-      name: 'Yıldız Sky Lab',
-      description: 'SKY LAB resmi web sitesi',
-      iconPath: 'assets/images/skylab.svg',
-      backgroundColor: Color(0xFF000000),
-    ),
-    ShortcutItem(
-      label: 'YıldızPlace',
-      name: 'YıldızPlace',
-      description: 'YTÜ kampüs haritası ve mekan rehberi',
-      iconPath: 'assets/icons/ytuplace.svg',
-      backgroundColor: Color(0xFF3D1515),
-    ),
-    ShortcutItem(
-      label: 'YTUGuessr',
-      name: 'YTUGuessr',
-      description: 'YTÜ kampüsünü keşfet, konumu tahmin et',
-      iconPath: 'assets/icons/ytuguessr.svg',
-      backgroundColor: Color(0xFF3D1515),
-    ),
-    ShortcutItem(
-      label: 'SKYCLOUD',
-      name: 'SKYCLOUD',
-      description: 'Kulüp dosya paylaşım ve depolama sistemi',
-      iconPath: 'assets/icons/sky_cloud.svg',
-      backgroundColor: Color(0xFF0A2A3D),
-    ),
-    ShortcutItem(
-      label: 'SKYFORMS',
-      name: 'SKYFORMS',
-      description: 'Kulüp anket ve form platformu',
-      iconPath: 'assets/icons/skyforms.svg',
-      backgroundColor: Color(0xFF2E1A4A),
-    ),
-    ShortcutItem(
-      label: 'SKYSEC',
-      name: 'SKYSEC Articles',
-      description: 'Siber güvenlik makaleleri ve yazılar',
-      iconPath: 'assets/icons/skysec.svg',
-      backgroundColor: Color(0xFF2A1F0D),
-    ),
-    ShortcutItem(
-      label: 'Oda Durumu',
-      name: 'Sky Lab Oda Durumu',
-      description: 'Kulüp odasının anlık açık/kapalı durumu',
-      iconPath: 'assets/icons/skylab_room.svg',
-      backgroundColor: Color(0xFF0D2E26),
-    ),
-    ShortcutItem(
-      label: 'Sunucu Durumu',
-      name: 'Sky Lab Sunucu Durumu',
-      description: 'Sunucu ve servis erişilebilirlik durumu',
-      iconPath: 'assets/icons/skylab_server.svg',
-      backgroundColor: Color(0xFF3D2000),
-    ),
-  ];
+  final _allShortcuts = LinksService.list;
 
   final List<NewsItem> latestNews = [
     NewsItem(
@@ -142,7 +69,7 @@ abstract class HomePageModel extends State<HomePage> {
 
   Set<int> _visibleIndices = {0, 1, 2, 3, 4, 5, 6, 7};
 
-  List<ShortcutItem> get _visibleShortcuts => [
+  List<LinkItem> get _visibleShortcuts => [
     for (int i = 0; i < _allShortcuts.length; i++)
       if (_visibleIndices.contains(i)) _allShortcuts[i],
   ];

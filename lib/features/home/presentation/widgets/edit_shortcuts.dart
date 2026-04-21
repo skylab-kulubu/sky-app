@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sky_app/features/home/presentation/pages/home_page.dart';
+import 'package:sky_app/core/models/link_item.dart';
 
 class EditShortcutsSheet extends StatefulWidget {
-  final List<ShortcutItem> allShortcuts;
+  final List<LinkItem> allShortcuts;
   final Set<int> visibleIndices;
   final ValueChanged<Set<int>> onChanged;
 
@@ -50,7 +50,9 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(_sheetBorderRadius)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(_sheetBorderRadius),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -106,11 +108,16 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
                           width: _iconSize,
                           height: _iconSize,
                           decoration: BoxDecoration(
-                            color: item.backgroundColor,
-                            borderRadius: BorderRadius.circular(_iconBorderRadius),
+                            color: item.color.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(
+                              _iconBorderRadius,
+                            ),
                           ),
                           padding: const EdgeInsets.all(_iconPadding),
-                          child: SvgPicture.asset(item.iconPath, fit: BoxFit.contain),
+                          child: SvgPicture.asset(
+                            item.iconPath,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -119,17 +126,17 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
                             children: [
                               Text(
                                 item.name,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 item.description,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[400],
-                                ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: Colors.grey[400]),
                               ),
                             ],
                           ),
@@ -139,14 +146,23 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
                           width: _checkSize,
                           height: _checkSize,
                           decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFF1E90FF) : Colors.transparent,
+                            color: isSelected
+                                ? const Color(0xFF1E90FF)
+                                : Colors.transparent,
                             shape: BoxShape.circle,
                             border: isSelected
                                 ? null
-                                : Border.all(color: Colors.grey[600]!, width: 1.5),
+                                : Border.all(
+                                    color: Colors.grey[600]!,
+                                    width: 1.5,
+                                  ),
                           ),
                           child: isSelected
-                              ? const Icon(Icons.check, color: Colors.white, size: 18)
+                              ? const Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 18,
+                                )
                               : null,
                         ),
                       ],

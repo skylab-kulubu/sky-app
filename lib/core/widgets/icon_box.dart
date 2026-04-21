@@ -1,22 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 
 class IconBox extends StatelessWidget {
-  const IconBox({super.key, required this.icon, required this.iconColor});
+  const IconBox({
+    super.key,
+    required this.icon,
+    required this.color,
+    this.size = 40,
+    this.padding = 10,
+  });
 
-  final IconData icon;
-  final Color iconColor;
+  final String icon;
+  final double? size;
+  final double? padding;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 40,
-      height: 40,
+      padding: EdgeInsets.all(padding!),
+      width: size,
+      height: size,
       decoration: BoxDecoration(
-        color: iconColor.withValues(alpha: 0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadiuses.iconBox),
       ),
-      child: Icon(icon, color: iconColor, size: 22),
+      child: SvgPicture.asset(icon, fit: BoxFit.contain),
     );
   }
 }

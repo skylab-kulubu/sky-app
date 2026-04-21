@@ -6,7 +6,7 @@ import 'package:sky_app/features/home/presentation/pages/home_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/webview_page.dart';
 import 'package:sky_app/features/qr/presentation/pages/qr_page.dart';
-import 'package:sky_app/features/team/presentation/pages/team_page.dart';
+import 'package:sky_app/features/team/presentation/pages/comming_soon_page.dart';
 
 class RouterManager {
   static final GoRouter router = GoRouter(
@@ -43,7 +43,7 @@ class RouterManager {
           GoRoute(
             path: '/team',
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: TeamPage()),
+                const NoTransitionPage(child: CommingSoonPage()),
           ),
           GoRoute(
             path: '/profile',

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/models/link_item.dart';
+import 'package:sky_app/core/services/links_service.dart';
 import 'package:sky_app/features/home/presentation/widgets/custom_carousel_slider.dart';
 import 'package:sky_app/features/home/presentation/widgets/latest_news_section.dart';
 import 'package:sky_app/features/home/presentation/widgets/shortcuts_section.dart';
@@ -27,14 +30,14 @@ class _HomePageState extends HomePageModel {
               children: [
                 CustomCarouselSlider(items: carouselItems),
                 const SizedBox(height: HomePageModel._sectionSpacing),
-                ShortcutsTitle(),
+                _sectionHeader(context, 'Kısayollar'),
                 const SizedBox(height: HomePageModel._titleSpacing),
                 ShortcutsSection(
                   shortcuts: _visibleShortcuts,
                   onEditTap: _openEditSheet,
                 ),
                 const SizedBox(height: HomePageModel._sectionSpacing),
-                LatestNewsTitle(),
+                _sectionHeader(context, 'Son Haberler'),
                 const SizedBox(height: HomePageModel._titleSpacing),
                 LatestNewsSection(latestNews: latestNews),
               ],
@@ -44,40 +47,11 @@ class _HomePageState extends HomePageModel {
       ),
     );
   }
-}
 
-class ShortcutsTitle extends StatelessWidget {
-  const ShortcutsTitle({super.key});
-
-  static const Color _titleColor = Colors.white;
-
-  @override
-  Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.titleMedium?.copyWith(
-      fontWeight: FontWeight.bold,
-      color: _titleColor,
-    );
+  Align _sectionHeader(BuildContext context, String title) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Text('Kısayollar', style: style),
-    );
-  }
-}
-
-class LatestNewsTitle extends StatelessWidget {
-  const LatestNewsTitle({super.key});
-
-  static const Color _titleColor = Colors.white;
-
-  @override
-  Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.titleMedium?.copyWith(
-      fontWeight: FontWeight.bold,
-      color: _titleColor,
-    );
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text('Son Haberler', style: style),
+      child: Text(title, style: context.textTheme.titleMedium),
     );
   }
 }

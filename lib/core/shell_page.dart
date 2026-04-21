@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
+import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
@@ -19,7 +20,32 @@ class ShellPage extends StatelessWidget {
     return Scaffold(
       extendBody: true,
       appBar: appBar(context),
-      body: child,
+      body: Stack(
+        children: [
+          child,
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: IgnorePointer(
+              child: Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.0),
+                      Colors.black.withValues(alpha: 0.4),
+                      Colors.black,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
       bottomNavigationBar: navBar(currentLocation, context),
     );
   }
@@ -30,11 +56,11 @@ class ShellPage extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Color.fromARGB(18, 255, 255, 255),
+          color: AppColors.tileBackgroundColor.withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(AppRadiuses.navbar),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.40),
+              color: Colors.black.withValues(alpha: 0.50),
               blurRadius: 32,
               offset: const Offset(0, 8),
             ),

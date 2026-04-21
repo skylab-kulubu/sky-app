@@ -14,7 +14,7 @@ class ProfileTile extends StatelessWidget {
     this.trailingIcon,
   });
 
-  final IconData icon;
+  final String icon;
   final Color iconColor;
   final String title;
   final String? subtitle;
@@ -31,7 +31,7 @@ class ProfileTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
-              IconBox(icon: icon, iconColor: iconColor),
+              IconBox(icon: icon, color: iconColor),
               const SizedBox(width: 16),
               _textSection(context),
               if (trailingIcon != null)
