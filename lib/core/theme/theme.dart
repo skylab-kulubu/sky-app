@@ -31,7 +31,11 @@ ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   cardColor: Colors.blueGrey.shade900,
   scaffoldBackgroundColor: AppColors.scaffoldBackgroundColor,
-  appBarTheme: AppBarTheme(backgroundColor: Colors.transparent, elevation: 0),
+  appBarTheme: AppBarTheme(
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    surfaceTintColor: Colors.transparent,
+  ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     shape: CircleBorder(),
     backgroundColor: Colors.grey.shade700,
@@ -48,6 +52,7 @@ ThemeData darkTheme = ThemeData(
   textTheme: TextTheme(
     bodyMedium: TextStyle(color: Colors.grey.shade400),
     labelSmall: TextStyle(fontFamily: 'Poppins'),
+    titleMedium: TextStyle(fontFamily: 'Poppins'),
   ),
   snackBarTheme: SnackBarThemeData(
     backgroundColor: Colors.grey.shade800,
