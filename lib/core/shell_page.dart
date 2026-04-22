@@ -134,10 +134,6 @@ class ShellPage extends StatelessWidget {
         width: 44,
         height: 44,
         fit: BoxFit.contain,
-        colorFilter: const ColorFilter.mode(
-          Color.fromRGBO(255, 255, 255, 1),
-          BlendMode.srcIn,
-        ),
       ),
       leadingWidth: 60,
       leading: Padding(
