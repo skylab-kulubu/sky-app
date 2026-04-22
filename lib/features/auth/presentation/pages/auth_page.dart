@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
-import 'package:sky_app/features/auth/presentation/widgets/app_button.dart';
-import 'package:sky_app/features/auth/presentation/widgets/sky_textfield.dart';
+import 'package:sky_app/core/widgets/sky_button.dart';
+import 'package:sky_app/core/widgets/sky_textfield.dart';
 import 'package:go_router/go_router.dart';
 
 part 'auth_pagemodel.dart';
@@ -51,20 +51,11 @@ class _AuthPageState extends AuthPagemodel {
     );
   }
 
-  // --- EXTRACT METHODS ---
-
   Widget _buildHeader() {
     return Column(
       children: [
         const SizedBox(height: 80),
-        SvgPicture.asset(
-          AppAssets.skylab,
-          height: 150,
-          colorFilter: const ColorFilter.mode(
-            Colors.white,
-            BlendMode.srcIn,
-          ), //pembe logoyu beyaza cevirmek icin kullandim
-        ),
+        SvgPicture.asset(AppAssets.skylab, height: 150),
         const SizedBox(height: 24),
         const Text(
           'SKY LAB',
@@ -86,16 +77,13 @@ class _AuthPageState extends AuthPagemodel {
   }
 
   Widget _buildPrimaryLoginButton() {
-    return AppButton(
+    return SkyButton(
       text: 'YTÜ Mail ile Giriş Yap',
       //ytu logosu gelecek
-      icon: const Text(
-        'YTÜ',
-        style: TextStyle(
-          color: Color(0xFF1E529B),
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-        ),
+      icon: SvgPicture.asset(
+        AppAssets.ytu,
+        height: 20,
+        colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
       ),
       backgroundColor: AppColors.buttonColor,
       onPressed: handleNavigate,
@@ -147,7 +135,7 @@ class _AuthPageState extends AuthPagemodel {
       child: showExtraOptions
           ? Column(
               children: [
-                AppButton(
+                SkyButton(
                   text: 'Google ile Giriş Yap',
                   icon: const Icon(
                     Icons.g_mobiledata,
@@ -158,7 +146,7 @@ class _AuthPageState extends AuthPagemodel {
                   onPressed: () {},
                 ),
                 const SizedBox(height: 16),
-                AppButton(
+                SkyButton(
                   text: 'E-posta ile Giriş Yap',
                   icon: const Icon(
                     Icons.mail_outline,
@@ -197,7 +185,7 @@ class _AuthPageState extends AuthPagemodel {
           ),
         ),
         const SizedBox(height: 24),
-        AppButton(
+        SkyButton(
           text: 'Giriş Yap',
           backgroundColor: AppColors.primaryColor,
           onPressed: handleNavigate,

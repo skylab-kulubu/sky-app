@@ -6,6 +6,8 @@ import 'package:sky_app/features/profile/presentation/pages/teams/team_arge_page
 import 'package:sky_app/features/profile/presentation/pages/teams/team_social_page.dart';
 import 'package:sky_app/features/profile/presentation/widgets/tab_label.dart';
 
+//TODO: Basvur'a basilinca calissin.
+
 //revome appbar and bottom navigator bar
 part 'teams_pagemodel.dart';
 

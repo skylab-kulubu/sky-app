@@ -80,6 +80,9 @@ abstract class HomePageModel extends State<HomePage> {
       isScrollControlled: true,
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.75,
+      ),
       builder: (_) => EditShortcutsSheet(
         allShortcuts: _allShortcuts,
         visibleIndices: _visibleIndices,

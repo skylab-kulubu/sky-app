@@ -1,5 +1,6 @@
 class AppAssets {
   static const String skylab = 'assets/images/skylab.svg';
+  static const String ytu = 'assets/images/ytu_logo.svg';
 
   //Teams
   static const String mobilab = 'assets/images/mobilab.svg';
