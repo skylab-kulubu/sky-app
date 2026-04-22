@@ -17,6 +17,7 @@ class AppColors {
   static const textGrayDark = Color(0xFF666666);
   static const textGrayDarker = Color(0xFF555555);
   static const unselectedLabelColor = Color(0xFF888888);
+  static const buttonColor = Color(0xFF303032);
 
   // Divider & Border
   static const dividerColor = Color(0xFF333333);

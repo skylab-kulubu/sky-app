@@ -17,7 +17,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 class RouterManager {
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/home',
+    initialLocation: '/auth',
     routes: [
       GoRoute(path: '/auth', builder: (context, state) => AuthPage()),
 
