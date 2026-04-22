@@ -1,0 +1,90 @@
+part of 'home_page.dart';
+
+class CarouselItem {
+  final String imageUrl;
+  final String title;
+  final String subtitle;
+
+  CarouselItem({
+    required this.imageUrl,
+    required this.title,
+    required this.subtitle,
+  });
+}
+
+class NewsItem {
+  final String imageUrl;
+  final String title;
+  final String description;
+
+  NewsItem({
+    required this.imageUrl,
+    required this.title,
+    required this.description,
+  });
+}
+
+abstract class HomePageModel extends State<HomePage> {
+  static const double _sectionSpacing = 32.0;
+  static const double _titleSpacing = 12.0;
+
+  final List<CarouselItem> carouselItems = [
+    CarouselItem(
+      imageUrl:
+          'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?auto=format&fit=crop&w=400&q=60',
+      title: 'Hackathon 2026 Başvuruları Başladı!',
+      subtitle: '24 saatlik yazılım maratonuna katıl, ödüller kazan!',
+    ),
+    CarouselItem(
+      imageUrl:
+          'https://images.unsplash.com/photo-1522205408450-add114ad53fe?auto=format&fit=crop&w=400&q=60',
+      title: 'Flutter Workshop Serisi',
+      subtitle: 'Her Cuma mobil uygulama geliştirme atölyeleri',
+    ),
+    CarouselItem(
+      imageUrl:
+          'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=60',
+      title: 'AI Konferansı Yaklaşıyor',
+      subtitle: 'Yapay zeka alanında son gelişmeler ve uygulamalar',
+    ),
+  ];
+
+  final _allShortcuts = LinksService.list;
+
+  final List<NewsItem> latestNews = [
+    NewsItem(
+      imageUrl:
+          'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?auto=format&fit=crop&w=400&q=60',
+      title: 'Son Haber 1',
+      description: 'Bu bir örnek haber açıklamasıdır.',
+    ),
+    NewsItem(
+      imageUrl:
+          'https://images.unsplash.com/photo-1522205408450-add114ad53fe?auto=format&fit=crop&w=400&q=60',
+      title: 'Son Haber 2',
+      description:
+          'Bu da başka bir örnek haber açıklamasıdır. aaafsaklfjasjlfşaslşfaslşfasjşlafsklnflksafksaljfşlifjsaişfşsajlfşjlasjflasilşfasşfasjşlaa',
+    ),
+  ];
+
+  Set<int> _visibleIndices = {0, 1, 2, 3, 4, 5, 6, 7};
+
+  List<LinkItem> get _visibleShortcuts => [
+    for (int i = 0; i < _allShortcuts.length; i++)
+      if (_visibleIndices.contains(i)) _allShortcuts[i],
+  ];
+
+  void _openEditSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => EditShortcutsSheet(
+        allShortcuts: _allShortcuts,
+        visibleIndices: _visibleIndices,
+        onChanged: (updated) => setState(() => _visibleIndices = updated),
+      ),
+    );
+  }
+}

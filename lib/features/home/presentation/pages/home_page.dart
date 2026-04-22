@@ -1,29 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/models/link_item.dart';
+import 'package:sky_app/core/services/links_service.dart';
+import 'package:sky_app/features/home/presentation/widgets/custom_carousel_slider.dart';
+import 'package:sky_app/features/home/presentation/widgets/latest_news_section.dart';
+import 'package:sky_app/features/home/presentation/widgets/shortcuts_section.dart';
+import 'package:sky_app/features/home/presentation/widgets/edit_shortcuts.dart';
 
-class HomePage extends StatelessWidget {
+part 'home_page_model.dart';
+
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends HomePageModel {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: AppPaddings.mainPaddingAll,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  context.push('/login');
-                },
-                child: Text("Login"),
-              ),
-            ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: AppPaddings.mainPaddingAll,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                CustomCarouselSlider(items: carouselItems),
+                const SizedBox(height: HomePageModel._sectionSpacing),
+                _sectionHeader(context, 'Kısayollar'),
+                const SizedBox(height: HomePageModel._titleSpacing),
+                ShortcutsSection(
+                  shortcuts: _visibleShortcuts,
+                  onEditTap: _openEditSheet,
+                ),
+                const SizedBox(height: HomePageModel._sectionSpacing),
+                _sectionHeader(context, 'Son Haberler'),
+                const SizedBox(height: HomePageModel._titleSpacing),
+                LatestNewsSection(latestNews: latestNews),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Align _sectionHeader(BuildContext context, String title) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(title, style: context.textTheme.titleMedium),
     );
   }
 }

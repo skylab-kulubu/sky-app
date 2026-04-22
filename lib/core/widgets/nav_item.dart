@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
-import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 
 class NavItem extends StatelessWidget {
@@ -21,6 +20,9 @@ class NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmall = screenWidth < 380;
+
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(AppRadiuses.navitem),
@@ -28,36 +30,35 @@ class NavItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadiuses.navitem),
         onTap: onTap,
         highlightColor: Colors.transparent,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            shape: BoxShape.circle,
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  isSelected ? selectedIcon : unSelectedIcon,
-                  size: AppSizes.icon,
+        splashColor: Colors.transparent,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                isSelected ? selectedIcon : unSelectedIcon,
+                size: 26,
+                color: isSelected
+                    ? context.colorScheme.primary
+                    : context.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.labelSmall?.copyWith(
+                  fontSize: isSmall ? 9 : 11,
+                  height: 1.2,
                   color: isSelected
                       ? context.colorScheme.primary
                       : context.colorScheme.onSurfaceVariant,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Text(
-                    label,
-                    style: context.textTheme.labelSmall?.copyWith(
-                      color: isSelected
-                          ? context.colorScheme.primary
-                          : context.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -17,4 +17,6 @@ class AppRadiuses {
   static const BorderRadius buttonBorderRadius = BorderRadius.all(
     Radius.circular(8),
   );
+  static const double tile = 16;
+  static const double iconBox = 12;
 }
