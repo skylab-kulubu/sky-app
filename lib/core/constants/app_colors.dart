@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Main Colors
   static const primaryColor = Color(0xFF1E90FF);
+  static const cardBackground = Color(0xFF1E1E1E);
+  static const buttonBackground = Color(0xFF263238);
+  static const indicatorColor = Color(0xFF2196F3);
   static const secondaryBlue = Color(0xFF00BFFF);
   static const scaffoldBackgroundColor = Color(0xFF1E1E1E);
   static const tileBackgroundColor = Color(0xFF252525);

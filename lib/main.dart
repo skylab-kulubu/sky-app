@@ -7,7 +7,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => ThemeProvider())],
-      child: const MainApp(),
+      child: MainApp(),
     ),
   );
 }
