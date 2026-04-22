@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
-import 'package:sky_app/features/profile/certificates/data/models/cert_model.dart';
-import 'package:sky_app/features/profile/certificates/presentation/widgets/cert_item.dart';
+import 'package:sky_app/features/profile/data/models/cert_model.dart';
+import 'package:sky_app/features/profile/presentation/widgets/cert_item.dart';
 
 part 'cert_pagemodel.dart';
 
@@ -37,27 +37,6 @@ class _CertPageState extends CertPagemodel {
   AppBar appBar() => AppBar(
     backgroundColor: Colors.transparent,
     elevation: 0,
-    leadingWidth: 52,
-    leading: Padding(
-      padding: const EdgeInsets.only(left: 16.0),
-      child: InkWell(
-        onTap: () => Navigator.pop(context),
-        borderRadius: AppRadiuses.containerBorderRadius,
-        child: Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: AppColors.cardBackground,
-            borderRadius: AppRadiuses.containerBorderRadius,
-          ),
-          child: const Icon(
-            Icons.arrow_back,
-            color: AppColors.textWhite,
-            size: 18,
-          ),
-        ),
-      ),
-    ),
     titleSpacing: 12,
     title: const Text(
       'Sertifikalar',

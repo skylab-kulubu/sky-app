@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
-import 'package:sky_app/features/profile/certificates/data/models/cert_model.dart';
+import 'package:sky_app/features/profile/data/models/cert_model.dart';
 
 class CertItem extends StatelessWidget {
   const CertItem({super.key, required this.certificate});

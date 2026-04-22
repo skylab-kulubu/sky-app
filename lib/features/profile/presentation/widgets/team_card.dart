@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
-import 'package:sky_app/features/profile/teams/data/models/team_model.dart';
+import 'package:sky_app/features/profile/data/models/team_model.dart';
 
 class TeamCard extends StatelessWidget {
   final Team team;

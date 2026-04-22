@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/features/profile/presentation/widgets/team_card.dart';
-import 'package:sky_app/features/profile/teams/data/models/team_model.dart';
+import 'package:sky_app/features/profile/data/models/team_model.dart';
 
 class TeamSocialPage extends StatefulWidget {
   const TeamSocialPage({super.key});
