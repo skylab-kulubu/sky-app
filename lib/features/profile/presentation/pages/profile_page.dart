@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
@@ -87,7 +88,9 @@ class _ProfilePageState extends ProfilePageModel {
               title: 'Ekipler',
               subtitle: 'Kulüp ekiplerini keşfet',
               trailingIcon: Icons.chevron_right_rounded,
-              onTap: () {},
+              onTap: () {
+                context.push('/profile/teams');
+              },
             ),
             _divider(),
             ProfileTile(
@@ -96,7 +99,9 @@ class _ProfilePageState extends ProfilePageModel {
               title: 'Sertifikalar',
               subtitle: 'Bootcamp ve eğitim sertifikaları',
               trailingIcon: Icons.chevron_right_rounded,
-              onTap: () {},
+              onTap: () {
+                context.go('/profile/certificates');
+              },
             ),
           ],
         ),

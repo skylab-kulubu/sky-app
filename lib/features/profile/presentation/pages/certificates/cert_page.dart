@@ -20,15 +20,17 @@ class _CertPageState extends CertPagemodel {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackgroundColor,
       appBar: appBar(),
-      body: Padding(
-        padding: AppPaddings.mainPaddingAll,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            subtitleText(),
-            const SizedBox(height: 16),
-            certificatesListContainer(),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: AppPaddings.mainPaddingAll,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              subtitleText(),
+              const SizedBox(height: 16),
+              certificatesListContainer(),
+            ],
+          ),
         ),
       ),
     );
@@ -50,27 +52,24 @@ class _CertPageState extends CertPagemodel {
 
   Widget subtitleText() => const Text(
     'Bootcamp ve eğitimlerden kazanılan sertifikalar.',
-    style: TextStyle(color: AppColors.textGrey, fontSize: 14),
+    style: TextStyle(color: AppColors.textGray, fontSize: 14),
   );
 
-  Widget certificatesListContainer() => Expanded(
-    child: Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: AppRadiuses.containerBorderRadius,
-      ),
-      child: ListView.separated(
-        itemCount: listOfCert.length,
-
-        separatorBuilder: (context, index) => const Divider(
-          color: AppColors.dividerColor,
-          height: 1,
-          thickness: 1,
-        ),
-        itemBuilder: (context, index) {
-          return CertItem(certificate: listOfCert[index]);
-        },
-      ),
+  Widget certificatesListContainer() => Container(
+    decoration: BoxDecoration(
+      color: AppColors.cardBackground,
+      borderRadius: AppRadiuses.containerBorderRadius,
+    ),
+    child: ListView.separated(
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: listOfCert.length,
+      separatorBuilder: (context, index) =>
+          const Divider(color: AppColors.dividerColor, height: 1, thickness: 1),
+      itemBuilder: (context, index) {
+        return CertItem(certificate: listOfCert[index]);
+      },
     ),
   );
 }

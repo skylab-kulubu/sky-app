@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Team {
-  final IconData icon;
+  final String icon;
   final String name;
   final String description;
   final Color color;

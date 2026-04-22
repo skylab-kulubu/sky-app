@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/features/profile/presentation/widgets/team_card.dart';
 import 'package:sky_app/features/profile/data/models/team_model.dart';
@@ -14,25 +15,25 @@ class _TeamSocialPageState extends State<TeamSocialPage> {
   final List<Team> socialTeams = [
     Team(
       name: "ORGANİZASYON",
-      icon: Icons.celebration,
+      icon: AppAssets.celebration,
       description: "Etkinlik planlama ve organizasyon",
       color: const Color(0xFFE91E63),
     ),
     Team(
       name: "GECEKODU",
-      icon: Icons.code,
+      icon: AppAssets.code,
       description: "Gece kodlama etkinlikleri",
       color: const Color(0xFF3F51B5),
     ),
     Team(
       name: "SOCILAB",
-      icon: Icons.groups_3,
+      icon: AppAssets.people,
       description: "Sosyal medya ve topluluk yönetimi",
       color: const Color(0xFF9C27B0),
     ),
     Team(
       name: "SKYMEDYA",
-      icon: Icons.camera_alt,
+      icon: AppAssets.camera,
       description: "Fotoğraf, video ve içerik üretimi",
       color: const Color(0xFFFFC107),
     ),

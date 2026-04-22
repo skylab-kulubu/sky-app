@@ -18,4 +18,15 @@ class AppAssets {
   static const String email = 'assets/icons/email.svg';
   static const String certificate = 'assets/icons/certificate.svg';
   static const String people = 'assets/icons/people.svg';
+  static const String binary = 'assets/icons/binary.svg';
+  static const String camera = 'assets/icons/camera.svg';
+  static const String celebration = 'assets/icons/celebration.svg';
+  static const String code = 'assets/icons/code.svg';
+  static const String computer = 'assets/icons/computer.svg';
+  static const String gameConsole = 'assets/icons/game_console.svg';
+  static const String link = 'assets/icons/link.svg';
+  static const String phone = 'assets/icons/phone.svg';
+  static const String robot = 'assets/icons/robot.svg';
+  static const String verifiedUser = 'assets/icons/verified_user.svg';
+  static const String web = 'assets/icons/web.svg';
 }

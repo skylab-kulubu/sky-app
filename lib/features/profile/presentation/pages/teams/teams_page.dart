@@ -20,7 +20,6 @@ class _TeamsPageState extends TeamPagesmodel {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackgroundColor,
       appBar: _appBar(context),
       body: Column(children: [_tabBarContainer(), _tabViewArea()]),
     );

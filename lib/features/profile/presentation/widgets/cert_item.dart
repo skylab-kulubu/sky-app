@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
+import 'package:sky_app/core/widgets/icon_box.dart';
 import 'package:sky_app/features/profile/data/models/cert_model.dart';
 
 class CertItem extends StatelessWidget {
@@ -13,23 +15,18 @@ class CertItem extends StatelessWidget {
     return Padding(
       padding: AppPaddings.mainPaddingAll,
       child: Row(
-        children: [_iconContainer(), const SizedBox(width: 16), _textsColumn()],
+        children: [
+          const IconBox(
+            icon: AppAssets.certificate,
+            color: Colors.blue,
+            size: 48,
+          ),
+          const SizedBox(width: 16),
+          _textsColumn(),
+        ],
       ),
     );
   }
-
-  Widget _iconContainer() => Container(
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: Color(0xFF332D21), // Örn: cert background color
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: const Icon(
-      Icons.workspace_premium,
-      color: Colors.orangeAccent,
-      size: 24,
-    ),
-  );
 
   Widget _textsColumn() => Expanded(
     child: Column(
@@ -46,7 +43,7 @@ class CertItem extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           certificate.subtitle,
-          style: const TextStyle(color: AppColors.textGrey, fontSize: 12),
+          style: const TextStyle(color: AppColors.textGray, fontSize: 12),
         ),
       ],
     ),

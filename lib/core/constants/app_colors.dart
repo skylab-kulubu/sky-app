@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Main Colors
   static const primaryColor = Color(0xFF1E90FF);
-  static const cardBackground = Color(0xFF1E1E1E);
+  static const cardBackground = Color(0xFF252525);
   static const buttonBackground = Color(0xFF263238);
   static const indicatorColor = Color(0xFF2196F3);
   static const secondaryBlue = Color(0xFF00BFFF);
   static const scaffoldBackgroundColor = Color(0xFF1E1E1E);
   static const tileBackgroundColor = Color(0xFF252525);
-  
+
   // Text Colors
   static const textWhite = Color(0xFFFFFFFF);
   static const textWhite70 = Color(0xFFF0F0F0);
@@ -35,7 +35,9 @@ class AppColors {
 
   // Opacity Backgrounds (For icon boxes)
   static final primaryBlue10 = const Color(0xFF1E90FF).withValues(alpha: 0.1);
-  static final secondaryBlue9 = const Color(0xFF00BFFF).withValues(alpha: 0.094);
+  static final secondaryBlue9 = const Color(
+    0xFF00BFFF,
+  ).withValues(alpha: 0.094);
   static final teal9 = const Color(0xFF1ABC9C).withValues(alpha: 0.094);
   static final green9 = const Color(0xFF2ECC71).withValues(alpha: 0.094);
   static final purple9 = const Color(0xFF6C5CE7).withValues(alpha: 0.094);

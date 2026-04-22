@@ -4,10 +4,11 @@ import 'package:sky_app/core/shell_page.dart';
 import 'package:sky_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:sky_app/features/calendar/presentation/pages/calendar_page.dart';
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
-import 'package:sky_app/features/profile/certificates/presentation/pages/cert_page.dart';
-import 'package:sky_app/features/profile/contact/presentation/pages/contact_page.dart';
+import 'package:sky_app/features/profile/presentation/pages/certificates/cert_page.dart';
+import 'package:sky_app/features/profile/presentation/pages/contact/contact_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
-import 'package:sky_app/features/profile/teams/presentation/teams_page.dart';
+import 'package:sky_app/features/profile/presentation/pages/teams/teams_page.dart';
+import 'package:sky_app/features/profile/presentation/pages/webview_page.dart';
 import 'package:sky_app/features/qr/presentation/pages/qr_page.dart';
 import 'package:sky_app/features/team/presentation/pages/comming_soon_page.dart';
 

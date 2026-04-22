@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/widgets/icon_box.dart';
 import 'package:sky_app/features/profile/data/models/team_model.dart';
 
 class TeamCard extends StatelessWidget {
   final Team team;
   const TeamCard({super.key, required this.team});
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -18,7 +18,7 @@ class TeamCard extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          _teamIconWithBackground(),
+          IconBox(icon: team.icon, color: team.color, size: 52, padding: 12),
           const SizedBox(height: 8),
           _teamTitle(),
           const SizedBox(height: 4),
@@ -31,15 +31,6 @@ class TeamCard extends StatelessWidget {
       ),
     );
   }
-
-  Widget _teamIconWithBackground() => Container(
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: team.color.withValues(alpha: 0.15),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Icon(team.icon, color: team.color, size: 28),
-  );
 
   Text _teamTitle() => Text(
     team.name,
@@ -55,7 +46,7 @@ class TeamCard extends StatelessWidget {
     textAlign: TextAlign.center,
     maxLines: 2,
     overflow: TextOverflow.ellipsis,
-    style: const TextStyle(color: AppColors.textGrey, fontSize: 10),
+    style: const TextStyle(color: AppColors.textGray, fontSize: 10),
   );
 
   Widget _applyButton() => SizedBox(
