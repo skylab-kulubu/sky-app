@@ -18,7 +18,7 @@ abstract class AuthPagemodel extends State<AuthPage> {
   // --- FONKSİYONLAR ---
 
   void handleNavigate() {
-    context.go('/home');
+    context.go('/home');  // sadece yönlendiriyor, mail kaydı yok
   }
 
   void toggleExtraOptions() {
