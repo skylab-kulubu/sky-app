@@ -48,7 +48,7 @@ class _TeamSocialPageState extends State<TeamSocialPage> {
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 0.85,
+        childAspectRatio: 1.15,
       ),
       itemBuilder: (context, index) {
         return TeamCard(team: socialTeams[index]);

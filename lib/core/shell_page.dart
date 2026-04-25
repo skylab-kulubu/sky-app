@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
@@ -83,7 +84,7 @@ class ShellPage extends StatelessWidget {
               ),
               Expanded(
                 child: NavItem(
-                  label: 'Takvim',
+                  label: 'Etkinlikler',
                   isSelected: currentLocation == '/calendar',
                   onTap: () => context.go('/calendar'),
                   unSelectedIcon: Icons.calendar_today_outlined,
@@ -92,11 +93,13 @@ class ShellPage extends StatelessWidget {
               ),
               Expanded(
                 child: NavItem(
-                  label: 'QR',
-                  isSelected: currentLocation == '/qr',
-                  onTap: () => context.go('/qr'),
-                  unSelectedIcon: Icons.qr_code_outlined,
-                  selectedIcon: Icons.qr_code,
+                  label: 'Biletler',
+                  isSelected: currentLocation == '/tickets',
+                  onTap: () => context.go('/tickets'),
+                  unSelectedIcon: PhosphorIcons.ticket(
+                    PhosphorIconsStyle.regular,
+                  ),
+                  selectedIcon: PhosphorIcons.ticket(PhosphorIconsStyle.fill),
                 ),
               ),
               Expanded(

@@ -9,8 +9,8 @@ import 'package:sky_app/features/profile/presentation/pages/contact/contact_page
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/teams/teams_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/webview_page.dart';
-import 'package:sky_app/features/qr/presentation/pages/qr_page.dart';
 import 'package:sky_app/features/team/presentation/pages/comming_soon_page.dart';
+import 'package:sky_app/features/tickets/presentation/pages/tickets_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -43,9 +43,9 @@ class RouterManager {
                 const NoTransitionPage(child: CalendarPage()),
           ),
           GoRoute(
-            path: '/qr',
+            path: '/tickets',
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: QrPage()),
+                const NoTransitionPage(child: TicketsPage()),
           ),
           GoRoute(
             path: '/team',

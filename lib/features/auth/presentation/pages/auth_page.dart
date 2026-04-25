@@ -6,8 +6,6 @@ import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/core/widgets/sky_textfield.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/services/user_service.dart';
-
 part 'auth_pagemodel.dart';
 
 class AuthPage extends StatefulWidget {

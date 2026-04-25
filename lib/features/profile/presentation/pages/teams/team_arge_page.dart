@@ -72,7 +72,7 @@ class _TeamArgePageState extends State<TeamArgePage> {
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 0.85,
+        childAspectRatio: 1.15,
       ),
       itemBuilder: (context, index) {
         return TeamCard(team: argeTeams[index]);

@@ -17,6 +17,7 @@ class TeamCard extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           IconBox(icon: team.icon, color: team.color, size: 52, padding: 12),
           const SizedBox(height: 8),
@@ -24,9 +25,9 @@ class TeamCard extends StatelessWidget {
           const SizedBox(height: 4),
           _teamDescription(),
 
-          const Spacer(),
-
-          _applyButton(),
+          // TODO: Basvur'a basilinca calissin.
+          //const Spacer(),
+          //_applyButton(),
         ],
       ),
     );

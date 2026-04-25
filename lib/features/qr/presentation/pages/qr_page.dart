@@ -27,6 +27,7 @@ class _QrPageState extends State<QrPage> {
       await _controller?.dispose();
       final controller = MobileScannerController(
         detectionSpeed: DetectionSpeed.noDuplicates,
+        autoStart: false,
       );
       setState(() => _controller = controller);
       await controller.start();
@@ -76,13 +77,21 @@ class _QrPageState extends State<QrPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 72, height: 72,
+                width: 72,
+                height: 72,
                 decoration: BoxDecoration(
                   color: _greenSurface,
                   shape: BoxShape.circle,
-                  border: Border.all(color: _greenLight.withValues(alpha: 0.5), width: 1.5),
+                  border: Border.all(
+                    color: _greenLight.withValues(alpha: 0.5),
+                    width: 1.5,
+                  ),
                 ),
-                child: const Icon(Icons.check_rounded, color: _greenLight, size: 40),
+                child: const Icon(
+                  Icons.check_rounded,
+                  color: _greenLight,
+                  size: 40,
+                ),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -114,7 +123,8 @@ class _QrPageState extends State<QrPage> {
                       ),
                     ),
                     const TextSpan(
-                      text: ', bu harika etkinliğe katılımın başarıyla kaydedildi. Seni aramızda görmek çok güzel!',
+                      text:
+                          ', bu harika etkinliğe katılımın başarıyla kaydedildi. Seni aramızda görmek çok güzel!',
                     ),
                   ],
                 ),
@@ -178,7 +188,8 @@ class _QrPageState extends State<QrPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: frameSize, height: frameSize,
+            width: frameSize,
+            height: frameSize,
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
@@ -188,18 +199,23 @@ class _QrPageState extends State<QrPage> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: _isScanning
-                      ? MobileScanner(controller: _controller!, onDetect: _onDetect)
+                      ? MobileScanner(
+                          controller: _controller!,
+                          onDetect: _onDetect,
+                        )
                       : Center(
-                    child: Icon(
-                      Icons.qr_code_2_rounded,
-                      size: frameSize * 0.5,
-                      color: color.withValues(alpha: 0.65),
-                    ),
-                  ),
+                          child: Icon(
+                            Icons.qr_code_2_rounded,
+                            size: frameSize * 0.5,
+                            color: color.withValues(alpha: 0.65),
+                          ),
+                        ),
                 ),
                 for (final a in [
-                  Alignment.topLeft, Alignment.topRight,
-                  Alignment.bottomLeft, Alignment.bottomRight,
+                  Alignment.topLeft,
+                  Alignment.topRight,
+                  Alignment.bottomLeft,
+                  Alignment.bottomRight,
                 ])
                   _Corner(color: color, alignment: a),
               ],
@@ -211,7 +227,9 @@ class _QrPageState extends State<QrPage> {
           Text(
             'Etkinlik QR kodunu tarayarak etkinliğe\nkatılım sağlayabilirsiniz.',
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.6),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(height: 1.6),
           ),
 
           const SizedBox(height: 28),
@@ -220,17 +238,17 @@ class _QrPageState extends State<QrPage> {
             width: double.infinity,
             child: _isScanning
                 ? ElevatedButton.icon(
-              onPressed: _closeCamera,
-              icon: const Icon(Icons.close, size: 20),
-              label: const Text('Kamerayı Kapat'),
-              style: buttonStyle,
-            )
+                    onPressed: _closeCamera,
+                    icon: const Icon(Icons.close, size: 20),
+                    label: const Text('Kamerayı Kapat'),
+                    style: buttonStyle,
+                  )
                 : ElevatedButton.icon(
-              onPressed: _openCamera,
-              icon: const Icon(Icons.camera_alt_rounded, size: 20),
-              label: const Text('Kamerayı Aç'),
-              style: buttonStyle,
-            ),
+                    onPressed: _openCamera,
+                    icon: const Icon(Icons.camera_alt_rounded, size: 20),
+                    label: const Text('Kamerayı Aç'),
+                    style: buttonStyle,
+                  ),
           ),
 
           const SizedBox(height: 12),
@@ -238,9 +256,9 @@ class _QrPageState extends State<QrPage> {
           Text(
             'Not: QR kod için kamera erişimi gereklidir.',
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.grey.shade600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
           ),
         ],
       ),
@@ -260,8 +278,10 @@ class _Corner extends StatelessWidget {
     final isTop = alignment.y == -1;
     final isLeft = alignment.x == -1;
     return Positioned(
-      top: isTop ? 0 : null, bottom: isTop ? null : 0,
-      left: isLeft ? 0 : null, right: isLeft ? null : 0,
+      top: isTop ? 0 : null,
+      bottom: isTop ? null : 0,
+      left: isLeft ? 0 : null,
+      right: isLeft ? null : 0,
       child: CustomPaint(
         size: const Size(28, 28),
         painter: _CornerPainter(color: color, isTop: isTop, isLeft: isLeft),
@@ -271,21 +291,46 @@ class _Corner extends StatelessWidget {
 }
 
 class _CornerPainter extends CustomPainter {
-  const _CornerPainter({required this.color, required this.isTop, required this.isLeft});
+  const _CornerPainter({
+    required this.color,
+    required this.isTop,
+    required this.isLeft,
+  });
   final Color color;
   final bool isTop, isLeft;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = color..strokeWidth = 3.5..strokeCap = StrokeCap.round..style = PaintingStyle.stroke;
+    final p = Paint()
+      ..color = color
+      ..strokeWidth = 3.5
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
     const r = 8.0;
     final w = size.width;
     final h = size.height;
     final path = Path();
-    if (isTop && isLeft)  { path.moveTo(0, h); path.lineTo(0, r); path.arcToPoint(Offset(r, 0), radius: const Radius.circular(r)); path.lineTo(w, 0); }
-    else if (isTop)       { path.moveTo(0, 0); path.lineTo(w - r, 0); path.arcToPoint(Offset(w, r), radius: const Radius.circular(r)); path.lineTo(w, h); }
-    else if (isLeft)      { path.moveTo(w, h); path.lineTo(r, h); path.arcToPoint(Offset(0, h - r), radius: const Radius.circular(r)); path.lineTo(0, 0); }
-    else                  { path.moveTo(w, 0); path.lineTo(w, h - r); path.arcToPoint(Offset(w - r, h), radius: const Radius.circular(r)); path.lineTo(0, h); }
+    if (isTop && isLeft) {
+      path.moveTo(0, h);
+      path.lineTo(0, r);
+      path.arcToPoint(Offset(r, 0), radius: const Radius.circular(r));
+      path.lineTo(w, 0);
+    } else if (isTop) {
+      path.moveTo(0, 0);
+      path.lineTo(w - r, 0);
+      path.arcToPoint(Offset(w, r), radius: const Radius.circular(r));
+      path.lineTo(w, h);
+    } else if (isLeft) {
+      path.moveTo(w, h);
+      path.lineTo(r, h);
+      path.arcToPoint(Offset(0, h - r), radius: const Radius.circular(r));
+      path.lineTo(0, 0);
+    } else {
+      path.moveTo(w, 0);
+      path.lineTo(w, h - r);
+      path.arcToPoint(Offset(w - r, h), radius: const Radius.circular(r));
+      path.lineTo(0, h);
+    }
     canvas.drawPath(path, p);
   }
 
