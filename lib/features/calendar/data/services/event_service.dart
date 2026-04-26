@@ -1,4 +1,4 @@
-import 'package:sky_app/core/models/event_model.dart';
+import 'package:sky_app/features/calendar/data/models/event_model.dart';
 
 class EventService {
   static final List<EventModel> events = [

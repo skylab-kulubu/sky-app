@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
-import 'package:sky_app/core/models/event_model.dart';
-import 'package:sky_app/core/services/event_service.dart';
+import 'package:sky_app/features/calendar/data/models/event_model.dart';
+import 'package:sky_app/features/calendar/data/services/event_service.dart';
 
 part 'calendar_page_model.dart';
 
@@ -18,25 +18,22 @@ class _CalendarPageState extends CalendarPageModel {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: ListView.builder(
-          padding: AppPaddings.mainPaddingAll,
-          itemCount: events.length,
-          itemBuilder: (context, index) {
-            final event = events[index];
-            return Padding(
-              key: Key(event.id),
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: _buildEventCard(event),
-            );
-          },
-        ),
+      body: ListView.builder(
+        padding: AppPaddings.mainPaddingAll,
+        itemCount: events.length,
+        itemBuilder: (context, index) {
+          final event = events[index];
+          return Padding(
+            key: Key(event.id),
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: _eventCard(event),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildEventCard(EventModel event) {
+  Widget _eventCard(EventModel event) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
@@ -91,12 +88,12 @@ class _CalendarPageState extends CalendarPageModel {
             ),
           ],
         ),
-        trailing: _buildTrailingButton(event),
+        trailing: _trailinButton(event),
       ),
     );
   }
 
-  Widget _buildTrailingButton(EventModel event) {
+  Widget _trailinButton(EventModel event) {
     if (event.isJoinable) {
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 130),
@@ -108,7 +105,10 @@ class _CalendarPageState extends CalendarPageModel {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 8.0,
+            ),
           ),
           child: const Text(
             'Katıl',
@@ -127,28 +127,28 @@ class _CalendarPageState extends CalendarPageModel {
             borderRadius: BorderRadius.circular(20.0),
             border: Border.all(color: AppColors.orange.withValues(alpha: 0.3)),
           ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.access_time,
-              size: 16.0,
-              color: AppColors.orange,
-            ),
-            const SizedBox(width: 4.0),
-            Flexible(
-              child: Text(
-                'Yakında',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.orange,
-                  fontWeight: FontWeight.w500,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.access_time,
+                size: 16.0,
+                color: AppColors.orange,
+              ),
+              const SizedBox(width: 4.0),
+              Flexible(
+                child: Text(
+                  'Yakında',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.orange,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
         ),
       );
     }
