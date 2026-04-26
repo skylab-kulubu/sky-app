@@ -5,6 +5,7 @@ import 'package:sky_app/features/auth/data/services/auth_service.dart';
 import 'package:sky_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:sky_app/features/calendar/presentation/pages/calendar_page.dart';
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
+import 'package:sky_app/features/notification/presentation/pages/notification_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/certificates/cert_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/contact/contact_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
@@ -34,6 +35,10 @@ class RouterManager {
     },
     routes: [
       GoRoute(path: '/auth', builder: (context, state) => AuthPage()),
+      GoRoute(
+        path: '/notification',
+        builder: (context, state) => NotificationPage(),
+      ),
 
       GoRoute(
         path: '/webview',

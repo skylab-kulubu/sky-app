@@ -157,7 +157,7 @@ class ShellPage extends StatelessWidget {
             width: 44,
             height: 44,
             child: IconButton(
-              onPressed: () {},
+              onPressed: () => context.push('/notification'),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints.tightFor(width: 44, height: 44),
               iconSize: 26,
