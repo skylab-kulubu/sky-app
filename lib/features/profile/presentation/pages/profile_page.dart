@@ -96,17 +96,17 @@ class _ProfilePageState extends ProfilePageModel {
                 context.push('/profile/teams');
               },
             ),
-            _divider(),
-            ProfileTile(
-              icon: AppAssets.certificate,
-              iconColor: AppColors.primaryColor,
-              title: 'Sertifikalar',
-              subtitle: 'Bootcamp ve eğitim sertifikaları',
-              trailingIcon: Icons.chevron_right_rounded,
-              onTap: () {
-                context.go('/profile/certificates');
-              },
-            ),
+            // _divider(),
+            // ProfileTile(
+            //   icon: AppAssets.certificate,
+            //   iconColor: AppColors.primaryColor,
+            //   title: 'Sertifikalar',
+            //   subtitle: 'Bootcamp ve eğitim sertifikaları',
+            //   trailingIcon: Icons.chevron_right_rounded,
+            //   onTap: () {
+            //     context.go('/profile/certificates');
+            //   },
+            // ),
           ],
         ),
       ),

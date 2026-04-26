@@ -102,15 +102,15 @@ class ShellPage extends StatelessWidget {
                   selectedIcon: PhosphorIcons.ticket(PhosphorIconsStyle.fill),
                 ),
               ),
-              Expanded(
-                child: NavItem(
-                  label: 'Ekip',
-                  isSelected: currentLocation == '/team',
-                  onTap: () => context.go('/team'),
-                  unSelectedIcon: Icons.people_outline,
-                  selectedIcon: Icons.people,
-                ),
-              ),
+              // Expanded(
+              //   child: NavItem(
+              //     label: 'Ekip',
+              //     isSelected: currentLocation == '/team',
+              //     onTap: () => context.go('/team'),
+              //     unSelectedIcon: Icons.people_outline,
+              //     selectedIcon: Icons.people,
+              //   ),
+              // ),
               Expanded(
                 child: NavItem(
                   label: 'Profil',

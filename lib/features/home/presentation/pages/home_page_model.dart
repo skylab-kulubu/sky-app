@@ -1,29 +1,5 @@
 part of 'home_page.dart';
 
-class CarouselItem {
-  final String imageUrl;
-  final String title;
-  final String subtitle;
-
-  CarouselItem({
-    required this.imageUrl,
-    required this.title,
-    required this.subtitle,
-  });
-}
-
-class NewsItem {
-  final String imageUrl;
-  final String title;
-  final String description;
-
-  NewsItem({
-    required this.imageUrl,
-    required this.title,
-    required this.description,
-  });
-}
-
 abstract class HomePageModel extends State<HomePage> {
   static const double _sectionSpacing = 32.0;
   static const double _titleSpacing = 12.0;
@@ -90,4 +66,28 @@ abstract class HomePageModel extends State<HomePage> {
       ),
     );
   }
+}
+
+class CarouselItem {
+  final String imageUrl;
+  final String title;
+  final String subtitle;
+
+  CarouselItem({
+    required this.imageUrl,
+    required this.title,
+    required this.subtitle,
+  });
+}
+
+class NewsItem {
+  final String imageUrl;
+  final String title;
+  final String description;
+
+  NewsItem({
+    required this.imageUrl,
+    required this.title,
+    required this.description,
+  });
 }
