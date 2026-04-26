@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/services/links_service.dart';
 import 'package:sky_app/core/services/webview_service.dart';
+import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/profile/presentation/widgets/profile_tile.dart';
 import 'package:sky_app/features/profile/presentation/widgets/profile_header.dart';
 
@@ -21,13 +23,15 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends ProfilePageModel {
   @override
   Widget build(BuildContext context) {
+    final user = context.read<UserProvider>().user;
+
     return ListView(
       padding: AppPaddings.mainPaddingAll,
       children: [
-        const ProfileHeader(
-          name: 'Yakup Emin',
-          email: 'skylab@std.yildiz.edu.tr',
-          teamName: 'MOBILAB',
+        ProfileHeader(
+          name: user!.name,
+          email: user.email,
+          teamName: user.teamsDisplay,
         ),
         _sectionHeader('KULÜP'),
         _clubSection(),

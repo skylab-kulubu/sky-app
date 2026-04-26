@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/shell_page.dart';
+import 'package:sky_app/features/auth/data/services/auth_service.dart';
 import 'package:sky_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:sky_app/features/calendar/presentation/pages/calendar_page.dart';
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
@@ -17,7 +18,20 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 class RouterManager {
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/auth',
+    initialLocation: '/home',
+    redirect: (context, state) async {
+      final AuthService authService = AuthService();
+      final bool isLoggedIn = await authService.isLoggedIn();
+      final bool isAuthRoute = state.matchedLocation == '/auth';
+
+      if (!isLoggedIn && !isAuthRoute) {
+        return '/auth';
+      }
+      if (isLoggedIn && isAuthRoute) {
+        return '/home';
+      }
+      return null;
+    },
     routes: [
       GoRoute(path: '/auth', builder: (context, state) => AuthPage()),
 
