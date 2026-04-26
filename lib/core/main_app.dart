@@ -12,10 +12,12 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
+  late final RouterManager _routerManager;
+
   @override
   void initState() {
     super.initState();
-    context.read<UserProvider>().tryAutoLogin();
+    _routerManager = RouterManager(context.read<UserProvider>());
   }
 
   @override
@@ -24,7 +26,7 @@ class _MainAppState extends State<MainApp> {
       debugShowCheckedModeBanner: false,
       title: 'SkyApp',
       theme: Provider.of<ThemeProvider>(context).themeData,
-      routerConfig: RouterManager.router,
+      routerConfig: _routerManager.router,
     );
   }
 }

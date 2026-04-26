@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/shell_page.dart';
-import 'package:sky_app/features/auth/data/services/auth_service.dart';
 import 'package:sky_app/features/auth/presentation/pages/auth_page.dart';
+import 'package:sky_app/features/auth/presentation/pages/splash_page.dart';
+import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/presentation/pages/calendar_page.dart';
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/certificates/cert_page.dart';
@@ -16,23 +17,29 @@ import 'package:sky_app/features/tickets/presentation/pages/tickets_page.dart';
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 class RouterManager {
-  static final GoRouter router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    initialLocation: '/home',
-    redirect: (context, state) async {
-      final AuthService authService = AuthService();
-      final bool isLoggedIn = await authService.isLoggedIn();
-      final bool isAuthRoute = state.matchedLocation == '/auth';
+  final UserProvider userProvider;
 
-      if (!isLoggedIn && !isAuthRoute) {
-        return '/auth';
-      }
-      if (isLoggedIn && isAuthRoute) {
-        return '/home';
-      }
+  RouterManager(this.userProvider);
+
+  late final GoRouter router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: '/',
+    refreshListenable: userProvider,
+    redirect: (context, state) {
+      final bool isInitialized = userProvider.isInitialized;
+      final bool isLoggedIn = userProvider.user != null;
+      final bool isAuthRoute = state.matchedLocation == '/auth';
+      final bool isSplashRoute = state.matchedLocation == '/';
+
+      if (!isInitialized) return isSplashRoute ? null : '/';
+      if (!isLoggedIn && !isAuthRoute) return '/auth';
+      if (isLoggedIn && (isAuthRoute || isSplashRoute)) return '/home';
+
       return null;
     },
     routes: [
+      GoRoute(path: '/', builder: (context, state) => const SplashPage()),
+
       GoRoute(path: '/auth', builder: (context, state) => AuthPage()),
 
       GoRoute(
