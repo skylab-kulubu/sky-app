@@ -21,8 +21,11 @@ class _CalendarPageState extends CalendarPageModel {
     return Scaffold(
       body: ListView.builder(
         padding: AppPaddings.mainPaddingAll,
-        itemCount: events.length,
+        itemCount: events.length + 1,
         itemBuilder: (context, index) {
+          if (index == events.length) {
+            return const SizedBox(height: 100);
+          }
           final event = events[index];
           return Padding(
             key: Key(event.id),
@@ -215,13 +218,13 @@ class _CalendarPageState extends CalendarPageModel {
                       const SizedBox(height: 8.0),
                       Row(
                         children: [
-                          Icon(Icons.location_on, size: 16, color: context.colorScheme.primary),
+                          Icon(Icons.location_on, size: 16, color: AppColors.primaryColor),
                           const SizedBox(width: 4.0),
                           Expanded(
                             child: Text(
                               event.location.isNotEmpty ? event.location : 'Konum Belirtilmemiş',
                               style: context.textTheme.bodyMedium?.copyWith(
-                                color: context.colorScheme.onSurfaceVariant,
+                                color: AppColors.textGray,
                               ),
                             ),
                           ),
@@ -255,6 +258,11 @@ class _CalendarPageState extends CalendarPageModel {
     final days = event.eventDays;
     if (days.isEmpty) return;
 
+    if (days.length == 1) {
+      showConfirmationDialog(context, event, days);
+      return;
+    }
+
     List<DateTime> selectedDays = List.from(days);
 
     showDialog(
@@ -278,7 +286,7 @@ class _CalendarPageState extends CalendarPageModel {
                         '${day.day.toString().padLeft(2, '0')}.${day.month.toString().padLeft(2, '0')}.${day.year}',
                         style: context.textTheme.bodyLarge,
                       ),
-                      activeColor: context.colorScheme.primary,
+                      activeColor: AppColors.primaryColor,
                       contentPadding: EdgeInsets.zero,
                       onChanged: (val) {
                         setDialogState(() {
