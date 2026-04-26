@@ -70,5 +70,17 @@
 	<key>NSCameraUsageDescription</key>
     <string>Camera access is required to scan event QR codes and confirm your attendance.</string>
 
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.yildizskylab.app</string>
+			</array>
+		</dict>
+	</array>
+
 </dict>
 </plist>
