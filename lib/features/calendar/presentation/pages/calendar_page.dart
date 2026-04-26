@@ -106,11 +106,7 @@ class _CalendarPageState extends CalendarPageModel {
   }
 
   Widget _trailinButton(EventModel event) {
-<<<<<<< HEAD
-    if (event.isJoinable) {
-=======
     if (event.active) {
->>>>>>> 1130271 (abi wifi sifresi ne)
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 130),
         child: ElevatedButton(

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/shell_page.dart';
 import 'package:sky_app/features/auth/presentation/pages/auth_page.dart';
+import 'package:sky_app/features/auth/presentation/pages/splash_page.dart';
+import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/presentation/pages/calendar_page.dart';
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
+import 'package:sky_app/features/notification/presentation/pages/notification_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/certificates/cert_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/contact/contact_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
@@ -15,11 +18,34 @@ import 'package:sky_app/features/tickets/presentation/pages/tickets_page.dart';
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 class RouterManager {
-  static final GoRouter router = GoRouter(
+  final UserProvider userProvider;
+
+  RouterManager(this.userProvider);
+
+  late final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/auth',
+    initialLocation: '/',
+    refreshListenable: userProvider,
+    redirect: (context, state) {
+      final bool isInitialized = userProvider.isInitialized;
+      final bool isLoggedIn = userProvider.user != null;
+      final bool isAuthRoute = state.matchedLocation == '/auth';
+      final bool isSplashRoute = state.matchedLocation == '/';
+
+      if (!isInitialized) return isSplashRoute ? null : '/';
+      if (!isLoggedIn && !isAuthRoute) return '/auth';
+      if (isLoggedIn && (isAuthRoute || isSplashRoute)) return '/home';
+
+      return null;
+    },
     routes: [
+      GoRoute(path: '/', builder: (context, state) => const SplashPage()),
+
       GoRoute(path: '/auth', builder: (context, state) => AuthPage()),
+      GoRoute(
+        path: '/notification',
+        builder: (context, state) => NotificationPage(),
+      ),
 
       GoRoute(
         path: '/webview',

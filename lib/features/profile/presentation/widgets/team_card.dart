@@ -50,24 +50,24 @@ class TeamCard extends StatelessWidget {
     style: const TextStyle(color: AppColors.textGray, fontSize: 10),
   );
 
-  Widget _applyButton() => SizedBox(
-    width: double.infinity,
-    child: ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.buttonBackground,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-      child: Text(
-        "Başvur",
-        style: TextStyle(
-          fontSize: 12,
-          color: AppColors.primaryColor,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    ),
-  );
+  // Widget _applyButton() => SizedBox(
+  //   width: double.infinity,
+  //   child: ElevatedButton(
+  //     onPressed: () {},
+  //     style: ElevatedButton.styleFrom(
+  //       backgroundColor: AppColors.buttonBackground,
+  //       elevation: 0,
+  //       padding: const EdgeInsets.symmetric(vertical: 10),
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+  //     ),
+  //     child: Text(
+  //       "Başvur",
+  //       style: TextStyle(
+  //         fontSize: 12,
+  //         color: AppColors.primaryColor,
+  //         fontWeight: FontWeight.w600,
+  //       ),
+  //     ),
+  //   ),
+  // );
 }

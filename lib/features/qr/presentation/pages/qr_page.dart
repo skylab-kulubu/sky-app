@@ -1,8 +1,10 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sky_app/core/services/user_service.dart';
+import 'package:sky_app/features/auth/data/services/auth_service.dart';
 
 const _green = Color(0xFF22C55E);
 const _greenLight = Color(0xFF86EFAC);
@@ -48,7 +50,7 @@ class _QrPageState extends State<QrPage> {
 
     _controller?.stop();
 
-    final profile = await UserService.getProfile();
+    final profile = await AuthService.getUser();
     final name = profile['name'] ?? '';
     final email = profile['email'] ?? '';
 
@@ -337,3 +339,4 @@ class _CornerPainter extends CustomPainter {
   @override
   bool shouldRepaint(_CornerPainter old) => old.color != color;
 }
+*/

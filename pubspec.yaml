@@ -12,6 +12,7 @@ dependencies:
   
   #Storage
   shared_preferences: 2.5.5
+  flutter_secure_storage: 10.0.0
 
   #State Management
   provider: 6.1.5+1
@@ -33,6 +34,10 @@ dependencies:
 
   #Permissions
   permission_handler: 12.0.1
+
+  #Auth
+  flutter_appauth: 12.0.0
+  timeago: ^3.7.1
 
 
 dev_dependencies:

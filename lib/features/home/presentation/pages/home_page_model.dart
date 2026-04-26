@@ -1,29 +1,5 @@
 part of 'home_page.dart';
 
-class CarouselItem {
-  final String imageUrl;
-  final String title;
-  final String subtitle;
-
-  CarouselItem({
-    required this.imageUrl,
-    required this.title,
-    required this.subtitle,
-  });
-}
-
-class NewsItem {
-  final String imageUrl;
-  final String title;
-  final String description;
-
-  NewsItem({
-    required this.imageUrl,
-    required this.title,
-    required this.description,
-  });
-}
-
 abstract class HomePageModel extends State<HomePage> {
   static const double _sectionSpacing = 32.0;
   static const double _titleSpacing = 12.0;
@@ -49,8 +25,6 @@ abstract class HomePageModel extends State<HomePage> {
     ),
   ];
 
-  final _allShortcuts = LinksService.list;
-
   final List<NewsItem> latestNews = [
     NewsItem(
       imageUrl:
@@ -67,27 +41,53 @@ abstract class HomePageModel extends State<HomePage> {
     ),
   ];
 
-  Set<int> _visibleIndices = {0, 1, 2, 3, 4, 5, 6, 7};
+  // final _allShortcuts = LinksService.list;
 
-  List<LinkItem> get _visibleShortcuts => [
-    for (int i = 0; i < _allShortcuts.length; i++)
-      if (_visibleIndices.contains(i)) _allShortcuts[i],
-  ];
+  // final Set<int> _visibleIndices = {0, 1, 2, 3, 4, 5, 6, 7};
 
-  void _openEditSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useRootNavigator: true,
-      backgroundColor: Colors.transparent,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.75,
-      ),
-      builder: (_) => EditShortcutsSheet(
-        allShortcuts: _allShortcuts,
-        visibleIndices: _visibleIndices,
-        onChanged: (updated) => setState(() => _visibleIndices = updated),
-      ),
-    );
-  }
+  // List<LinkItem> get _visibleShortcuts => [
+  //   for (int i = 0; i < _allShortcuts.length; i++)
+  //     if (_visibleIndices.contains(i)) _allShortcuts[i],
+  // ];
+
+  // void _openEditSheet() {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     useRootNavigator: true,
+  //     backgroundColor: Colors.transparent,
+  //     constraints: BoxConstraints(
+  //       maxHeight: MediaQuery.of(context).size.height * 0.75,
+  //     ),
+  //     builder: (_) => EditShortcutsSheet(
+  //       allShortcuts: _allShortcuts,
+  //       visibleIndices: _visibleIndices,
+  //       onChanged: (updated) => setState(() => _visibleIndices = updated),
+  //     ),
+  //   );
+  // }
+}
+
+class CarouselItem {
+  final String imageUrl;
+  final String title;
+  final String subtitle;
+
+  CarouselItem({
+    required this.imageUrl,
+    required this.title,
+    required this.subtitle,
+  });
+}
+
+class NewsItem {
+  final String imageUrl;
+  final String title;
+  final String description;
+
+  NewsItem({
+    required this.imageUrl,
+    required this.title,
+    required this.description,
+  });
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
-import 'package:sky_app/core/widgets/sky_textfield.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 
 part 'auth_pagemodel.dart';
 
@@ -19,7 +20,6 @@ class _AuthPageState extends AuthPagemodel {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -31,28 +31,19 @@ class _AuthPageState extends AuthPagemodel {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildHeader(),
-                      SizedBox(height: 24),
-                      _buildPrimaryLoginButton(),
-                      // const SizedBox(height: 32),
-                      // _buildDivider(),
-                      // const SizedBox(height: 24),
-                      // _buildExtraOptions(),
-                      // const SizedBox(height: 40),
-                    ],
+                    children: [_header(), SizedBox(height: 24), _loginButton()],
                   ),
                 ),
               ),
             ),
-            _buildFooter(),
+            _footer(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _header() {
     return Column(
       children: [
         const SizedBox(height: 80),
@@ -77,150 +68,34 @@ class _AuthPageState extends AuthPagemodel {
     );
   }
 
-  Widget _buildPrimaryLoginButton() {
+  Widget _loginButton() {
     return SkyButton(
-      text: 'YTÜ Mail ile Giriş Yap',
-      //ytu logosu gelecek
-      icon: SvgPicture.asset(
-        AppAssets.ytu,
-        height: 20,
-        colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-      ),
-      backgroundColor: AppColors.buttonColor,
-      onPressed: handleNavigate,
-    );
-  }
-
-  Widget _buildDivider() {
-    return GestureDetector(
-      onTap: toggleExtraOptions,
-      child: Row(
-        children: [
-          const Expanded(
-            child: Divider(color: AppColors.unselectedLabelColor, thickness: 1),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: [
-                const Text(
-                  'YTÜ öğrencisi değil misin?',
-                  style: TextStyle(
-                    color: AppColors.unselectedLabelColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Icon(
-                  showExtraOptions
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: AppColors.unselectedLabelColor,
-                  size: 16,
-                ),
-              ],
-            ),
-          ),
-          const Expanded(
-            child: Divider(color: AppColors.unselectedLabelColor, thickness: 1),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExtraOptions() {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      child: showExtraOptions
-          ? Column(
-              children: [
-                SkyButton(
-                  text: 'Google ile Giriş Yap',
-                  icon: const Icon(
-                    Icons.g_mobiledata,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                  backgroundColor: AppColors.buttonColor,
-                  onPressed: () {},
-                ),
-                const SizedBox(height: 16),
-                SkyButton(
-                  text: 'E-posta ile Giriş Yap',
-                  icon: const Icon(
-                    Icons.mail_outline,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  backgroundColor: AppColors.buttonColor,
-                  onPressed: selectEmailLogin,
-                ),
-                if (emailSelected) _buildEmailForm(),
-              ],
-            )
-          : const SizedBox(),
-    );
-  }
-
-  Widget _buildEmailForm() {
-    return Column(
-      children: [
-        const SizedBox(height: 24),
-        SkyTextfield(hintText: 'E-posta', controller: emailController),
-        const SizedBox(height: 16),
-        SkyTextfield(
-          hintText: 'Şifre',
-          obscureText: obscurePassword,
-          controller: passwordController,
-          suffixIcon: IconButton(
-            icon: Icon(
-              obscurePassword
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
-              color: AppColors.unselectedLabelColor,
-              size: 20,
-            ),
-            onPressed: toggleObscurePassword,
-          ),
-        ),
-        const SizedBox(height: 24),
-        SkyButton(
-          text: 'Giriş Yap',
-          backgroundColor: AppColors.primaryColor,
-          onPressed: handleNavigate,
-        ),
-        const SizedBox(height: 16),
-        GestureDetector(
-          onTap: () {},
-          child: const Text.rich(
-            TextSpan(
-              text: 'Hesabın yok mu? ',
-              style: TextStyle(
-                color: AppColors.unselectedLabelColor,
-                fontSize: 12,
+      text: 'e-skylab ile Giriş Yap',
+      icon: isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
               ),
-              children: [
-                TextSpan(
-                  text: 'Kayıt ol',
-                  style: TextStyle(
-                    color: AppColors.primaryColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    decoration: TextDecoration.underline,
-                    decorationColor: AppColors.primaryColor,
-                  ),
-                ),
-              ],
+            )
+          : SvgPicture.asset(
+              AppAssets.skylab,
+              height: 20,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              ),
             ),
-          ),
-        ),
-      ],
+      backgroundColor: AppColors.buttonColor,
+      onPressed: () {
+        isLoading ? null : handleAuth();
+      },
     );
   }
 
-  Widget _buildFooter() {
+  Widget _footer() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 24.0, top: 12.0),
       child: Row(
