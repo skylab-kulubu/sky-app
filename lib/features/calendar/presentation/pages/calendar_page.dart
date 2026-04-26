@@ -101,7 +101,7 @@ class _CalendarPageState extends CalendarPageModel {
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 130),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () => showJoinConfirmationDialog(event),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryColor,
             foregroundColor: AppColors.textWhite,
