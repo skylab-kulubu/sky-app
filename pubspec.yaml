@@ -37,6 +37,7 @@ dependencies:
 
   #Auth
   flutter_appauth: 12.0.0
+  dio:
   timeago: ^3.7.1
 
 
