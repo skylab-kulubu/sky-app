@@ -3,6 +3,7 @@ import 'package:sky_app/core/constants/app_colors.dart';
 
 //light theme
 ThemeData lightTheme = ThemeData(
+  useMaterial3: true,
   brightness: Brightness.light,
   cardColor: Colors.blueGrey,
   scaffoldBackgroundColor: Colors.white,
@@ -28,6 +29,7 @@ ThemeData lightTheme = ThemeData(
 
 //dark theme
 ThemeData darkTheme = ThemeData(
+  useMaterial3: true,
   brightness: Brightness.dark,
   cardColor: Colors.blueGrey.shade900,
   scaffoldBackgroundColor: AppColors.scaffoldBackgroundColor,

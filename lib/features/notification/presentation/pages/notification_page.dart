@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
-import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/notification/data/services/notification_service.dart';
@@ -105,10 +104,14 @@ class _NotificationPageState extends State<NotificationPage> {
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              title: Text(notifications[index].title),
+                              backgroundColor: AppColors.cardBackground,
+                              title: Text(
+                                notifications[index].title,
+                                style: context.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                               content: Text(notifications[index].content),
-                              backgroundColor:
-                                  AppColors.scaffoldBackgroundColor,
                               actions: [
                                 ElevatedButton(
                                   onPressed: () {
