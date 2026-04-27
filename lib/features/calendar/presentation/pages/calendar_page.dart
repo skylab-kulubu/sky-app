@@ -37,10 +37,13 @@ class _CalendarPageState extends State<CalendarPage> {
         return Scaffold(
           body: events.isEmpty
               ? Center(
-                  child: Text(
-                    'Gösterilecek etkinlik bulunamadı.',
-                    style: context.textTheme.bodyLarge?.copyWith(
-                      color: AppColors.textGray,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 100.0),
+                    child: Text(
+                      'Gösterilecek etkinlik bulunamadı.',
+                      style: context.textTheme.bodyLarge?.copyWith(
+                        color: AppColors.textGray,
+                      ),
                     ),
                   ),
                 )

@@ -53,7 +53,7 @@ class ShellPage extends StatelessWidget {
 
   Padding navBar(String currentLocation, BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 40, top: 10),
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 30, top: 10),
       child: Container(
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(

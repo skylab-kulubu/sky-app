@@ -16,9 +16,6 @@ class CustomCarouselSlider extends StatefulWidget {
 class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
   static const int _initialVirtualPage = 10000;
   static const double _sliderHeight = 220.0;
-  static const double _arrowButtonSize = 32.0;
-  static const double _arrowIconSize = 22.0;
-  static const double _arrowEdgeOffset = 10.0;
   static const double _dotHeight = 8.0;
   static const double _dotActiveWidth = 12.0;
   static const double _dotInactiveWidth = 8.0;
@@ -137,66 +134,6 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
                       ],
                     );
                   },
-                ),
-              ),
-            ),
-            Positioned(
-              left: _arrowEdgeOffset,
-              top: 0,
-              bottom: 0,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () {
-                    _startAutoPlay();
-                    _pageController.animateToPage(
-                      _currentPage - 1,
-                      duration: const Duration(milliseconds: 350),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                  child: Container(
-                    width: _arrowButtonSize,
-                    height: _arrowButtonSize,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.black.withValues(alpha: 0.45),
-                    ),
-                    child: Icon(
-                      Icons.chevron_left,
-                      color: Colors.white,
-                      size: _arrowIconSize,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: _arrowEdgeOffset,
-              top: 0,
-              bottom: 0,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () {
-                    _startAutoPlay();
-                    _pageController.animateToPage(
-                      _currentPage + 1,
-                      duration: const Duration(milliseconds: 350),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                  child: Container(
-                    width: _arrowButtonSize,
-                    height: _arrowButtonSize,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.black.withValues(alpha: 0.45),
-                    ),
-                    child: Icon(
-                      Icons.chevron_right,
-                      color: Colors.white,
-                      size: _arrowIconSize,
-                    ),
-                  ),
                 ),
               ),
             ),
