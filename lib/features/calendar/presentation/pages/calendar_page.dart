@@ -1,12 +1,12 @@
+import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
-import 'package:sky_app/features/calendar/data/services/event_service.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
-part 'calendar_page_model.dart';
+import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -15,25 +15,52 @@ class CalendarPage extends StatefulWidget {
   State<CalendarPage> createState() => _CalendarPageState();
 }
 
-class _CalendarPageState extends CalendarPageModel {
+class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView.builder(
-        padding: AppPaddings.mainPaddingAll,
-        itemCount: events.length + 1,
-        itemBuilder: (context, index) {
-          if (index == events.length) {
-            return const SizedBox(height: 100);
-          }
-          final event = events[index];
-          return Padding(
-            key: Key(event.id),
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: _eventCard(event),
+    return Consumer<EventProvider>(
+      builder: (context, eventProvider, child) {
+        final events = eventProvider.events;
+
+        if (!eventProvider.isInitialized && !eventProvider.isLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
           );
-        },
-      ),
+        }
+
+        if (eventProvider.isLoading && events.isEmpty) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        return Scaffold(
+          body: events.isEmpty
+              ? Center(
+                  child: Text(
+                    'Gösterilecek etkinlik bulunamadı.',
+                    style: context.textTheme.bodyLarge?.copyWith(
+                      color: AppColors.textGray,
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  padding: AppPaddings.mainPaddingAll,
+                  itemCount: events.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == events.length) {
+                      return const SizedBox(height: 100);
+                    }
+                    final event = events[index];
+                    return Padding(
+                      key: Key(event.id),
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: _eventCard(event),
+                    );
+                  },
+                ),
+        );
+      },
     );
   }
 
@@ -49,17 +76,20 @@ class _CalendarPageState extends CalendarPageModel {
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(12.0),
           child: event.coverImageUrl.isNotEmpty
-              ? Image.network(
-                  event.coverImageUrl,
+              ? CachedNetworkImage(
+                  imageUrl: event.coverImageUrl,
                   width: 60,
                   height: 60,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
-                    'assets/images/skylab.svg',
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.contain,
-                  ),
+                  placeholder: (context, url) =>
+                      CircularProgressIndicator.adaptive(),
+                  errorBuilder: (context, error, stackTrace) =>
+                      SvgPicture.asset(
+                        'assets/images/skylab.svg',
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.contain,
+                      ),
                 )
               : SvgPicture.asset(
                   'assets/images/skylab.svg',
@@ -172,21 +202,25 @@ class _CalendarPageState extends CalendarPageModel {
       useRootNavigator: true,
       builder: (dialogContext) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16.0)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16.0),
+                  ),
                   child: event.coverImageUrl.isNotEmpty
                       ? Image.network(
                           event.coverImageUrl,
                           width: double.infinity,
                           height: 200,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => SvgPicture.asset(
+                          errorBuilder: (_, _, _) => SvgPicture.asset(
                             'assets/images/skylab.svg',
                             width: double.infinity,
                             height: 200,
@@ -214,11 +248,17 @@ class _CalendarPageState extends CalendarPageModel {
                       const SizedBox(height: 8.0),
                       Row(
                         children: [
-                          Icon(Icons.location_on, size: 16, color: AppColors.primaryColor),
+                          Icon(
+                            Icons.location_on,
+                            size: 16,
+                            color: AppColors.primaryColor,
+                          ),
                           const SizedBox(width: 4.0),
                           Expanded(
                             child: Text(
-                              event.location.isNotEmpty ? event.location : 'Konum Belirtilmemiş',
+                              event.location.isNotEmpty
+                                  ? event.location
+                                  : 'Konum Belirtilmemiş',
                               style: context.textTheme.bodyMedium?.copyWith(
                                 color: AppColors.textGray,
                               ),
@@ -228,7 +268,9 @@ class _CalendarPageState extends CalendarPageModel {
                       ),
                       const SizedBox(height: 16.0),
                       Text(
-                        event.description.isNotEmpty ? event.description : 'Açıklama bulunmuyor.',
+                        event.description.isNotEmpty
+                            ? event.description
+                            : 'Açıklama bulunmuyor.',
                         style: context.textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 24.0),
@@ -236,7 +278,10 @@ class _CalendarPageState extends CalendarPageModel {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () => Navigator.pop(dialogContext),
-                          child: Text('Kapat', style: context.textTheme.bodyMedium),
+                          child: Text(
+                            'Kapat',
+                            style: context.textTheme.bodyMedium,
+                          ),
                         ),
                       ),
                     ],
@@ -268,15 +313,24 @@ class _CalendarPageState extends CalendarPageModel {
         return StatefulBuilder(
           builder: (ctx, setDialogState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-              title: Text('Katılacağın Günler', style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              title: Text(
+                'Katılacağın Günler',
+                style: context.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: days.map((day) {
                     final isSelected = selectedDays.contains(day);
                     return CheckboxListTile(
-                      checkboxShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+                      checkboxShape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
                       value: isSelected,
                       title: Text(
                         '${day.day.toString().padLeft(2, '0')}.${day.month.toString().padLeft(2, '0')}.${day.year}',
@@ -300,7 +354,12 @@ class _CalendarPageState extends CalendarPageModel {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
-                  child: Text('İptal', style: context.textTheme.bodyMedium?.copyWith(color: AppColors.textGray)),
+                  child: Text(
+                    'İptal',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textGray,
+                    ),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: selectedDays.isEmpty
@@ -313,7 +372,13 @@ class _CalendarPageState extends CalendarPageModel {
                     backgroundColor: AppColors.primaryColor,
                     foregroundColor: AppColors.textWhite,
                   ),
-                  child: Text('Devam Et', style: context.textTheme.bodyMedium?.copyWith(color: AppColors.textWhite, fontWeight: FontWeight.w600)),
+                  child: Text(
+                    'Devam Et',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textWhite,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ],
             );
@@ -323,14 +388,25 @@ class _CalendarPageState extends CalendarPageModel {
     );
   }
 
-  void showConfirmationDialog(BuildContext context, EventModel event, List<DateTime> selectedDays) {
+  void showConfirmationDialog(
+    BuildContext context,
+    EventModel event,
+    List<DateTime> selectedDays,
+  ) {
     showDialog(
       context: context,
       useRootNavigator: true,
       builder: (dialogContext) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-          title: Text('Emin misin?', style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          title: Text(
+            'Emin misin?',
+            style: context.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           content: Text(
             '${event.name} etkinliğine ${selectedDays.length} gün için katılım kaydın oluşturulacak. Onaylıyor musun?',
             style: context.textTheme.bodyMedium,
@@ -338,20 +414,38 @@ class _CalendarPageState extends CalendarPageModel {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: Text('İptal', style: context.textTheme.bodyMedium?.copyWith(color: AppColors.textGray)),
+              child: Text(
+                'İptal',
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textGray,
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Kaydın başarıyla alındı!', style: context.textTheme.bodyMedium?.copyWith(color: AppColors.textWhite))),
+                  SnackBar(
+                    content: Text(
+                      'Kaydın başarıyla alındı!',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textWhite,
+                      ),
+                    ),
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryColor,
                 foregroundColor: AppColors.textWhite,
               ),
-              child: Text('Onayla', style: context.textTheme.bodyMedium?.copyWith(color: AppColors.textWhite, fontWeight: FontWeight.w600)),
+              child: Text(
+                'Onayla',
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textWhite,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         );
