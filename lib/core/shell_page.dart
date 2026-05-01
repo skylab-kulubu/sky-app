@@ -92,7 +92,7 @@ class ShellPage extends StatelessWidget {
               ),
               Expanded(
                 child: NavItem(
-                  label: 'QR',
+                  label: 'Bilet',
                   isSelected: currentLocation == '/qr',
                   onTap: () => context.go('/qr'),
                   unSelectedIcon: Icons.qr_code_outlined,
