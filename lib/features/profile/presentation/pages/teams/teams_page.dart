@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/widgets/tab_label.dart';
 import 'package:sky_app/features/profile/presentation/pages/teams/team_arge_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/teams/team_social_page.dart';
-import 'package:sky_app/features/profile/presentation/widgets/tab_label.dart';
 
 //TODO: Basvur'a basilinca calissin.
 
@@ -76,8 +76,11 @@ class _TeamsPageState extends TeamPagesmodel {
           child: TabLabel(icon: Icons.biotech, label: "AR-GE"),
         ),
       ),
-      Tab(
-        child: TabLabel(icon: Icons.groups, label: "Sosyal"),
+      ClipRRect(
+        borderRadius: BorderRadiusGeometry.all(Radius.circular(10)),
+        child: Tab(
+          child: TabLabel(icon: Icons.groups, label: "Sosyal"),
+        ),
       ),
     ],
   );
