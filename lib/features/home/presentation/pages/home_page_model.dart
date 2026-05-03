@@ -4,27 +4,6 @@ abstract class HomePageModel extends State<HomePage> {
   static const double _sectionSpacing = 32.0;
   static const double _titleSpacing = 12.0;
 
-  final List<CarouselItem> carouselItems = [
-    CarouselItem(
-      imageUrl:
-          'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?auto=format&fit=crop&w=400&q=60',
-      title: 'Hackathon 2026 Başvuruları Başladı!',
-      subtitle: '24 saatlik yazılım maratonuna katıl, ödüller kazan!',
-    ),
-    CarouselItem(
-      imageUrl:
-          'https://images.unsplash.com/photo-1522205408450-add114ad53fe?auto=format&fit=crop&w=400&q=60',
-      title: 'Flutter Workshop Serisi',
-      subtitle: 'Her Cuma mobil uygulama geliştirme atölyeleri',
-    ),
-    CarouselItem(
-      imageUrl:
-          'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=60',
-      title: 'AI Konferansı Yaklaşıyor',
-      subtitle: 'Yapay zeka alanında son gelişmeler ve uygulamalar',
-    ),
-  ];
-
   final List<NewsItem> latestNews = [
     NewsItem(
       imageUrl:
@@ -41,7 +20,7 @@ abstract class HomePageModel extends State<HomePage> {
     ),
   ];
 
-  // final _allShortcuts = LinksService.list;
+
 
   // final Set<int> _visibleIndices = {0, 1, 2, 3, 4, 5, 6, 7};
 
@@ -66,18 +45,6 @@ abstract class HomePageModel extends State<HomePage> {
   //     ),
   //   );
   // }
-}
-
-class CarouselItem {
-  final String imageUrl;
-  final String title;
-  final String subtitle;
-
-  CarouselItem({
-    required this.imageUrl,
-    required this.title,
-    required this.subtitle,
-  });
 }
 
 class NewsItem {

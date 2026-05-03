@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/features/home/data/services/announcement_service.dart';
 import 'package:sky_app/features/home/presentation/widgets/custom_carousel_slider.dart';
 import 'package:sky_app/features/home/presentation/widgets/latest_news_section.dart';
 

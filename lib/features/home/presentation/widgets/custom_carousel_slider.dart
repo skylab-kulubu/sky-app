@@ -2,12 +2,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
-import 'package:sky_app/features/home/presentation/pages/home_page.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/features/home/data/models/announcement_model.dart';
 
 class CustomCarouselSlider extends StatefulWidget {
   const CustomCarouselSlider({super.key, required this.items});
 
-  final List<CarouselItem> items;
+  final List<AnnouncementModel> items;
 
   @override
   State<CustomCarouselSlider> createState() => _CustomCarouselSliderState();
@@ -63,6 +64,47 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
     );
   }
 
+  void _showAnnouncementDialog(BuildContext context, AnnouncementModel item) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          scrollable: true,
+          contentPadding: const EdgeInsets.all(20),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(item.image, fit: BoxFit.cover),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                item.title,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              Text(item.subtitle),
+            ],
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: Color(0xFF333333), width: 2),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Tamam'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _autoPlayTimer?.cancel();
@@ -86,52 +128,60 @@ class _CustomCarouselSliderState extends State<CustomCarouselSlider> {
                   onPageChanged: (page) => setState(() => _currentPage = page),
                   itemBuilder: (context, index) {
                     final item = widget.items[index % widget.items.length];
-                    return Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.network(item.imageUrl, fit: BoxFit.cover),
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                Colors.black.withValues(alpha: 0.75),
-                              ],
-                              stops: const [0.4, 1.0],
+                    return GestureDetector(
+                      onTap: () {
+                        _showAnnouncementDialog(context, item);
+                      },
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset(item.image, fit: BoxFit.cover),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withValues(alpha: 0.75),
+                                ],
+                                stops: const [0.4, 1.0],
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          bottom: _textBottomOffset,
-                          left: _textHorizontalPadding,
-                          right: _textHorizontalPadding,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.title,
-                                style: Theme.of(context).textTheme.titleMedium
-                                    ?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                item.subtitle,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.85,
+                          Positioned(
+                            bottom: _textBottomOffset,
+                            left: _textHorizontalPadding,
+                            right: _textHorizontalPadding,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.title,
+
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                    ),
-                              ),
-                            ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  item.subtitle,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.85,
+                                        ),
+                                      ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   },
                 ),
