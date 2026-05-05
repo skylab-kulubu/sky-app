@@ -1,4 +1,5 @@
 class UserModel {
+  final String id;
   final String name;
   final String givenName;
   final String familyName;
@@ -11,6 +12,7 @@ class UserModel {
   final List<String> realmRoles;
 
   const UserModel({
+    required this.id,
     required this.name,
     required this.givenName,
     required this.familyName,
@@ -25,6 +27,7 @@ class UserModel {
 
   factory UserModel.fromJwt(Map<String, dynamic> payload) {
     return UserModel(
+      id: payload['sub'] ?? '',
       name: payload['name'] ?? '',
       givenName: payload['given_name'] ?? '',
       familyName: payload['family_name'] ?? '',

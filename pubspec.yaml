@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
   
   #Storage
   shared_preferences: 2.5.5
@@ -40,6 +42,7 @@ dependencies:
 
   #Auth
   flutter_appauth: 12.0.0
+  crypto: ^3.0.7
 
 
 dev_dependencies:

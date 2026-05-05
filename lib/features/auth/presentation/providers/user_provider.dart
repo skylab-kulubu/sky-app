@@ -1,6 +1,5 @@
 import 'dart:developer';
-
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sky_app/features/auth/data/models/user_model.dart';
 import 'package:sky_app/features/auth/data/services/auth_service.dart';
 
@@ -15,7 +14,7 @@ class UserProvider extends ChangeNotifier {
   Future<bool> login() async {
     notifyListeners();
     final success = await _authService.login();
-    if (success) {
+    if (success && !kIsWeb) {
       _user = await _authService.getUser();
     }
     notifyListeners();
@@ -40,5 +39,14 @@ class UserProvider extends ChangeNotifier {
       _isInitialized = true;
       notifyListeners();
     }
+  }
+
+  Future<void> handleWebAuth(String code) async {
+    final success = await _authService.handleWebCallback(code);
+    if (success) {
+      _user = await _authService.getUser();
+    }
+    _isInitialized = true;
+    notifyListeners();
   }
 }

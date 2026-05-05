@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -22,10 +23,27 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _initApp() async {
-    await Future.wait([
-      context.read<UserProvider>().tryAutoLogin(),
-      context.read<EventProvider>().fetchEvents(),
-    ]);
+    final userProvider = context.read<UserProvider>();
+    final eventProvider = context.read<EventProvider>();
+
+    if (kIsWeb) {
+      final uri = Uri.base;
+      if (uri.queryParameters.containsKey('code')) {
+        final code = uri.queryParameters['code']!;
+        await userProvider.handleWebAuth(code);
+
+        if (userProvider.user != null) {
+          await eventProvider.fetchEvents();
+        }
+        return;
+      }
+    }
+
+    await userProvider.tryAutoLogin();
+
+    if (userProvider.user != null) {
+      await eventProvider.fetchEvents();
+    }
   }
 
   @override
