@@ -96,6 +96,7 @@ class _ProfilePageState extends ProfilePageModel {
                 context.push('/profile/teams');
               },
             ),
+
             // _divider(),
             // ProfileTile(
             //   icon: AppAssets.certificate,
