@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
-import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/home/data/models/announcement_model.dart';
 
 class CustomCarouselSlider extends StatefulWidget {

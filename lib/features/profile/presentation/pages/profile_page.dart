@@ -38,7 +38,7 @@ class _ProfilePageState extends ProfilePageModel {
         _sectionHeader('BAĞLANTILAR'),
         _linksSection(),
         const SizedBox(height: 20),
-        _contactSection(),
+        // _contactSection(),
         const SizedBox(height: 12),
         ClipRRect(
           borderRadius: BorderRadius.circular(AppRadiuses.tile),
@@ -146,24 +146,24 @@ class _ProfilePageState extends ProfilePageModel {
     );
   }
 
-  Widget _contactSection() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadiuses.tile),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.tileBackgroundColor,
-          borderRadius: BorderRadius.circular(AppRadiuses.tile),
-        ),
-        child: ProfileTile(
-          icon: AppAssets.email,
-          iconColor: AppColors.primaryColor,
-          title: 'İletişim',
-          trailingIcon: Icons.chevron_right_rounded,
-          onTap: () {},
-        ),
-      ),
-    );
-  }
+  // Widget _contactSection() {
+  //   return ClipRRect(
+  //     borderRadius: BorderRadius.circular(AppRadiuses.tile),
+  //     child: Container(
+  //       decoration: BoxDecoration(
+  //         color: AppColors.tileBackgroundColor,
+  //         borderRadius: BorderRadius.circular(AppRadiuses.tile),
+  //       ),
+  //       child: ProfileTile(
+  //         icon: AppAssets.email,
+  //         iconColor: AppColors.primaryColor,
+  //         title: 'İletişim',
+  //         trailingIcon: Icons.chevron_right_rounded,
+  //         onTap: () {},
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _divider() => const Divider(
     height: 1,

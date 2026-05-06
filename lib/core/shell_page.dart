@@ -5,8 +5,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
-import 'package:sky_app/core/constants/app_sizes.dart';
-import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/nav_item.dart';
 
 class ShellPage extends StatelessWidget {
@@ -150,26 +148,26 @@ class ShellPage extends StatelessWidget {
           ),
         ),
       ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 5),
-          child: SizedBox(
-            width: 44,
-            height: 44,
-            child: IconButton(
-              onPressed: () => context.push('/notification'),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints.tightFor(width: 44, height: 44),
-              iconSize: 26,
-              icon: Icon(
-                Icons.notifications_outlined,
-                size: AppSizes.icon,
-                color: context.colorScheme.onSurface,
-              ),
-            ),
-          ),
-        ),
-      ],
+      // actions: [
+      //   Padding(
+      //     padding: const EdgeInsets.only(right: 5),
+      //     child: SizedBox(
+      //       width: 44,
+      //       height: 44,
+      //       child: IconButton(
+      //         onPressed: () => context.push('/notification'),
+      //         padding: EdgeInsets.zero,
+      //         constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+      //         iconSize: 26,
+      //         icon: Icon(
+      //           Icons.notifications_outlined,
+      //           size: AppSizes.icon,
+      //           color: context.colorScheme.onSurface,
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ],
     );
   }
 }

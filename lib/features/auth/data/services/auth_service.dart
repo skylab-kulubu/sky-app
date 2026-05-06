@@ -16,7 +16,7 @@ class AuthService {
 
   static const String _clientId = 'skyapp';
   static const String _redirectUrl = kIsWeb
-      ? 'http://localhost:8080/'
+      ? 'https://app.yildizskylab.com/'
       : 'com.yildizskylab.app:/oauth2redirect';
   static const String _issuer = 'https://e.yildizskylab.com/realms/e-skylab';
   static const List<String> _scopes = [
