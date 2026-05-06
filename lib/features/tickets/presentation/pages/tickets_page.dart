@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
-import 'package:sky_app/core/widgets/tab_label.dart';
-import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/tickets/presentation/pages/active_tickets_page.dart';
 import 'package:sky_app/features/tickets/presentation/pages/past_tickets_page.dart';
 import 'package:sky_app/features/tickets/presentation/widgets/tickets_tab_bar.dart';
