@@ -63,7 +63,6 @@ class _Header extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _StatusBadge(isActive: isActive),
           const SizedBox(height: 10),
           Text(
             eventName.toUpperCase(),
@@ -96,42 +95,42 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _StatusBadge extends StatelessWidget {
-  final bool isActive;
+// class _StatusBadge extends StatelessWidget {
+//   final bool isActive;
 
-  const _StatusBadge({required this.isActive});
+//   const _StatusBadge({required this.isActive});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.black26,
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: isActive ? AppColors.green : AppColors.textGray,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            isActive ? 'Aktif Bilet' : 'Geçmiş Bilet',
-            style: Theme.of(
-              context,
-            ).textTheme.labelMedium?.copyWith(color: AppColors.textWhite),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+//       decoration: BoxDecoration(
+//         color: Colors.black26,
+//         borderRadius: BorderRadius.circular(100),
+//       ),
+//       child: Row(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           Container(
+//             width: 8,
+//             height: 8,
+//             decoration: BoxDecoration(
+//               color: isActive ? AppColors.green : AppColors.textGray,
+//               shape: BoxShape.circle,
+//             ),
+//           ),
+//           const SizedBox(width: 6),
+//           Text(
+//             isActive ? 'Aktif Bilet' : 'Geçmiş Bilet',
+//             style: Theme.of(
+//               context,
+//             ).textTheme.labelMedium?.copyWith(color: AppColors.textWhite),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class _Details extends StatelessWidget {
   final String date;

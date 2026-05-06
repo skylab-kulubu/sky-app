@@ -8,6 +8,7 @@ class EventModel {
   final String endDate;
   final String formUrl;
   final bool active;
+  final String typeName;
 
   EventModel({
     required this.id,
@@ -19,6 +20,7 @@ class EventModel {
     required this.endDate,
     required this.formUrl,
     required this.active,
+    required this.typeName,
   });
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class EventModel {
       endDate: json['endDate'] as String? ?? '',
       formUrl: json['formUrl'] as String? ?? '',
       active: json['active'] as bool? ?? false,
+      typeName: json['type']['name'] as String? ?? '',
     );
   }
 
@@ -40,11 +43,11 @@ class EventModel {
     try {
       final start = DateTime.parse(startDate);
       final end = DateTime.parse(endDate);
-      
+
       final days = <DateTime>[];
       var current = DateTime(start.year, start.month, start.day);
       final last = DateTime(end.year, end.month, end.day);
-      
+
       while (!current.isAfter(last)) {
         days.add(current);
         current = current.add(const Duration(days: 1));

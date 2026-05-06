@@ -45,8 +45,8 @@ class CheckInService {
       final token = await _authService.getAccessToken();
       if (token == null) return [];
 
-      final events = await _eventService.fetchEvents();
-      final activeEvent = events.where((e) => e.active).firstOrNull;
+      final activeEvents = await _eventService.fetchActiveEvents();
+      final activeEvent = activeEvents.firstOrNull;
       if (activeEvent == null) return [];
 
       final response = await _dio.get<dynamic>(

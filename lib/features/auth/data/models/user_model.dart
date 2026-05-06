@@ -42,6 +42,7 @@ class UserModel {
   }
 
   static const List<String> _teamRoles = [
+    'AGC',
     'MOBILAB',
     'AIRLAB',
     'ALGOLAB',
@@ -56,10 +57,25 @@ class UserModel {
     'DK',
     'YK',
     'SKYDEVOPS',
+    'YILDIZJAM',
   ];
 
   List<String> get teams =>
       realmRoles.where((role) => _teamRoles.contains(role)).toList();
+
+  bool isOrganizerFor(String activeEventTypeName) {
+    if (activeEventTypeName.isEmpty) return false;
+    return realmRoles.contains(activeEventTypeName);
+  }
+
+  bool isOrganizerForAny(Iterable<String> activeEventTypeNames) {
+    for (final activeEventTypeName in activeEventTypeNames) {
+      if (isOrganizerFor(activeEventTypeName)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   String get teamsDisplay => teams.isEmpty ? '' : teams.join(' • ');
 }

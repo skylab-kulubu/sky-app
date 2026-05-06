@@ -1,9 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
+import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/tickets/presentation/pages/active_tickets_page.dart';
 import 'package:sky_app/features/tickets/presentation/pages/past_tickets_page.dart';
 import 'package:sky_app/features/tickets/presentation/widgets/tickets_tab_bar.dart';
@@ -17,8 +22,6 @@ class TicketsPage extends StatefulWidget {
 
 class _TicketsPageState extends State<TicketsPage>
     with SingleTickerProviderStateMixin {
-  bool get isOrganizer =>
-      true; // TODO context.read<UserProvider>().user!.isOrganizer;
   late final TabController tabController;
 
   @override
@@ -35,6 +38,15 @@ class _TicketsPageState extends State<TicketsPage>
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<UserProvider>().user;
+    final activeEvents = context.watch<EventProvider>().activeEvents;
+    final activeEventTypeNames = activeEvents.map((event) => event.typeName);
+    final isOrganizer = user?.isOrganizerForAny(activeEventTypeNames) ?? false;
+
+    log(
+      'User teams: ${user?.teamsDisplay}, Active event types: ${activeEvents.map((e) => e.typeName).join(', ')}, Is organizer: $isOrganizer',
+    );
+
     return Scaffold(
       body: Padding(
         padding: AppPaddings.mainPaddingAll,
@@ -61,7 +73,7 @@ class _TicketsPageState extends State<TicketsPage>
 }
 
 class _OrganizerButton extends StatelessWidget {
-  const _OrganizerButton({super.key});
+  const _OrganizerButton();
 
   @override
   Widget build(BuildContext context) {

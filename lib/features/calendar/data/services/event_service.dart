@@ -12,8 +12,16 @@ class EventService {
   );
 
   Future<List<EventModel>> fetchEvents() async {
+    return _fetchEvents('/api/events');
+  }
+
+  Future<List<EventModel>> fetchActiveEvents() async {
+    return _fetchEvents('/api/events/active');
+  }
+
+  Future<List<EventModel>> _fetchEvents(String path) async {
     try {
-      final response = await _dio.get<dynamic>('/api/events');
+      final response = await _dio.get<dynamic>(path);
       dynamic rawData = response.data;
       if (rawData is String) {
         rawData = jsonDecode(rawData);

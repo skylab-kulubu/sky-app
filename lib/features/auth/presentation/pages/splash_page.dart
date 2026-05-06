@@ -34,6 +34,7 @@ class _SplashPageState extends State<SplashPage> {
 
         if (userProvider.user != null) {
           await eventProvider.fetchEvents();
+          await eventProvider.fetchActiveEvents();
         }
         return;
       }
@@ -43,6 +44,7 @@ class _SplashPageState extends State<SplashPage> {
 
     if (userProvider.user != null) {
       await eventProvider.fetchEvents();
+      await eventProvider.fetchActiveEvents();
     }
   }
 
