@@ -1,58 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
-import 'package:sky_app/features/tickets/data/models/ticket_model.dart';
-import 'package:sky_app/features/tickets/data/services/tickets_service.dart';
+import 'package:sky_app/features/tickets/presentation/providers/ticket_provider.dart';
 import 'package:sky_app/features/tickets/presentation/widgets/ticket_card.dart';
 
-class PastTicketsPage extends StatefulWidget {
+class PastTicketsPage extends StatelessWidget {
   const PastTicketsPage({super.key});
 
   @override
-  State<PastTicketsPage> createState() => _PastTicketsPageState();
-}
-
-class _PastTicketsPageState extends State<PastTicketsPage> {
-  final TicketsService _ticketsService = TicketsService();
-
-  List<TicketModel> _tickets = [];
-  bool _isLoading = true;
-  bool _hasError = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchTickets();
-  }
-
-  Future<void> _fetchTickets() async {
-    setState(() {
-      _isLoading = true;
-      _hasError = false;
-    });
-
-    try {
-      final all = await _ticketsService.fetchMyTickets();
-      if (!mounted) return;
-      setState(() {
-        _tickets = all.where((t) => !t.isActive).toList(growable: false);
-        _isLoading = false;
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        _hasError = true;
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
+    final provider = context.watch<TicketProvider>();
+    final tickets = provider.pastTickets;
+
+    if (provider.isLoading && provider.tickets.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_hasError) {
+    if (provider.hasError && provider.tickets.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -60,7 +24,9 @@ class _PastTicketsPageState extends State<PastTicketsPage> {
             const Text('Biletler yüklenemedi.'),
             const SizedBox(height: 12),
             TextButton(
-              onPressed: _fetchTickets,
+              onPressed: () => context.read<TicketProvider>().fetchTickets(
+                forceRefresh: true,
+              ),
               child: const Text('Tekrar dene'),
             ),
           ],
@@ -68,15 +34,15 @@ class _PastTicketsPageState extends State<PastTicketsPage> {
       );
     }
 
-    if (_tickets.isEmpty) {
+    if (tickets.isEmpty) {
       return const Center(child: Text('Geçmiş biletiniz bulunmuyor.'));
     }
 
     return ListView.separated(
-      itemCount: _tickets.length,
+      itemCount: tickets.length,
       separatorBuilder: (_, _) => SizedBox(height: AppSizes.bigSpace),
       itemBuilder: (context, index) {
-        final ticket = _tickets[index];
+        final ticket = tickets[index];
         return TicketCard(
           eventName: ticket.event.name,
           location: ticket.event.location,

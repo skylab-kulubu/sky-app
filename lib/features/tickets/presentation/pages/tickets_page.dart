@@ -11,6 +11,7 @@ import 'package:sky_app/features/auth/presentation/providers/user_provider.dart'
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/tickets/presentation/pages/active_tickets_page.dart';
 import 'package:sky_app/features/tickets/presentation/pages/past_tickets_page.dart';
+import 'package:sky_app/features/tickets/presentation/providers/ticket_provider.dart';
 import 'package:sky_app/features/tickets/presentation/widgets/tickets_tab_bar.dart';
 
 class TicketsPage extends StatefulWidget {
@@ -28,6 +29,13 @@ class _TicketsPageState extends State<TicketsPage>
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final ticketProvider = context.read<TicketProvider>();
+      if (!ticketProvider.isInitialized) {
+        ticketProvider.fetchTickets();
+      }
+    });
   }
 
   @override

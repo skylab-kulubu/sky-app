@@ -4,6 +4,7 @@ import 'package:sky_app/core/main_app.dart';
 import 'package:sky_app/core/theme/theme_provider.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
+import 'package:sky_app/features/tickets/presentation/providers/ticket_provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter_web_plugins/url_strategy.dart';
 
@@ -18,6 +19,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => EventProvider()),
+        ChangeNotifierProvider(create: (_) => TicketProvider()),
       ],
       child: MainApp(),
     ),

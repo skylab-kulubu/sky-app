@@ -68,4 +68,8 @@ class EventProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> joinEvent(String eventId) async {
+    return await _eventService.joinEvent(eventId);
+  }
 }

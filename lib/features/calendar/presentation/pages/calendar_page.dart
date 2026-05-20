@@ -17,6 +17,11 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<EventProvider>(
       builder: (context, eventProvider, child) {
@@ -133,17 +138,17 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
           ],
         ),
-        trailing: _trailinButton(event),
+        trailing: _trailingButton(event),
       ),
     );
   }
 
-  Widget _trailinButton(EventModel event) {
+  Widget _trailingButton(EventModel event) {
     if (event.active) {
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 130),
         child: ElevatedButton(
-          onPressed: () => showJoinFlow(context, event),
+          onPressed: () => showConfirmationDialog(context, event),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryColor,
             foregroundColor: AppColors.textWhite,
@@ -298,65 +303,34 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  void showJoinFlow(BuildContext context, EventModel event) {
-    final days = event.eventDays;
-    if (days.isEmpty) return;
-
-    if (days.length == 1) {
-      showConfirmationDialog(context, event, days);
-      return;
-    }
-
-    List<DateTime> selectedDays = List.from(days);
-
+  void showConfirmationDialog(BuildContext context, EventModel event) {
     showDialog(
       context: context,
       useRootNavigator: true,
       builder: (dialogContext) {
+        var isJoining = false;
+
         return StatefulBuilder(
-          builder: (ctx, setDialogState) {
+          builder: (context, setState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
               ),
               title: Text(
-                'Katılacağın Günler',
+                'Emin misin?',
                 style: context.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: days.map((day) {
-                    final isSelected = selectedDays.contains(day);
-                    return CheckboxListTile(
-                      checkboxShape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                      value: isSelected,
-                      title: Text(
-                        '${day.day.toString().padLeft(2, '0')}.${day.month.toString().padLeft(2, '0')}.${day.year}',
-                        style: context.textTheme.bodyLarge,
-                      ),
-                      activeColor: AppColors.primaryColor,
-                      contentPadding: EdgeInsets.zero,
-                      onChanged: (val) {
-                        setDialogState(() {
-                          if (val == true) {
-                            selectedDays.add(day);
-                          } else {
-                            selectedDays.remove(day);
-                          }
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
+              content: Text(
+                '${event.name} etkinliğine katılım kaydın oluşturulacak. Onaylıyor musun?',
+                style: context.textTheme.bodyMedium,
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
+                  onPressed: isJoining
+                      ? null
+                      : () => Navigator.pop(dialogContext),
                   child: Text(
                     'İptal',
                     style: context.textTheme.bodyMedium?.copyWith(
@@ -365,92 +339,64 @@ class _CalendarPageState extends State<CalendarPage> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: selectedDays.isEmpty
+                  onPressed: isJoining
                       ? null
-                      : () {
+                      : () async {
+                          setState(() {
+                            isJoining = true;
+                          });
+
+                          final eventProvider = Provider.of<EventProvider>(
+                            context,
+                            listen: false,
+                          );
+                          final joined = await eventProvider.joinEvent(
+                            event.id,
+                          );
+
+                          if (!context.mounted) return;
+
                           Navigator.pop(dialogContext);
-                          showConfirmationDialog(context, event, selectedDays);
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                joined
+                                    ? 'Kaydın başarıyla alındı!'
+                                    : 'Katılım kaydı oluşturulamadı.',
+                                style: context.textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.textWhite,
+                                ),
+                              ),
+                            ),
+                          );
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,
                     foregroundColor: AppColors.textWhite,
                   ),
-                  child: Text(
-                    'Devam Et',
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textWhite,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: isJoining
+                      ? SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator.adaptive(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.textWhite,
+                            ),
+                          ),
+                        )
+                      : Text(
+                          'Onayla',
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: AppColors.textWhite,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ],
             );
           },
-        );
-      },
-    );
-  }
-
-  void showConfirmationDialog(
-    BuildContext context,
-    EventModel event,
-    List<DateTime> selectedDays,
-  ) {
-    showDialog(
-      context: context,
-      useRootNavigator: true,
-      builder: (dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          title: Text(
-            'Emin misin?',
-            style: context.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Text(
-            '${event.name} etkinliğine ${selectedDays.length} gün için katılım kaydın oluşturulacak. Onaylıyor musun?',
-            style: context.textTheme.bodyMedium,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(
-                'İptal',
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textGray,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Kaydın başarıyla alındı!',
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textWhite,
-                      ),
-                    ),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                foregroundColor: AppColors.textWhite,
-              ),
-              child: Text(
-                'Onayla',
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textWhite,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
         );
       },
     );
