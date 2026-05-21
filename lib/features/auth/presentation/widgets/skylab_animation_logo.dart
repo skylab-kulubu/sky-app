@@ -1,0 +1,396 @@
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
+
+// ── SVG path data ───────────────────────────────────────────────────────────
+// SkyLab logo paths (viewBox 0 0 586 554). Key order matches Framer Motion
+// Object.keys() insertion order from the reference implementation.
+
+const Map<String, String> svgPaths = {
+  'p12f85900':
+      'M202.27 271.08C202.27 271.42 202.14 277.72 201.97 285.09C201.8 292.46 201.87 298.27 202.13 298.01C202.39 297.75 204.01 292.65 205.72 286.69L208.83 275.84L205.55 273.15C203.74 271.67 202.27 270.74 202.28 271.07L202.27 271.08Z',
+  'p15984f0':
+      'M254.51 96.18C259.05 97.81 261.03 102.32 261.5 112.09L261.86 119.63L263.66 115.21C264.03 114.13 264.4 113.05 264.78 111.97C264.94 108.59 265.16 103.34 265.27 96.87C265.45 86.64 265.03 83.81 266.57 79.93C268.03 76.25 270.98 73.18 276.83 67.09L285.42 58.14L289.06 47.76C290.39 43.98 291.67 40.79 292.48 39.15C292.81 38.48 293.06 38.08 293.21 38C293.35 38.07 293.61 38.48 293.94 39.15C294.75 40.79 296.03 43.98 297.36 47.76L301 58.14L309.59 67.09C315.44 73.18 318.39 76.25 319.85 79.93C321.39 83.81 320.97 86.63 321.15 96.87C321.26 103.34 321.48 108.59 321.64 111.97C322.01 113.05 322.38 114.13 322.76 115.21L324.56 119.63L324.92 112.09C325.39 102.32 327.37 97.81 331.91 96.18C333.56 95.59 335 95.05 335.11 94.98C335.35 94.83 320.48 53.26 314.4 37.09C303.07 6.93 301.53 3.78 296.83 1.27C295.42 0.52 294.65 0.12 293.94 0.02C293.66 9.31323e-10 293.46 -0.01 293.2 0C292.95 0 292.75 9.31323e-10 292.48 0.02C291.77 0.12 291 0.52 289.59 1.27C284.89 3.77 283.35 6.93 272.02 37.09C265.95 53.26 251.08 94.83 251.31 94.98C251.41 95.04 252.85 95.58 254.51 96.18Z',
+  'p1a20d600':
+      'M300.36 401.43C298.05 399.2 295.67 398.18 293.2 398.37C290.74 398.19 288.37 399.2 286.06 401.43C281.41 405.92 250.43 443.34 249.35 445.77C248.76 447.1 248.46 449.28 248.68 450.63C249.47 455.44 285.34 548.6 287.14 550.51C289.04 552.53 291.22 553.7 293.21 553.9C293.21 553.9 293.21 553.9 293.22 553.9C295.2 553.7 297.38 552.53 299.29 550.51C301.09 548.6 336.96 455.44 337.75 450.63C337.97 449.29 337.67 447.1 337.08 445.77C336 443.34 305.02 405.93 300.37 401.43H300.36ZM305.97 484.19C299.28 502.24 293.6 517.1 293.35 517.22C293.34 517.22 293.29 517.15 293.23 517.03V517C293.23 517 293.23 517 293.23 517.02C293.23 517.02 293.23 517.02 293.23 517V517.03C293.17 517.16 293.12 517.23 293.11 517.22C292.86 517.11 287.18 502.25 280.49 484.19C273.8 466.14 268.38 451.21 268.44 451.01C268.86 449.67 292.39 422.73 293.11 422.77C293.13 422.77 293.18 422.8 293.23 422.83C293.28 422.79 293.33 422.76 293.35 422.76C294.06 422.72 317.6 449.67 318.02 451C318.08 451.2 312.66 466.13 305.97 484.18V484.19Z',
+  'p1cd4e100':
+      'M156.39 277.82V437.85L174.06 420.19L191.73 402.53V323.38C191.73 279.85 191.48 244.25 191.17 244.27C190.86 244.29 182.91 251.84 173.5 261.06L156.39 277.81V277.82Z',
+  'p1dae6200':
+      'M585.43 359.08C584.42 356.66 514 285.9 509.93 283.22C508.79 282.47 506.67 281.86 505.22 281.85C502.56 281.85 455.76 294.86 449.76 297.27C443.91 299.62 442.21 304.11 444.6 310.89C447.69 319.64 467.07 359.3 469.19 361.22C472.21 363.95 486.86 365.69 538.48 369.43C576.82 372.21 580.5 372.11 584.74 368.14C586.7 366.3 586.96 362.78 585.42 359.09L585.43 359.08ZM486.71 346.88L481.34 346.4L473.69 329.81C469.49 320.69 466.19 312.84 466.37 312.38C466.63 311.71 500.83 301.22 502.22 301.38C502.43 301.4 513.85 312.45 527.6 325.92C541.35 339.39 552.6 350.64 552.6 350.92C552.6 351.35 502.15 348.26 486.7 346.88H486.71Z',
+  'p20f79d00':
+      'M284.09 79.39L275.34 88.23L275.08 235.98L274.82 383.73H293.23H293.95H311.62L311.36 235.98L311.1 88.23L302.35 79.39C298.65 75.66 295.38 72.46 293.95 71.17C293.56 70.82 293.31 70.61 293.23 70.58C293.15 70.62 292.9 70.83 292.51 71.18C291.08 72.47 287.81 75.67 284.11 79.4L284.09 79.39Z',
+  'p28bb8280':
+      'M136.66 297.27C130.66 294.86 83.86 281.84 81.2 281.85C79.75 281.85 77.63 282.47 76.49 283.22C72.42 285.9 2 356.66 0.99 359.08C-0.55 362.77 -0.29 366.3 1.67 368.13C5.91 372.1 9.59 372.21 47.93 369.42C99.56 365.68 114.21 363.94 117.22 361.21C119.34 359.29 138.72 319.62 141.81 310.88C144.2 304.1 142.5 299.62 136.65 297.26L136.66 297.27ZM112.73 329.81L105.08 346.4L99.71 346.88C84.27 348.26 33.81 351.35 33.81 350.92C33.81 350.64 45.06 339.39 58.81 325.92C72.56 312.45 83.98 301.4 84.19 301.38C85.58 301.22 119.78 311.71 120.04 312.38C120.22 312.84 116.92 320.68 112.72 329.81H112.73Z',
+  'p2cc72200':
+      'M251.13 383.35V244.62C251.13 168.32 251.04 105.89 250.94 105.89C250.84 105.89 242.88 113.76 233.27 123.38L215.79 140.87V383.35H251.13Z',
+  'p3097fa00':
+      'M395.27 244.28C394.96 244.26 394.71 279.86 394.71 323.39V402.54L412.38 420.2L430.05 437.86V277.83L412.94 261.08C403.53 251.87 395.58 244.31 395.27 244.29V244.28Z',
+  'p36c88b00':
+      'M320.98 368.13V378.84C322.24 379.74 323.5 380.64 324.77 381.54V359.68C323.51 358.72 322.25 357.75 320.98 356.79V368.14V368.13Z',
+  'p3b5dc900':
+      'M392.63 160.9L381.16 160.78V179.44L387.36 179.87C390.77 180.11 406.25 180.66 421.76 181.09C461.49 182.2 494.23 183.36 494.54 183.68C494.76 183.9 419.91 243.04 415.44 246.17C414.1 247.11 414.39 247.59 420.22 253.98C423.64 257.72 426.65 260.78 426.91 260.77C427.18 260.77 440.59 250.44 456.72 237.83C472.85 225.22 489.09 212.56 492.81 209.69C496.53 206.83 505.82 199.46 513.46 193.32C524.59 184.37 527.7 181.46 529.15 178.64C532.97 171.23 529.66 167.27 518.62 166.05C506.9 164.75 466.22 162.84 423.63 161.59C412.88 161.27 398.92 160.96 392.61 160.9H392.63Z',
+  'p3cad3800':
+      'M384.3 298.01C384.56 298.27 384.64 292.46 384.46 285.09C384.29 277.72 384.15 271.42 384.16 271.08C384.16 270.74 382.69 271.68 380.89 273.16L377.61 275.85L380.72 286.7C382.43 292.67 384.04 297.76 384.31 298.02L384.3 298.01Z',
+  'p4c50c00':
+      'M261.67 381.54C262.93 380.64 264.19 379.74 265.46 378.84V356.79C264.2 357.75 262.94 358.72 261.67 359.68V381.54Z',
+  'p543f872':
+      'M370.64 383.35V140.87L353.16 123.38C343.55 113.76 335.6 105.89 335.49 105.89C335.38 105.89 335.3 168.32 335.3 244.62V383.35H370.64Z',
+  'p596f400':
+      'M213.15 391.35L201.88 398.68C201.54 400.62 201.3 402.3 200.64 404.18C198.89 409.17 186.19 420.53 181.71 424.97C177.48 429.15 172.75 433.77 168.62 438.06C165 441.82 157.27 448.3 152.12 444.77C150.93 443.95 150.05 443.12 149.18 441.96C147.49 439.71 145.46 431.83 145.5 431.49C145.59 430.65 140.15 446.25 146.13 450.76C147.39 451.71 149 452.13 149.46 452.23C152.29 452.85 155.07 451.97 158.13 450.79C165.4 447.97 173.68 441.39 180.31 437.02C194.5 427.67 208.44 417.81 222.54 408.1C228.96 403.68 236.37 398.88 242.73 394.58C243.34 394.17 244.14 393.3 244.49 392.28H215.41C215.19 392.28 213.81 391.48 213.16 391.35H213.15Z',
+  'p5ee5d00':
+      'M379.16 133.04C380.94 136.68 383.44 137.87 389 137.73C396.82 137.53 442.29 129.24 445.2 127.48C447.15 126.3 452.13 115.85 457.1 102.5C468.6 71.62 483.02 30.41 483.81 26.11C484.47 22.55 483.05 17.5 480.99 16.06C480.08 15.42 477.77 14.9 475.84 14.9C471.63 14.9 469.88 15.77 443.21 31.15C432.46 37.35 414 47.92 402.18 54.64C385.46 64.15 380.38 67.39 379.25 69.26C377.87 71.54 377.79 73.28 377.82 100.99C377.84 127.41 377.98 130.58 379.17 133.03L379.16 133.04ZM396.23 98.56L396.25 79.2L426.42 61.91C443.01 52.4 456.93 44.48 457.35 44.33C457.78 44.17 457.9 44.58 457.63 45.29C457.37 45.98 454.75 53.38 451.82 61.75C448.89 70.11 445.69 79.15 444.71 81.84C443.73 84.53 440.99 92.31 438.62 99.13C436.25 105.95 434.27 111.61 434.21 111.7C434.12 111.84 397.28 117.93 396.52 117.93C396.35 117.93 396.22 109.22 396.23 98.57V98.56Z',
+  'p7800':
+      'M129.34 102.51C134.31 115.85 139.29 126.31 141.24 127.49C144.14 129.24 189.62 137.53 197.44 137.74C203 137.88 205.5 136.69 207.28 133.05C208.47 130.61 208.61 127.44 208.63 101.01C208.66 73.3 208.58 71.55 207.2 69.28C206.06 67.4 200.99 64.17 184.27 54.66C172.46 47.94 154 37.37 143.24 31.17C116.57 15.79 114.82 14.92 110.61 14.92C108.68 14.92 106.37 15.44 105.46 16.08C103.4 17.52 101.98 22.57 102.64 26.13C103.43 30.43 117.85 71.64 129.35 102.52L129.34 102.51ZM129.08 44.32C129.5 44.48 143.41 52.39 160.01 61.9L190.18 79.19L190.2 98.55C190.21 109.2 190.08 117.91 189.91 117.91C189.14 117.91 152.3 111.82 152.22 111.68C152.17 111.59 150.18 105.94 147.81 99.11C145.44 92.29 142.7 84.5 141.72 81.82C140.74 79.13 137.54 70.09 134.61 61.73C131.68 53.37 129.07 45.96 128.8 45.27C128.53 44.56 128.65 44.14 129.08 44.31V44.32Z',
+  'p9522b80':
+      'M72.95 193.32C80.58 199.46 89.87 206.83 93.6 209.69C97.32 212.55 113.56 225.22 129.69 237.83C145.82 250.44 159.23 260.77 159.5 260.77C159.77 260.77 162.78 257.72 166.19 253.98C172.02 247.6 172.31 247.11 170.97 246.17C166.5 243.04 91.65 183.9 91.87 183.68C92.18 183.37 124.92 182.2 164.65 181.09C180.16 180.66 195.64 180.11 199.05 179.87L205.25 179.44V160.78L193.78 160.9C187.47 160.97 173.52 161.28 162.76 161.59C120.17 162.84 79.49 164.75 67.77 166.05C56.73 167.27 53.42 171.23 57.24 178.64C58.69 181.46 61.8 184.37 72.93 193.32H72.95Z',
+  'pe3cee00':
+      'M440.93 431.49C440.97 431.83 438.94 439.71 437.25 441.96C436.38 443.12 435.5 443.95 434.31 444.77C429.16 448.3 421.43 441.82 417.81 438.06C413.68 433.77 408.94 429.15 404.72 424.97C400.24 420.54 387.54 409.17 385.79 404.18C385.13 402.29 384.89 400.62 384.55 398.68L373.28 391.35C372.63 391.48 371.25 392.28 371.03 392.28H341.95C342.3 393.31 343.1 394.17 343.71 394.58C350.07 398.88 357.47 403.68 363.9 408.1C378 417.81 391.95 427.67 406.13 437.02C412.77 441.39 421.05 447.97 428.31 450.79C431.37 451.98 434.15 452.86 436.98 452.23C437.43 452.13 439.05 451.71 440.31 450.76C446.29 446.25 440.85 430.65 440.94 431.49H440.93Z',
+};
+
+/// SVG viewBox dimensions used for canvas scaling.
+const double _viewBoxWidth = 586;
+const double _viewBoxHeight = 554;
+
+// ── SVG path parser ─────────────────────────────────────────────────────────
+// Tokenizer splits command letters and numeric literals (incl. scientific notation).
+
+final RegExp _tokenRegex = RegExp(
+  r'([MmLlCcHhVvZz])|(-?\d*\.?\d+(?:e[-+]?\d+)?)',
+);
+
+bool _isCommand(String token) {
+  return token.length == 1 && 'MmLlCcHhVvZz'.contains(token);
+}
+
+/// Converts an SVG `d` attribute string into a [ui.Path] with even-odd fill.
+///
+/// Supported commands: M/m, L/l, C/c, H/h, V/v, Z/z.
+/// After M/m the implicit next command becomes L/l (SVG spec).
+/// Repeated numeric groups reuse the current command.
+ui.Path _parseSvgPath(String d) {
+  final path = ui.Path();
+  final tokens = _tokenRegex
+      .allMatches(d)
+      .map((match) => match.group(0)!)
+      .toList();
+
+  String? cmd;
+  double cx = 0;
+  double cy = 0;
+  var index = 0;
+
+  while (index < tokens.length) {
+    final token = tokens[index];
+
+    if (_isCommand(token)) {
+      cmd = token;
+      index++;
+
+      if (cmd == 'Z' || cmd == 'z') {
+        path.close();
+        continue;
+      }
+    } else if (cmd == null) {
+      index++;
+      continue;
+    }
+
+    final upper = cmd.toUpperCase();
+    final relative = cmd != upper;
+
+    if (upper == 'M') {
+      final x = _readNumber(tokens, index);
+      final y = _readNumber(tokens, index + 1);
+      index += 2;
+
+      final absX = relative ? cx + x : x;
+      final absY = relative ? cy + y : y;
+      path.moveTo(absX, absY);
+      cx = absX;
+      cy = absY;
+
+      // Subsequent coordinate pairs are implicit line-tos.
+      cmd = relative ? 'l' : 'L';
+      continue;
+    }
+
+    if (upper == 'L') {
+      final x = _readNumber(tokens, index);
+      final y = _readNumber(tokens, index + 1);
+      index += 2;
+
+      final absX = relative ? cx + x : x;
+      final absY = relative ? cy + y : y;
+      path.lineTo(absX, absY);
+      cx = absX;
+      cy = absY;
+    } else if (upper == 'H') {
+      final x = _readNumber(tokens, index);
+      index += 1;
+
+      final absX = relative ? cx + x : x;
+      path.lineTo(absX, cy);
+      cx = absX;
+    } else if (upper == 'V') {
+      final y = _readNumber(tokens, index);
+      index += 1;
+
+      final absY = relative ? cy + y : y;
+      path.lineTo(cx, absY);
+      cy = absY;
+    } else if (upper == 'C') {
+      final x1 = _readNumber(tokens, index);
+      final y1 = _readNumber(tokens, index + 1);
+      final x2 = _readNumber(tokens, index + 2);
+      final y2 = _readNumber(tokens, index + 3);
+      final x = _readNumber(tokens, index + 4);
+      final y = _readNumber(tokens, index + 5);
+      index += 6;
+
+      final absX1 = relative ? cx + x1 : x1;
+      final absY1 = relative ? cy + y1 : y1;
+      final absX2 = relative ? cx + x2 : x2;
+      final absY2 = relative ? cy + y2 : y2;
+      final absX = relative ? cx + x : x;
+      final absY = relative ? cy + y : y;
+
+      path.cubicTo(absX1, absY1, absX2, absY2, absX, absY);
+      cx = absX;
+      cy = absY;
+    } else {
+      index++;
+    }
+  }
+
+  path.fillType = ui.PathFillType.evenOdd;
+  return path;
+}
+
+double _readNumber(List<String> tokens, int index) {
+  return double.parse(tokens[index]);
+}
+
+// ── Animation timing helpers ──────────────────────────────────────────────────
+// Mirrors Framer Motion transitions from SkylabAnimationLogo.jsx.
+
+const double _drawDuration = 2.0;
+const double _stagger = 0.08;
+const double _fillDelay = 0.3;
+const double _initialDelay = 0.6;
+const double _fillAnimDuration = 0.8;
+const double _strokeFadeDuration = 0.5;
+
+const Curve _drawEase = Cubic(0.22, 1.0, 0.36, 1.0);
+
+/// Returns eased progress in [0, 1] for a time window starting at [start].
+double _window(double t, double start, double duration, Curve curve) {
+  if (duration <= 0) {
+    return t >= start ? 1.0 : 0.0;
+  }
+  final raw = ((t - start) / duration).clamp(0.0, 1.0);
+  return curve.transform(raw);
+}
+
+double _totalAnimationSeconds(int pathCount) {
+  if (pathCount == 0) {
+    return 0;
+  }
+  return _initialDelay +
+      (pathCount - 1) * _stagger +
+      _drawDuration +
+      _fillDelay +
+      _strokeFadeDuration;
+}
+
+// ── Parsed path cache ─────────────────────────────────────────────────────────
+
+class _ParsedPath {
+  const _ParsedPath({required this.path, required this.metrics});
+
+  final ui.Path path;
+  final List<ui.PathMetric> metrics;
+}
+
+// ── CustomPainter ─────────────────────────────────────────────────────────────
+
+class _LogoPainter extends CustomPainter {
+  _LogoPainter({
+    required this.parsedPaths,
+    required this.t,
+    required this.color,
+    required this.strokeWidth,
+  }) : _strokePaint = Paint()
+         ..style = PaintingStyle.stroke
+         ..strokeJoin = StrokeJoin.round
+         ..strokeCap = StrokeCap.round
+         ..isAntiAlias = true,
+       _fillPaint = Paint()
+         ..style = PaintingStyle.fill
+         ..isAntiAlias = true;
+
+  final List<_ParsedPath> parsedPaths;
+  final double t;
+  final Color color;
+  final double strokeWidth;
+
+  final Paint _strokePaint;
+  final Paint _fillPaint;
+
+  // Reused each frame to avoid allocating partial paths on the heap.
+  final ui.Path _partialStroke = ui.Path();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final scale = math.min(
+      size.width / _viewBoxWidth,
+      size.height / _viewBoxHeight,
+    );
+    final dx = (size.width - _viewBoxWidth * scale) / 2;
+    final dy = (size.height - _viewBoxHeight * scale) / 2;
+
+    canvas.save();
+    canvas.translate(dx, dy);
+    canvas.scale(scale);
+
+    _strokePaint.strokeWidth = strokeWidth;
+
+    for (var i = 0; i < parsedPaths.length; i++) {
+      final parsed = parsedPaths[i];
+      final pathStart = _initialDelay + i * _stagger;
+
+      final tDraw = _window(t, pathStart, _drawDuration, _drawEase);
+      final tFill = _window(
+        t,
+        pathStart + _drawDuration * 0.6 + _fillDelay,
+        _fillAnimDuration,
+        Curves.easeOut,
+      );
+      final strokeFade = _window(
+        t,
+        pathStart + _drawDuration + _fillDelay,
+        _strokeFadeDuration,
+        Curves.easeOut,
+      );
+      final tStroke = 1.0 - strokeFade;
+
+      if (tDraw > 0 && tStroke > 0) {
+        _partialStroke.reset();
+        for (final metric in parsed.metrics) {
+          final length = metric.length * tDraw;
+          if (length <= 0) {
+            continue;
+          }
+          _partialStroke.addPath(metric.extractPath(0, length), Offset.zero);
+        }
+
+        if (!_partialStroke.getBounds().isEmpty) {
+          _strokePaint.color = color.withValues(alpha: color.a * tStroke);
+          canvas.drawPath(_partialStroke, _strokePaint);
+        }
+      }
+
+      if (tFill > 0) {
+        _fillPaint.color = color.withValues(alpha: color.a * tFill);
+        canvas.drawPath(parsed.path, _fillPaint);
+      }
+    }
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _LogoPainter oldDelegate) {
+    return oldDelegate.t != t ||
+        oldDelegate.color != color ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.parsedPaths != parsedPaths;
+  }
+}
+
+// ── SkylabAnimationLogo widget ─────────────────────────────────────────────────────────
+
+class SkylabAnimationLogo extends StatefulWidget {
+  const SkylabAnimationLogo({
+    super.key,
+    this.color = const ui.Color.fromARGB(255, 65, 50, 58),
+    this.strokeWidth = 1.5,
+    this.autoStart = true,
+  });
+
+  final Color color;
+  final double strokeWidth;
+  final bool autoStart;
+
+  @override
+  State<SkylabAnimationLogo> createState() => _SkylabAnimationLogoState();
+}
+
+class _SkylabAnimationLogoState extends State<SkylabAnimationLogo>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final List<_ParsedPath> _parsedPaths;
+  late final double _totalSeconds;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Parse once and cache path metrics — never repeated per frame.
+    _parsedPaths = svgPaths.values
+        .map((d) {
+          final path = _parseSvgPath(d);
+          return _ParsedPath(
+            path: path,
+            metrics: path.computeMetrics().toList(growable: false),
+          );
+        })
+        .toList(growable: false);
+
+    _totalSeconds = _totalAnimationSeconds(_parsedPaths.length);
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: (_totalSeconds * 1000).ceil()),
+    );
+
+    if (widget.autoStart) {
+      _controller.forward().whenComplete(_controller.stop);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant SkylabAnimationLogo oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.autoStart &&
+        !_controller.isAnimating &&
+        _controller.value == 0) {
+      _controller.forward().whenComplete(_controller.stop);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return CustomPaint(
+            painter: _LogoPainter(
+              parsedPaths: _parsedPaths,
+              t: _controller.value * _totalSeconds,
+              color: widget.color,
+              strokeWidth: widget.strokeWidth,
+            ),
+            child: const SizedBox.expand(),
+          );
+        },
+      ),
+    );
+  }
+}

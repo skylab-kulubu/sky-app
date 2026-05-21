@@ -52,6 +52,7 @@ ThemeData darkTheme = ThemeData(
     onSurfaceVariant: AppColors.unselectedLabelColor,
   ),
   textTheme: TextTheme(
+    displaySmall: TextStyle(fontFamily: 'Poppins'),
     bodyMedium: TextStyle(color: Colors.grey.shade400),
     labelSmall: TextStyle(fontFamily: 'Poppins'),
     titleMedium: TextStyle(fontFamily: 'Poppins'),

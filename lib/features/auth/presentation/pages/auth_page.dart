@@ -1,11 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
-import 'package:sky_app/core/widgets/sky_button.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/features/auth/presentation/widgets/skylab_animation_logo.dart';
 
 part 'auth_pagemodel.dart';
 
@@ -21,45 +24,49 @@ class _AuthPageState extends AuthPagemodel {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
+        child: Stack(
+          clipBehavior: .hardEdge,
           children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [_header(), SizedBox(height: 24), _loginButton()],
+            Positioned(
+              right: -300,
+              top: 0,
+              bottom: 0,
+              width: 800,
+              child: SkylabAnimationLogo(),
+            ),
+            Column(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [_header(context), _loginButton()],
+                    ),
                   ),
                 ),
-              ),
+                _footer(),
+              ],
             ),
-            _footer(),
           ],
         ),
       ),
     );
   }
 
-  Widget _header() {
+  Widget _header(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 80),
-        SvgPicture.asset(AppAssets.skylab, height: 150),
-        const SizedBox(height: 24),
-        const Text(
+        const SizedBox(height: 150),
+        Text(
           'SKY LAB',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.5,
-            color: Colors.white,
+          style: context.textTheme.displaySmall?.copyWith(
+            fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Bilgisayar Bilimleri Kulübü',
           style: TextStyle(fontSize: 12, color: AppColors.unselectedLabelColor),
         ),
@@ -69,35 +76,56 @@ class _AuthPageState extends AuthPagemodel {
   }
 
   Widget _loginButton() {
-    return SkyButton(
-      text: 'e-skylab ile Giriş Yap',
-      icon: isLoading
-          ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            )
-          : SvgPicture.asset(
-              AppAssets.skylab,
-              height: 20,
-              colorFilter: const ColorFilter.mode(
-                Colors.white,
-                BlendMode.srcIn,
+    const buttonHeight = 68.0;
+    final borderRadius = BorderRadius.circular(buttonHeight / 2);
+
+    return SizedBox(
+      width: double.infinity,
+      height: buttonHeight,
+      child: ClipRRect(
+        borderRadius: borderRadius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Material(
+            color: AppColors.buttonColor.withValues(alpha: 0.45),
+            child: InkWell(
+              onTap: isLoading ? null : handleAuth,
+              splashColor: Colors.white.withValues(alpha: 0.08),
+              highlightColor: Colors.white.withValues(alpha: 0.04),
+              child: SizedBox(
+                height: buttonHeight,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (isLoading)
+                      const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    else
+                      SvgPicture.asset(AppAssets.skylab, height: 20),
+                    const SizedBox(width: 12),
+                    Text(
+                      'e-skylab ile Giriş Yap',
+                      style: context.textTheme.titleMedium,
+                    ),
+                  ],
+                ),
               ),
             ),
-      backgroundColor: AppColors.buttonColor,
-      onPressed: () {
-        isLoading ? null : handleAuth();
-      },
+          ),
+        ),
+      ),
     );
   }
 
   Widget _footer() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24.0, top: 12.0),
+      padding: const EdgeInsets.only(top: 24.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
