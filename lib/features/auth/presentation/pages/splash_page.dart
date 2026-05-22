@@ -1,9 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/features/auth/presentation/widgets/skylab_loader.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 
 class SplashPage extends StatefulWidget {
@@ -50,13 +49,6 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(80.0),
-          child: SvgPicture.asset(AppAssets.skylab),
-        ),
-      ),
-    );
+    return Scaffold(body: Center(child: SkylabLoader(size: 120)));
   }
 }

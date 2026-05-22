@@ -1,13 +1,10 @@
-import 'dart:math' as math;
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/widgets/svg_animation_widget.dart';
 
-// ── SVG path data ───────────────────────────────────────────────────────────
-// SkyLab logo paths (viewBox 0 0 586 554). Key order matches Framer Motion
-// Object.keys() insertion order from the reference implementation.
+// ── SkyLab SVG path data ──────────────────────────────────────────────────────
+// viewBox 0 0 586 554. Key order matches Framer Motion Object.keys() order.
 
-const Map<String, String> svgPaths = {
+const Map<String, String> _skylabRawPaths = {
   'p12f85900':
       'M202.27 271.08C202.27 271.42 202.14 277.72 201.97 285.09C201.8 292.46 201.87 298.27 202.13 298.01C202.39 297.75 204.01 292.65 205.72 286.69L208.83 275.84L205.55 273.15C203.74 271.67 202.27 270.74 202.28 271.07L202.27 271.08Z',
   'p15984f0':
@@ -48,272 +45,23 @@ const Map<String, String> svgPaths = {
       'M440.93 431.49C440.97 431.83 438.94 439.71 437.25 441.96C436.38 443.12 435.5 443.95 434.31 444.77C429.16 448.3 421.43 441.82 417.81 438.06C413.68 433.77 408.94 429.15 404.72 424.97C400.24 420.54 387.54 409.17 385.79 404.18C385.13 402.29 384.89 400.62 384.55 398.68L373.28 391.35C372.63 391.48 371.25 392.28 371.03 392.28H341.95C342.3 393.31 343.1 394.17 343.71 394.58C350.07 398.88 357.47 403.68 363.9 408.1C378 417.81 391.95 427.67 406.13 437.02C412.77 441.39 421.05 447.97 428.31 450.79C431.37 451.98 434.15 452.86 436.98 452.23C437.43 452.13 439.05 451.71 440.31 450.76C446.29 446.25 440.85 430.65 440.94 431.49H440.93Z',
 };
 
-/// SVG viewBox dimensions used for canvas scaling.
-const double _viewBoxWidth = 586;
-const double _viewBoxHeight = 554;
-
-// ── SVG path parser ─────────────────────────────────────────────────────────
-// Tokenizer splits command letters and numeric literals (incl. scientific notation).
-
-final RegExp _tokenRegex = RegExp(
-  r'([MmLlCcHhVvZz])|(-?\d*\.?\d+(?:e[-+]?\d+)?)',
+/// Parsed SkyLab logo path library (shared with [SkylabLoader]).
+final SvgPathLibrary skylabLibrary = SvgPathLibrary(
+  viewBoxWidth: 586,
+  viewBoxHeight: 554,
+  rawPaths: _skylabRawPaths,
 );
 
-bool _isCommand(String token) {
-  return token.length == 1 && 'MmLlCcHhVvZz'.contains(token);
-}
-
-/// Converts an SVG `d` attribute string into a [ui.Path] with even-odd fill.
-///
-/// Supported commands: M/m, L/l, C/c, H/h, V/v, Z/z.
-/// After M/m the implicit next command becomes L/l (SVG spec).
-/// Repeated numeric groups reuse the current command.
-ui.Path _parseSvgPath(String d) {
-  final path = ui.Path();
-  final tokens = _tokenRegex
-      .allMatches(d)
-      .map((match) => match.group(0)!)
-      .toList();
-
-  String? cmd;
-  double cx = 0;
-  double cy = 0;
-  var index = 0;
-
-  while (index < tokens.length) {
-    final token = tokens[index];
-
-    if (_isCommand(token)) {
-      cmd = token;
-      index++;
-
-      if (cmd == 'Z' || cmd == 'z') {
-        path.close();
-        continue;
-      }
-    } else if (cmd == null) {
-      index++;
-      continue;
-    }
-
-    final upper = cmd.toUpperCase();
-    final relative = cmd != upper;
-
-    if (upper == 'M') {
-      final x = _readNumber(tokens, index);
-      final y = _readNumber(tokens, index + 1);
-      index += 2;
-
-      final absX = relative ? cx + x : x;
-      final absY = relative ? cy + y : y;
-      path.moveTo(absX, absY);
-      cx = absX;
-      cy = absY;
-
-      // Subsequent coordinate pairs are implicit line-tos.
-      cmd = relative ? 'l' : 'L';
-      continue;
-    }
-
-    if (upper == 'L') {
-      final x = _readNumber(tokens, index);
-      final y = _readNumber(tokens, index + 1);
-      index += 2;
-
-      final absX = relative ? cx + x : x;
-      final absY = relative ? cy + y : y;
-      path.lineTo(absX, absY);
-      cx = absX;
-      cy = absY;
-    } else if (upper == 'H') {
-      final x = _readNumber(tokens, index);
-      index += 1;
-
-      final absX = relative ? cx + x : x;
-      path.lineTo(absX, cy);
-      cx = absX;
-    } else if (upper == 'V') {
-      final y = _readNumber(tokens, index);
-      index += 1;
-
-      final absY = relative ? cy + y : y;
-      path.lineTo(cx, absY);
-      cy = absY;
-    } else if (upper == 'C') {
-      final x1 = _readNumber(tokens, index);
-      final y1 = _readNumber(tokens, index + 1);
-      final x2 = _readNumber(tokens, index + 2);
-      final y2 = _readNumber(tokens, index + 3);
-      final x = _readNumber(tokens, index + 4);
-      final y = _readNumber(tokens, index + 5);
-      index += 6;
-
-      final absX1 = relative ? cx + x1 : x1;
-      final absY1 = relative ? cy + y1 : y1;
-      final absX2 = relative ? cx + x2 : x2;
-      final absY2 = relative ? cy + y2 : y2;
-      final absX = relative ? cx + x : x;
-      final absY = relative ? cy + y : y;
-
-      path.cubicTo(absX1, absY1, absX2, absY2, absX, absY);
-      cx = absX;
-      cy = absY;
-    } else {
-      index++;
-    }
-  }
-
-  path.fillType = ui.PathFillType.evenOdd;
-  return path;
-}
-
-double _readNumber(List<String> tokens, int index) {
-  return double.parse(tokens[index]);
-}
-
-// ── Animation timing helpers ──────────────────────────────────────────────────
-// Mirrors Framer Motion transitions from SkylabAnimationLogo.jsx.
-
-const double _drawDuration = 2.0;
-const double _stagger = 0.08;
-const double _fillDelay = 0.3;
-const double _initialDelay = 0.6;
-const double _fillAnimDuration = 0.8;
-const double _strokeFadeDuration = 0.5;
-
-const Curve _drawEase = Cubic(0.22, 1.0, 0.36, 1.0);
-
-/// Returns eased progress in [0, 1] for a time window starting at [start].
-double _window(double t, double start, double duration, Curve curve) {
-  if (duration <= 0) {
-    return t >= start ? 1.0 : 0.0;
-  }
-  final raw = ((t - start) / duration).clamp(0.0, 1.0);
-  return curve.transform(raw);
-}
-
-double _totalAnimationSeconds(int pathCount) {
-  if (pathCount == 0) {
-    return 0;
-  }
-  return _initialDelay +
-      (pathCount - 1) * _stagger +
-      _drawDuration +
-      _fillDelay +
-      _strokeFadeDuration;
-}
-
-// ── Parsed path cache ─────────────────────────────────────────────────────────
-
-class _ParsedPath {
-  const _ParsedPath({required this.path, required this.metrics});
-
-  final ui.Path path;
-  final List<ui.PathMetric> metrics;
-}
-
-// ── CustomPainter ─────────────────────────────────────────────────────────────
-
-class _LogoPainter extends CustomPainter {
-  _LogoPainter({
-    required this.parsedPaths,
-    required this.t,
-    required this.color,
-    required this.strokeWidth,
-  }) : _strokePaint = Paint()
-         ..style = PaintingStyle.stroke
-         ..strokeJoin = StrokeJoin.round
-         ..strokeCap = StrokeCap.round
-         ..isAntiAlias = true,
-       _fillPaint = Paint()
-         ..style = PaintingStyle.fill
-         ..isAntiAlias = true;
-
-  final List<_ParsedPath> parsedPaths;
-  final double t;
-  final Color color;
-  final double strokeWidth;
-
-  final Paint _strokePaint;
-  final Paint _fillPaint;
-
-  // Reused each frame to avoid allocating partial paths on the heap.
-  final ui.Path _partialStroke = ui.Path();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final scale = math.min(
-      size.width / _viewBoxWidth,
-      size.height / _viewBoxHeight,
-    );
-    final dx = (size.width - _viewBoxWidth * scale) / 2;
-    final dy = (size.height - _viewBoxHeight * scale) / 2;
-
-    canvas.save();
-    canvas.translate(dx, dy);
-    canvas.scale(scale);
-
-    _strokePaint.strokeWidth = strokeWidth;
-
-    for (var i = 0; i < parsedPaths.length; i++) {
-      final parsed = parsedPaths[i];
-      final pathStart = _initialDelay + i * _stagger;
-
-      final tDraw = _window(t, pathStart, _drawDuration, _drawEase);
-      final tFill = _window(
-        t,
-        pathStart + _drawDuration * 0.6 + _fillDelay,
-        _fillAnimDuration,
-        Curves.easeOut,
-      );
-      final strokeFade = _window(
-        t,
-        pathStart + _drawDuration + _fillDelay,
-        _strokeFadeDuration,
-        Curves.easeOut,
-      );
-      final tStroke = 1.0 - strokeFade;
-
-      if (tDraw > 0 && tStroke > 0) {
-        _partialStroke.reset();
-        for (final metric in parsed.metrics) {
-          final length = metric.length * tDraw;
-          if (length <= 0) {
-            continue;
-          }
-          _partialStroke.addPath(metric.extractPath(0, length), Offset.zero);
-        }
-
-        if (!_partialStroke.getBounds().isEmpty) {
-          _strokePaint.color = color.withValues(alpha: color.a * tStroke);
-          canvas.drawPath(_partialStroke, _strokePaint);
-        }
-      }
-
-      if (tFill > 0) {
-        _fillPaint.color = color.withValues(alpha: color.a * tFill);
-        canvas.drawPath(parsed.path, _fillPaint);
-      }
-    }
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant _LogoPainter oldDelegate) {
-    return oldDelegate.t != t ||
-        oldDelegate.color != color ||
-        oldDelegate.strokeWidth != strokeWidth ||
-        oldDelegate.parsedPaths != parsedPaths;
-  }
-}
+final DrawAndFillRecipe _skylabLogoRecipe = DrawAndFillRecipe(
+  library: skylabLibrary,
+);
 
 // ── SkylabAnimationLogo widget ─────────────────────────────────────────────────────────
 
-class SkylabAnimationLogo extends StatefulWidget {
+class SkylabAnimationLogo extends StatelessWidget {
   const SkylabAnimationLogo({
     super.key,
-    this.color = const ui.Color.fromARGB(255, 65, 50, 58),
+    this.color = const Color(0xFF4B2B3C),
     this.strokeWidth = 1.5,
     this.autoStart = true,
   });
@@ -323,74 +71,14 @@ class SkylabAnimationLogo extends StatefulWidget {
   final bool autoStart;
 
   @override
-  State<SkylabAnimationLogo> createState() => _SkylabAnimationLogoState();
-}
-
-class _SkylabAnimationLogoState extends State<SkylabAnimationLogo>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final List<_ParsedPath> _parsedPaths;
-  late final double _totalSeconds;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Parse once and cache path metrics — never repeated per frame.
-    _parsedPaths = svgPaths.values
-        .map((d) {
-          final path = _parseSvgPath(d);
-          return _ParsedPath(
-            path: path,
-            metrics: path.computeMetrics().toList(growable: false),
-          );
-        })
-        .toList(growable: false);
-
-    _totalSeconds = _totalAnimationSeconds(_parsedPaths.length);
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: (_totalSeconds * 1000).ceil()),
-    );
-
-    if (widget.autoStart) {
-      _controller.forward().whenComplete(_controller.stop);
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant SkylabAnimationLogo oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.autoStart &&
-        !_controller.isAnimating &&
-        _controller.value == 0) {
-      _controller.forward().whenComplete(_controller.stop);
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return CustomPaint(
-            painter: _LogoPainter(
-              parsedPaths: _parsedPaths,
-              t: _controller.value * _totalSeconds,
-              color: widget.color,
-              strokeWidth: widget.strokeWidth,
-            ),
-            child: const SizedBox.expand(),
-          );
-        },
-      ),
+    return SvgAnimationWidget(
+      library: skylabLibrary,
+      effects: _skylabLogoRecipe.build(),
+      totalDuration: _skylabLogoRecipe.totalDuration(),
+      color: color,
+      strokeWidth: strokeWidth,
+      autoStart: autoStart,
     );
   }
 }

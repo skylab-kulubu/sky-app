@@ -125,7 +125,7 @@ class _AuthPageState extends AuthPagemodel {
 
   Widget _footer() {
     return Padding(
-      padding: const EdgeInsets.only(top: 24.0),
+      padding: const EdgeInsets.only(top: 36.0, bottom: 24.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
