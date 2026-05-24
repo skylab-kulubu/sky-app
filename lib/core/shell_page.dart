@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
@@ -94,10 +93,8 @@ class ShellPage extends StatelessWidget {
                   label: 'Biletler',
                   isSelected: currentLocation == '/tickets',
                   onTap: () => context.go('/tickets'),
-                  unSelectedIcon: PhosphorIcons.ticket(
-                    PhosphorIconsStyle.regular,
-                  ),
-                  selectedIcon: PhosphorIcons.ticket(PhosphorIconsStyle.fill),
+                  unSelectedIcon: Icons.local_activity_outlined,
+                  selectedIcon: Icons.local_activity,
                 ),
               ),
               // Expanded(
