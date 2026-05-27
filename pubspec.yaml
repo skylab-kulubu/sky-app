@@ -27,6 +27,7 @@ dependencies:
   flutter_svg: 2.3.0
   carousel_slider: 5.1.2
   timeago: 3.7.1
+  confetti: 0.7.0
 
   #Web & External Links
   dio: 5.9.2
@@ -42,6 +43,7 @@ dependencies:
   #Auth
   flutter_appauth: 12.0.1
   crypto: 3.0.7
+  
 
 
 dev_dependencies:

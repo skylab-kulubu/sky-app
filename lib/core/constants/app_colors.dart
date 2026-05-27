@@ -46,4 +46,14 @@ class AppColors {
   static final orange9 = const Color(0xFFE67E22).withValues(alpha: 0.094);
   static final red9 = const Color(0xFFE74C3C).withValues(alpha: 0.094);
   static final pink9 = const Color(0xFFE84393).withValues(alpha: 0.094);
+
+  // For mobilab icon button confetti colors
+  static const List<Color> confetti = [
+    coral,
+    darkOrange,
+    green,
+    secondaryBlue,
+    purple,
+    orange,
+  ];
 }

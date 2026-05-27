@@ -1,15 +1,38 @@
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/widgets/nav_item.dart';
 
-class ShellPage extends StatelessWidget {
+class ShellPage extends StatefulWidget {
   const ShellPage({super.key, required this.child});
 
   final Widget child;
+
+  @override
+  State<ShellPage> createState() => _ShellPageState();
+}
+
+class _ShellPageState extends State<ShellPage> {
+  late final ConfettiController _confettiController;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController = ConfettiController(
+      duration: const Duration(milliseconds: 800),
+    );
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +43,7 @@ class ShellPage extends StatelessWidget {
       appBar: appBar(context),
       body: Stack(
         children: [
-          child,
+          widget.child,
           Positioned(
             left: 0,
             right: 0,
@@ -42,6 +65,11 @@ class ShellPage extends StatelessWidget {
               ),
             ),
           ),
+          Positioned(
+            top: -10,
+            left: 40,
+            child: CustomConfetti(confettiController: _confettiController),
+          ),
         ],
       ),
       bottomNavigationBar: navBar(currentLocation, context),
@@ -52,7 +80,7 @@ class ShellPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 30, top: 10),
       child: Container(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(AppSizes.midSpace),
         decoration: BoxDecoration(
           color: AppColors.tileBackgroundColor.withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(AppRadiuses.navbar),
@@ -129,22 +157,12 @@ class ShellPage extends StatelessWidget {
       centerTitle: true,
       title: SvgPicture.asset(
         AppAssets.skylab,
-        width: 44,
-        height: 44,
+        width: AppSizes.shellTitleLogo,
+        height: AppSizes.shellTitleLogo,
         fit: BoxFit.contain,
       ),
       leadingWidth: 60,
-      leading: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Center(
-          child: SvgPicture.asset(
-            AppAssets.mobilab,
-            width: 36,
-            height: 36,
-            fit: BoxFit.contain,
-          ),
-        ),
-      ),
+      leading: MobilabIconButton(confettiController: _confettiController),
       // actions: [
       //   Padding(
       //     padding: const EdgeInsets.only(right: 5),
@@ -165,6 +183,55 @@ class ShellPage extends StatelessWidget {
       //     ),
       //   ),
       // ],
+    );
+  }
+}
+
+class MobilabIconButton extends StatelessWidget {
+  const MobilabIconButton({super.key, required this._confettiController});
+
+  final ConfettiController _confettiController;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        _confettiController.stop();
+        _confettiController.play();
+      },
+      padding: EdgeInsets.zero,
+      highlightColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      icon: SvgPicture.asset(
+        AppAssets.mobilab,
+        width: AppSizes.shellLeadingLogo,
+        height: AppSizes.shellLeadingLogo,
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+}
+
+class CustomConfetti extends StatelessWidget {
+  const CustomConfetti({super.key, required this._confettiController});
+
+  final ConfettiController _confettiController;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConfettiWidget(
+      confettiController: _confettiController,
+      blastDirectionality: BlastDirectionality.directional,
+      blastDirection: 0.5, // ~30 degrees, toward bottom-right
+      shouldLoop: false,
+      numberOfParticles: 50,
+      maxBlastForce: 30,
+      minBlastForce: 15,
+      gravity: 0.25,
+      emissionFrequency: 0.05,
+      particleDrag: 0.05,
+      colors: AppColors.confetti,
     );
   }
 }
