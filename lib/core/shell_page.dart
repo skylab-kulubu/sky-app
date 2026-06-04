@@ -68,7 +68,7 @@ class _ShellPageState extends State<ShellPage> {
           Positioned(
             top: -10,
             left: 40,
-            child: CustomConfetti(confettiController: _confettiController),
+            child: _customConfetti(),
           ),
         ],
       ),
@@ -162,7 +162,7 @@ class _ShellPageState extends State<ShellPage> {
         fit: BoxFit.contain,
       ),
       leadingWidth: 60,
-      leading: MobilabIconButton(confettiController: _confettiController),
+      leading: _mobilabIconButton(),
       // actions: [
       //   Padding(
       //     padding: const EdgeInsets.only(right: 5),
@@ -185,15 +185,8 @@ class _ShellPageState extends State<ShellPage> {
       // ],
     );
   }
-}
 
-class MobilabIconButton extends StatelessWidget {
-  const MobilabIconButton({super.key, required this._confettiController});
-
-  final ConfettiController _confettiController;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _mobilabIconButton() {
     return IconButton(
       onPressed: () {
         _confettiController.stop();
@@ -211,15 +204,8 @@ class MobilabIconButton extends StatelessWidget {
       ),
     );
   }
-}
 
-class CustomConfetti extends StatelessWidget {
-  const CustomConfetti({super.key, required this._confettiController});
-
-  final ConfettiController _confettiController;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _customConfetti() {
     return ConfettiWidget(
       confettiController: _confettiController,
       blastDirectionality: BlastDirectionality.directional,
