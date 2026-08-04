@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
@@ -44,11 +46,17 @@ class ProfileHeader extends StatelessWidget {
           ? Image.network(
               avatarUrl!,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Center(
-                child: Icon(Icons.person, color: Colors.purple, size: 28),
+              errorBuilder: (context, error, stackTrace) => const Center(
+                child: AppIcon(
+                  AppIcons.profile,
+                  color: Colors.purple,
+                  size: 28,
+                ),
               ),
             )
-          : Center(child: Icon(Icons.person, color: Colors.purple, size: 28)),
+          : const Center(
+              child: AppIcon(AppIcons.profile, color: Colors.purple, size: 28),
+            ),
     );
   }
 

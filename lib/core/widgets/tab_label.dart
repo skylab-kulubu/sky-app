@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 
 class TabLabel extends StatelessWidget {
-  final IconData? icon;
+  final String? icon;
   final String label;
   const TabLabel({super.key, this.icon, required this.label});
 
@@ -12,7 +13,7 @@ class TabLabel extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         icon != null
-            ? Icon(icon, size: AppSizes.icon)
+            ? AppIcon(icon!, size: AppSizes.icon)
             : const SizedBox.shrink(),
         const SizedBox(width: AppSizes.bigSpace),
         Text(label),

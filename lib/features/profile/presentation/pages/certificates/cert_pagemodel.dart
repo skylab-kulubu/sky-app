@@ -1,8 +1,6 @@
-
 part of "cert_page.dart";
 
 abstract class CertPagemodel extends State<CertPage> {
-
   final List<Certificate> listOfCert = [
     Certificate(
       title: "Flutter Bootcamp 2025",

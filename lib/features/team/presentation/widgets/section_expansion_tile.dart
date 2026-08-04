@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 
 class SectionExpansionTile extends StatelessWidget {
   const SectionExpansionTile({
@@ -12,7 +13,7 @@ class SectionExpansionTile extends StatelessWidget {
   });
   final String title;
   final Color color;
-  final IconData icon;
+  final String icon;
   final int? notificationCount;
   final Widget? child;
 
@@ -33,7 +34,7 @@ class SectionExpansionTile extends StatelessWidget {
             color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: color, size: 22),
+          child: AppIcon(icon, color: color, size: 22),
         ),
         title: Row(
           crossAxisAlignment: CrossAxisAlignment.center,

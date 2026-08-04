@@ -20,8 +20,6 @@ abstract class HomePagemodel extends State<HomePage> {
     ),
   ];
 
-
-
   // final Set<int> _visibleIndices = {0, 1, 2, 3, 4, 5, 6, 7};
 
   // List<LinkItem> get _visibleShortcuts => [

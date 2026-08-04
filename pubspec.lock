@@ -592,6 +592,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0"
+  reicon_flutter:
+    dependency: "direct main"
+    description:
+      name: reicon_flutter
+      sha256: a21ccc1b2082c5973078c7b14ae24d9b6283819420ba9195a05a364bbe0adc65
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   shared_preferences:
     dependency: "direct main"
     description:

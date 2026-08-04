@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 
@@ -180,8 +182,8 @@ class _CalendarPageState extends State<CalendarPage> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.access_time,
+              const AppIcon(
+                AppIcons.clock,
                 size: 16.0,
                 color: AppColors.orange,
               ),
@@ -256,8 +258,8 @@ class _CalendarPageState extends State<CalendarPage> {
                       const SizedBox(height: 8.0),
                       Row(
                         children: [
-                          Icon(
-                            Icons.location_on,
+                          const AppIcon(
+                            AppIcons.location,
                             size: 16,
                             color: AppColors.primaryColor,
                           ),

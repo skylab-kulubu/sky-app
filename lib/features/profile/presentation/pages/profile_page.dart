@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/services/links_service.dart';
@@ -91,7 +92,7 @@ class _ProfilePageState extends ProfilePagemodel {
               iconColor: AppColors.primaryColor,
               title: 'Ekipler',
               subtitle: 'Kulüp ekiplerini keşfet',
-              trailingIcon: Icons.chevron_right_rounded,
+              trailingIcon: AppIcons.chevronRight,
               onTap: () {
                 context.push('/profile/teams');
               },
@@ -103,7 +104,7 @@ class _ProfilePageState extends ProfilePagemodel {
             //   iconColor: AppColors.primaryColor,
             //   title: 'Sertifikalar',
             //   subtitle: 'Bootcamp ve eğitim sertifikaları',
-            //   trailingIcon: Icons.chevron_right_rounded,
+            //   trailingIcon: AppIcons.chevronRight,
             //   onTap: () {
             //     context.go('/profile/certificates');
             //   },
@@ -135,7 +136,7 @@ class _ProfilePageState extends ProfilePagemodel {
               iconColor: link.color,
               title: link.name,
               subtitle: link.description,
-              trailingIcon: Icons.open_in_new_rounded,
+              trailingIcon: AppIcons.externalLink,
               onTap: () {
                 WebviewService.openLink(context, link);
               },
@@ -158,7 +159,7 @@ class _ProfilePageState extends ProfilePagemodel {
   //         icon: AppAssets.email,
   //         iconColor: AppColors.primaryColor,
   //         title: 'İletişim',
-  //         trailingIcon: Icons.chevron_right_rounded,
+  //         trailingIcon: AppIcons.chevronRight,
   //         onTap: () {},
   //       ),
   //     ),

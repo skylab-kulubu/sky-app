@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 
 class NavItem extends StatelessWidget {
-  final IconData unSelectedIcon;
-  final IconData selectedIcon;
+  /// [AppIcons] içindeki ikon adı. Seçiliyken Filled, değilken Outline çizilir.
+  final String icon;
   final bool isSelected;
   final VoidCallback onTap;
   final String label;
@@ -14,8 +15,7 @@ class NavItem extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     required this.label,
-    required this.unSelectedIcon,
-    required this.selectedIcon,
+    required this.icon,
   });
 
   @override
@@ -38,8 +38,9 @@ class NavItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                isSelected ? selectedIcon : unSelectedIcon,
+              AppIcon(
+                icon,
+                filled: isSelected,
                 size: 26,
                 color: isSelected
                     ? context.colorScheme.primary

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/team/presentation/widgets/person_tag.dart';
@@ -61,22 +62,22 @@ class _TeamPageState extends State<TeamPage> {
               SectionExpansionTile(
                 title: 'Duyurular',
                 color: Color(0xffE74C3C),
-                icon: Icons.campaign_outlined,
+                icon: AppIcons.announcement,
               ),
               SectionExpansionTile(
                 title: 'Görevler',
                 color: Color(0xff1E90FF),
-                icon: Icons.assignment_outlined,
+                icon: AppIcons.task,
               ),
               SectionExpansionTile(
                 title: 'Proje Atama',
                 color: Color(0xff2ECC71),
-                icon: Icons.workspaces_outlined,
+                icon: AppIcons.project,
               ),
               SectionExpansionTile(
                 title: 'Eğitimler',
                 color: Color(0xff9B59B6),
-                icon: Icons.cast_for_education_outlined,
+                icon: AppIcons.education,
               ),
               SizedBox(height: 100),
             ],

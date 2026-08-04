@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/models/link_item.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 
 class EditShortcutsSheet extends StatefulWidget {
   final List<LinkItem> allShortcuts;
@@ -80,7 +82,7 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
                 const Spacer(),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, color: Colors.white),
+                  icon: const AppIcon(AppIcons.close, color: Colors.white),
                 ),
               ],
             ),
@@ -158,8 +160,8 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
                                   ),
                           ),
                           child: isSelected
-                              ? const Icon(
-                                  Icons.check,
+                              ? const AppIcon(
+                                  AppIcons.check,
                                   color: Colors.white,
                                   size: 18,
                                 )

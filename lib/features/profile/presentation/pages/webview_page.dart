@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 
 class WebviewPage extends StatefulWidget {
   const WebviewPage({super.key, required this.url, required this.title});
@@ -53,8 +55,8 @@ class _WebviewPageState extends State<WebviewPage> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
+          icon: const AppIcon(
+            AppIcons.arrowBack,
             color: Colors.white,
             size: 20,
           ),
@@ -66,8 +68,8 @@ class _WebviewPageState extends State<WebviewPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.open_in_browser_rounded,
+                  const AppIcon(
+                    AppIcons.browser,
                     color: Colors.white,
                     size: 48,
                   ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/models/link_item.dart';
 import 'package:sky_app/core/services/webview_service.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/icon_box.dart';
 
 class ShortcutsSection extends StatelessWidget {
@@ -82,7 +84,7 @@ class ShortcutsSection extends StatelessWidget {
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.edit),
+                AppIcon(AppIcons.edit),
                 SizedBox(width: 12.0),
                 Text('Kısayolları Düzenle'),
               ],

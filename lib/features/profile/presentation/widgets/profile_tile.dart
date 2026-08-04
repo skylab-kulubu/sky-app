@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/icon_box.dart';
 
 class ProfileTile extends StatelessWidget {
@@ -19,7 +20,7 @@ class ProfileTile extends StatelessWidget {
   final String title;
   final String? subtitle;
   final VoidCallback onTap;
-  final IconData? trailingIcon;
+  final String? trailingIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,7 @@ class ProfileTile extends StatelessWidget {
               const SizedBox(width: 16),
               _textSection(context),
               if (trailingIcon != null)
-                Icon(trailingIcon, color: AppColors.textGrayDark, size: 20),
+                AppIcon(trailingIcon!, color: AppColors.textGrayDark, size: 20),
             ],
           ),
         ),

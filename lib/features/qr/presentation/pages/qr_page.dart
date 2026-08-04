@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/services/user_service.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/auth/data/services/auth_service.dart';
 
 const _green = Color(0xFF22C55E);
@@ -89,8 +91,8 @@ class _QrPageState extends State<QrPage> {
                     width: 1.5,
                   ),
                 ),
-                child: const Icon(
-                  Icons.check_rounded,
+                child: const AppIcon(
+                  AppIcons.check,
                   color: _greenLight,
                   size: 40,
                 ),
@@ -206,8 +208,8 @@ class _QrPageState extends State<QrPage> {
                           onDetect: _onDetect,
                         )
                       : Center(
-                          child: Icon(
-                            Icons.qr_code_2_rounded,
+                          child: AppIcon(
+                            AppIcons.qr,
                             size: frameSize * 0.5,
                             color: color.withValues(alpha: 0.65),
                           ),
@@ -241,13 +243,13 @@ class _QrPageState extends State<QrPage> {
             child: _isScanning
                 ? ElevatedButton.icon(
                     onPressed: _closeCamera,
-                    icon: const Icon(Icons.close, size: 20),
+                    icon: const AppIcon(AppIcons.close, size: 20),
                     label: const Text('Kamerayı Kapat'),
                     style: buttonStyle,
                   )
                 : ElevatedButton.icon(
                     onPressed: _openCamera,
-                    icon: const Icon(Icons.camera_alt_rounded, size: 20),
+                    icon: const AppIcon(AppIcons.camera, size: 20),
                     label: const Text('Kamerayı Aç'),
                     style: buttonStyle,
                   ),

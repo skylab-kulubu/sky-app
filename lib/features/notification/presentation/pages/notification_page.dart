@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/notification/data/services/notification_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -54,8 +56,8 @@ class _NotificationPageState extends State<NotificationPage> {
                               : Color(0xFF1E90FF).withAlpha(41),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
-                          Icons.campaign_outlined,
+                        child: const AppIcon(
+                          AppIcons.announcement,
                           size: AppSizes.icon,
                         ),
                       ),

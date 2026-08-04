@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 
 class TicketCard extends StatelessWidget {
   final String eventName;
@@ -75,8 +77,8 @@ class _Header extends StatelessWidget {
           const SizedBox(height: 4),
           Row(
             children: [
-              const Icon(
-                Icons.location_on,
+              const AppIcon(
+                AppIcons.location,
                 color: AppColors.textWhite70,
                 size: 14,
               ),
@@ -171,7 +173,7 @@ class _Details extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadiuses.containerRadius),
             ),
             child: const Center(
-              child: Icon(Icons.qr_code_2, size: 80, color: Colors.black),
+              child: AppIcon(AppIcons.qr, size: 80, color: Colors.black),
             ),
           ),
         ],
@@ -224,7 +226,7 @@ class _Footer extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          const Icon(Icons.person_outline, color: AppColors.textGray, size: 18),
+          const AppIcon(AppIcons.profile, color: AppColors.textGray, size: 18),
           const SizedBox(width: 8),
           Text(
             holderName,

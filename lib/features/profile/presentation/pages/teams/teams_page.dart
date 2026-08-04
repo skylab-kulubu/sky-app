@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/widgets/tab_label.dart';
@@ -73,13 +74,13 @@ class _TeamsPageState extends TeamsPagemodel {
       ClipRRect(
         borderRadius: BorderRadiusGeometry.all(Radius.circular(10)),
         child: Tab(
-          child: TabLabel(icon: Icons.biotech, label: "AR-GE"),
+          child: TabLabel(icon: AppIcons.research, label: "AR-GE"),
         ),
       ),
       ClipRRect(
         borderRadius: BorderRadiusGeometry.all(Radius.circular(10)),
         child: Tab(
-          child: TabLabel(icon: Icons.groups, label: "Sosyal"),
+          child: TabLabel(icon: AppIcons.group, label: "Sosyal"),
         ),
       ),
     ],

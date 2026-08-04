@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/widgets/nav_item.dart';
 
@@ -75,8 +76,7 @@ class ShellPage extends StatelessWidget {
                   label: 'Ana Sayfa',
                   isSelected: currentLocation == '/home',
                   onTap: () => context.go('/home'),
-                  unSelectedIcon: Icons.home_outlined,
-                  selectedIcon: Icons.home,
+                  icon: AppIcons.home,
                 ),
               ),
               Expanded(
@@ -84,8 +84,7 @@ class ShellPage extends StatelessWidget {
                   label: 'Etkinlikler',
                   isSelected: currentLocation == '/calendar',
                   onTap: () => context.go('/calendar'),
-                  unSelectedIcon: Icons.calendar_today_outlined,
-                  selectedIcon: Icons.calendar_today,
+                  icon: AppIcons.calendar,
                 ),
               ),
               Expanded(
@@ -93,8 +92,7 @@ class ShellPage extends StatelessWidget {
                   label: 'Biletler',
                   isSelected: currentLocation == '/tickets',
                   onTap: () => context.go('/tickets'),
-                  unSelectedIcon: Icons.local_activity_outlined,
-                  selectedIcon: Icons.local_activity,
+                  icon: AppIcons.ticket,
                 ),
               ),
               // Expanded(
@@ -102,8 +100,7 @@ class ShellPage extends StatelessWidget {
               //     label: 'Ekip',
               //     isSelected: currentLocation == '/team',
               //     onTap: () => context.go('/team'),
-              //     unSelectedIcon: Icons.people_outline,
-              //     selectedIcon: Icons.people,
+              //     icon: AppIcons.people,
               //   ),
               // ),
               Expanded(
@@ -111,8 +108,7 @@ class ShellPage extends StatelessWidget {
                   label: 'Profil',
                   isSelected: currentLocation == '/profile',
                   onTap: () => context.go('/profile'),
-                  unSelectedIcon: Icons.person_outline,
-                  selectedIcon: Icons.person,
+                  icon: AppIcons.profile,
                 ),
               ),
             ],
@@ -157,7 +153,7 @@ class ShellPage extends StatelessWidget {
       //         constraints: const BoxConstraints.tightFor(width: 44, height: 44),
       //         iconSize: 26,
       //         icon: Icon(
-      //           Icons.notifications_outlined,
+      //           AppIcons.notification,
       //           size: AppSizes.icon,
       //           color: context.colorScheme.onSurface,
       //         ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/tickets/data/models/event_day_model.dart';
 import 'package:sky_app/features/tickets/data/services/check_in_service.dart';
 
@@ -116,8 +118,7 @@ class _ScanQRState extends State<ScanQR> {
                     ),
                     if (!_isScanning && _scannedTicketId == null)
                       _StartScanOverlay(onStart: _startScanning),
-                    if (_isLoading)
-                      const _LoadingOverlay(),
+                    if (_isLoading) const _LoadingOverlay(),
                     if (_scannedTicketId != null && !_isLoading)
                       _ResultOverlay(
                         success: _checkInSuccess ?? false,
@@ -147,18 +148,18 @@ class _StartScanOverlay extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.qr_code_scanner, size: 64, color: Colors.white),
+            const AppIcon(AppIcons.scan, size: 64, color: Colors.white),
             SizedBox(height: AppSizes.midSpace),
             Text(
               'Kamera hazır',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.white70,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
             ),
             SizedBox(height: AppSizes.bigSpace),
             FilledButton.icon(
               onPressed: onStart,
-              icon: const Icon(Icons.play_arrow),
+              icon: const AppIcon(AppIcons.play),
               label: const Text('Taramaya Başla'),
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.primaryColor,
@@ -201,8 +202,8 @@ class _ResultOverlay extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              success ? Icons.check_circle : Icons.cancel,
+            AppIcon(
+              success ? AppIcons.checkCircle : AppIcons.closeCircle,
               size: 72,
               color: success ? Colors.green : Colors.red,
             ),
@@ -217,7 +218,7 @@ class _ResultOverlay extends StatelessWidget {
             SizedBox(height: AppSizes.bigSpace),
             OutlinedButton.icon(
               onPressed: onReset,
-              icon: const Icon(Icons.refresh, color: Colors.white),
+              icon: const AppIcon(AppIcons.refresh, color: Colors.white),
               label: const Text(
                 'Tekrar Tara',
                 style: TextStyle(color: Colors.white),
@@ -269,7 +270,10 @@ class _ActiveSessionContainer extends StatelessWidget {
                 ? Text(day.formattedDate)
                 : null,
             trailing: isSelected
-                ? Icon(Icons.check_circle, color: AppColors.primaryColor)
+                ? const AppIcon(
+                    AppIcons.checkCircle,
+                    color: AppColors.primaryColor,
+                  )
                 : null,
             onTap: () {
               onDaySelected(day);
@@ -285,8 +289,8 @@ class _ActiveSessionContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final dayLabel = selectedEventDay != null
         ? (selectedEventDay!.name.isNotEmpty
-            ? selectedEventDay!.name
-            : selectedEventDay!.formattedDate)
+              ? selectedEventDay!.name
+              : selectedEventDay!.formattedDate)
         : '-';
 
     return Container(
