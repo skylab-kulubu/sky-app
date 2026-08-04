@@ -1,6 +1,6 @@
 part of 'teams_page.dart'; // Part of
 
-abstract class TeamPagesmodel extends State<TeamsPage>
+abstract class TeamsPagemodel extends State<TeamsPage>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
 

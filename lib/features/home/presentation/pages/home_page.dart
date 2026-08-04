@@ -7,7 +7,7 @@ import 'package:sky_app/features/home/data/services/announcement_service.dart';
 import 'package:sky_app/features/home/presentation/widgets/custom_carousel_slider.dart';
 import 'package:sky_app/features/home/presentation/widgets/latest_news_section.dart';
 
-part 'home_page_model.dart';
+part 'home_pagemodel.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends HomePageModel {
+class _HomePageState extends HomePagemodel {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
@@ -44,18 +44,18 @@ class _HomePageState extends HomePageModel {
                     ),
                   ),
                 ),
-                const SizedBox(height: HomePageModel._sectionSpacing),
+                const SizedBox(height: HomePagemodel._sectionSpacing),
                 CustomCarouselSlider(items: carouselItems),
-                const SizedBox(height: HomePageModel._sectionSpacing),
+                const SizedBox(height: HomePagemodel._sectionSpacing),
                 // _sectionHeader(context, 'Kısayollar'),
-                // const SizedBox(height: HomePageModel._titleSpacing),
+                // const SizedBox(height: HomePagemodel._titleSpacing),
                 // ShortcutsSection(
                 //   shortcuts: _visibleShortcuts,
                 //   onEditTap: _openEditSheet,
                 // ),
-                // const SizedBox(height: HomePageModel._sectionSpacing),
+                // const SizedBox(height: HomePagemodel._sectionSpacing),
                 _sectionHeader(context, 'Son Haberler'),
-                const SizedBox(height: HomePageModel._titleSpacing),
+                const SizedBox(height: HomePagemodel._titleSpacing),
                 LatestNewsSection(latestNews: latestNews),
               ],
             ),

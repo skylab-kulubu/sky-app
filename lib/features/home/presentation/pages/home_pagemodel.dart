@@ -1,6 +1,6 @@
 part of 'home_page.dart';
 
-abstract class HomePageModel extends State<HomePage> {
+abstract class HomePagemodel extends State<HomePage> {
   static const double _sectionSpacing = 32.0;
   static const double _titleSpacing = 12.0;
 

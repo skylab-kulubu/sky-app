@@ -2,13 +2,22 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Main Colors
-  static const primaryColor = Color(0xFF1E90FF);
+  static const primaryColor = Color(0xFFe0c8e5);
   static const cardBackground = Color(0xFF252525);
   static const buttonBackground = Color(0xFF263238);
-  static const indicatorColor = Color(0xFF2196F3);
+  static const indicatorColor = Color(0xFFe0c8e5);
   static const secondaryBlue = Color(0xFF00BFFF);
-  static const scaffoldBackgroundColor = Color(0xFF1E1E1E);
+  static const scaffoldBackgroundColor = Color(0xFF000000);
   static const tileBackgroundColor = Color(0xFF252525);
+
+  // Bottom Navigation (glass floating nav from design)
+  static const navBackground = Color(0xEB1E1E24); // slightly translucent glass
+  static const primaryDeep = Color(0xFFC9A0D6);
+  static const navTextTertiary = Color(0xFF9A97A6);
+  static final navBorder = Colors.white.withValues(alpha: 0.10);
+  static final navIndicator = const Color(
+    0xFFE0C8E5,
+  ).withValues(alpha: 0.14); // primarySoft
 
   // Text Colors
   static const textWhite = Color(0xFFFFFFFF);

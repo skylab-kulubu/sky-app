@@ -9,7 +9,7 @@ class LatestNewsSection extends StatelessWidget {
 
   static const double _separatorHeight = 8.0;
   static const double _cardBorderRadius = 24.0;
-  static const Color _cardColor = Color(0xFF303030);
+  static const Color _cardColor = Color.fromARGB(255, 27, 26, 26);
   static const double _thumbnailSpacing = 12.0;
 
   @override
@@ -18,7 +18,8 @@ class LatestNewsSection extends StatelessWidget {
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       itemCount: latestNews.length,
-      separatorBuilder: (context, index) => const SizedBox(height: _separatorHeight),
+      separatorBuilder: (context, index) =>
+          const SizedBox(height: _separatorHeight),
       itemBuilder: (context, index) {
         final news = latestNews[index];
         return Container(
@@ -57,9 +58,9 @@ class NewsTitleAndDescription extends StatelessWidget {
     final titleStyle = Theme.of(
       context,
     ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
-    final descriptionStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-      color: _descriptionColor,
-    );
+    final descriptionStyle = Theme.of(
+      context,
+    ).textTheme.bodyMedium?.copyWith(color: _descriptionColor);
 
     return Expanded(
       child: Column(
@@ -97,10 +98,7 @@ class NewsThumbnail extends StatelessWidget {
         borderRadius: BorderRadius.circular(_borderRadius),
         color: _backgroundColor,
       ),
-      child: Image.network(
-        news.imageUrl,
-        fit: BoxFit.cover,
-      ),
+      child: Image.network(news.imageUrl, fit: BoxFit.cover),
     );
   }
 }

@@ -18,7 +18,7 @@ class TeamsPage extends StatefulWidget {
   State<TeamsPage> createState() => _TeamsPageState();
 }
 
-class _TeamsPageState extends TeamPagesmodel {
+class _TeamsPageState extends TeamsPagemodel {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

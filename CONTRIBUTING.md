@@ -10,38 +10,58 @@ Bu projeye katkıda bulunmadan önce lütfen aşağıdaki kuralları dikkatlice 
 lib/
 ├── main.dart
 ├── core/
-│   └── constants/
-│       ├── app_color.dart
-│       ├── app_padding.dart
-│       └── app_radius.dart
+│   ├── constants/
+│   │   ├── app_assets.dart
+│   │   ├── app_colors.dart
+│   │   ├── app_paddings.dart
+│   │   ├── app_radiuses.dart
+│   │   └── app_sizes.dart
+│   ├── extensions/
+│   ├── models/
+│   ├── router/
+│   ├── services/
+│   ├── theme/
+│   └── widgets/
 └── features/
     └── home/
         ├── data/
-        │   └── (repository, model, service dosyaları)
+        │   ├── models/
+        │   └── services/
         └── presentation/
             ├── pages/
             │   ├── home_page.dart
             │   └── home_pagemodel.dart
             ├── widgets/
-            │   └── name_container.dart
+            │   └── latest_news_section.dart
             └── providers/
 ```
 
 Her yeni özellik `features/` altına kendi adıyla klasör açılarak eklenir. Klasör yapısı yukarıdaki şemaya uygun olmalıdır.
 
+Birden fazla feature'ın ortak kullandığı widget, servis, model ve sabitler `core/` altında yaşar; yalnızca tek bir feature'ı ilgilendirenler o feature'ın kendi klasöründe kalır.
+
 ---
 
 ##  Page & PageModel Ayrımı (`part` / `part of`)
 
-Her sayfa iki ayrı dosyaya bölünür:
+**Bu ayrım her sayfa için zorunlu değildir.** Sayfa büyüdükçe — özellikle `StatefulWidget` sayfalarda fonksiyon sayısı arttıkça — UI tarafı kalabalıklaşır ve okunması zorlaşır. Böyle durumlarda sayfa ikiye bölünür:
 
-- `home_page.dart` → Sadece `build` ve extract method'ları içerir.
-- `home_pagemodel.dart` → `initState`, `dispose` ve iş mantığını içerir.
+- `home_page.dart` → Sadece `build` ve UI extract method'ları.
+- `home_pagemodel.dart` → `initState`, `dispose`, state alanları ve iş mantığı.
+
+Sayfa küçükse ve neredeyse hiç mantık içermiyorsa (basit bir `StatelessWidget`, tek `build`'lik bir sayfa) tek dosyada bırakılır. Kural okunabilirlik içindir; dosya sayısını artırmak için değil.
+
+**Ne zaman ayır:**
+
+- Sayfada birden fazla event handler / iş mantığı fonksiyonu birikmişse
+- `initState` / `dispose` ve controller yönetimi varsa
+- `build` dışındaki mantık, UI kodunu okumayı zorlaştırıyorsa
 
 **`home_page.dart`**
 ```dart
 import 'package:flutter/material.dart';
-import 'package:atolye_deneme_skyapp/features/home/presentation/widgets/name_container.dart';
+import 'package:sky_app/core/constants/app_paddings.dart';
+import 'package:sky_app/features/home/presentation/widgets/latest_news_section.dart';
 
 part 'home_pagemodel.dart';
 
@@ -55,20 +75,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends HomePagemodel {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: fab(),
-      bottomNavigationBar: navbar(),
-      body: Column(
-        children: [
-          NameContainer(name: 'Meryem'),
-          NameContainer(name: 'Büşra'),
-        ],
-      ),
+    return ListView(
+      padding: AppPaddings.mainPaddingAll,
+      children: [
+        _sectionHeader('Son Haberler'),
+        const LatestNewsSection(),
+      ],
     );
   }
 
-  BottomNavigationBar navbar() => BottomNavigationBar(items: []);
-  FloatingActionButton fab() => FloatingActionButton(onPressed: () {});
+  Widget _sectionHeader(String title) => Text(title);
 }
 ```
 
@@ -77,6 +93,8 @@ class _HomePageState extends HomePagemodel {
 part of 'home_page.dart';
 
 abstract class HomePagemodel extends State<HomePage> {
+  final ScrollController scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -84,12 +102,15 @@ abstract class HomePagemodel extends State<HomePage> {
 
   @override
   void dispose() {
+    scrollController.dispose();
     super.dispose();
   }
 }
 ```
 
-> ⚠️ `HomePagemodel` sınıfı mutlaka `abstract` olmalıdır.
+> ⚠️ PageModel sınıfı mutlaka `abstract` olmalıdır.
+
+**İsimlendirme:** Dosya `<sayfa_adı>_pagemodel.dart`, sınıf `<SayfaAdı>Pagemodel` şeklinde yazılır.
 
 ---
 
@@ -98,29 +119,34 @@ abstract class HomePagemodel extends State<HomePage> {
 Birden fazla yerde kullanılan ya da karmaşık hale gelen widget'lar `widgets/` klasörüne ayrı bir dosya olarak çıkarılır.
 
 ```dart
-// features/home/presentation/widgets/name_container.dart
+// features/home/presentation/widgets/news_thumbnail.dart
 
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_radiuses.dart';
 
-class NameContainer extends StatelessWidget {
-  const NameContainer({
+class NewsThumbnail extends StatelessWidget {
+  const NewsThumbnail({
     super.key,
-    required this.name,
+    required this.title,
   });
 
-  final String name;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColor.primary, // core/constants kullanılmalı
+        color: AppColors.cardBackground, // core/constants kullanılmalı
+        borderRadius: AppRadiuses.cardBorderRadius,
       ),
-      child: Text(name),
+      child: Text(title),
     );
   }
 }
 ```
+
+Yalnızca tek bir feature'da kullanılan widget o feature'ın `presentation/widgets/` klasörüne; birden fazla feature'da kullanılanlar `core/widgets/` altına konur.
 
 ---
 
@@ -130,16 +156,19 @@ Aynı sayfa içinde tekrar eden ya da uzun UI blokları `build` metodundan ayrı
 
 ```dart
 // ✅ Doğru
-FloatingActionButton fab() => FloatingActionButton(onPressed: () {});
-BottomNavigationBar navbar() => BottomNavigationBar(items: []);
+Widget _sectionHeader(String title) => Text(title);
+PreferredSizeWidget _appBar() => AppBar(title: const Text('Profil'));
 
 // ❌ Yanlış — her şeyi build içine yazmak
 @override
 Widget build(BuildContext context) {
   return Scaffold(
-    floatingActionButton: FloatingActionButton(onPressed: () {}),
-    bottomNavigationBar: BottomNavigationBar(items: []),
-    // ...
+    appBar: AppBar(title: const Text('Profil')),
+    body: Column(
+      children: [
+        // onlarca satır iç içe widget
+      ],
+    ),
   );
 }
 ```
@@ -148,25 +177,33 @@ Widget build(BuildContext context) {
 
 ##  Core Constants Kullanımı
 
-Renk, padding ve radius değerleri **kesinlikle** hard-code yazılmaz. `core/constants/` altındaki ilgili sabit dosyası kullanılır.
+Renk, padding, radius ve boyut değerleri **kesinlikle** hard-code yazılmaz. `core/constants/` altındaki ilgili sabit dosyası kullanılır.
 
 ```dart
 // ❌ Yanlış
 color: Colors.black
 padding: EdgeInsets.all(16)
-borderRadius: BorderRadius.circular(8)
+borderRadius: BorderRadius.circular(16)
+size: 26
+'assets/icons/email.svg'
 
 // ✅ Doğru
-color: AppColor.primary
-padding: EdgeInsets.all(AppPadding.m)
-borderRadius: BorderRadius.circular(AppRadius.m)
+color: AppColors.scaffoldBackgroundColor
+padding: AppPaddings.mainPaddingAll
+borderRadius: AppRadiuses.cardBorderRadius
+size: AppSizes.icon
+AppAssets.email
 ```
 
-| Dosya | İçerik |
-|---|---|
-| `app_color.dart` | Renk sabitleri |
-| `app_padding.dart` | Padding değerleri |
-| `app_radius.dart` | Border radius değerleri |
+| Dosya | Sınıf | İçerik |
+|---|---|---|
+| `app_colors.dart` | `AppColors` | Renk sabitleri |
+| `app_paddings.dart` | `AppPaddings` | `EdgeInsets` padding değerleri |
+| `app_radiuses.dart` | `AppRadiuses` | Border radius değerleri (`double` ve `BorderRadius`) |
+| `app_sizes.dart` | `AppSizes` | İkon boyutları ve boşluk (space) değerleri |
+| `app_assets.dart` | `AppAssets` | Asset dosya yolları (svg, png) |
+
+İhtiyaç duyduğun değer sabit dosyasında yoksa, hard-code yazmak yerine ilgili dosyaya anlamlı bir isimle yeni sabit ekle.
 
 ---
 
@@ -175,7 +212,7 @@ borderRadius: BorderRadius.circular(AppRadius.m)
 PR açmadan önce aşağıdaki maddeleri kontrol et:
 
 - [ ] Klasör yapısı kurala uygun (`features/özellik_adı/data` ve `presentation`)
-- [ ] Page ve PageModel `part`/`part of` ile ayrılmış
+- [ ] Sayfa kalabalıklaştıysa Page ve PageModel `part`/`part of` ile ayrılmış
 - [ ] Tekrar eden widget'lar `widgets/` klasörüne extract edilmiş
 - [ ] Uzun UI blokları extract method olarak ayrılmış
-- [ ] Hard-coded renk, padding ve radius değeri yok; `core/constants` kullanılıyor
+- [ ] Hard-coded renk, padding, radius, boyut ve asset yolu yok; `core/constants` kullanılıyor

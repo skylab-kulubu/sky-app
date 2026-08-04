@@ -4,6 +4,7 @@ class AppRadiuses {
   static const double buttonRadius = 100;
   static const double navbar = 24;
   static const double navitem = 16;
+  static const double navIndicator = 18;
 
   static const double cardRadius = 16;
   static const double containerRadius = 10;

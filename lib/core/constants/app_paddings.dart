@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 class AppPaddings {
   static const mainPaddingAll = EdgeInsets.all(16);
 
+  static const all6 = EdgeInsets.all(6);
+
   static const horizontal8 = EdgeInsets.symmetric(horizontal: 8);
   static const horizontal16Vertical8 = EdgeInsets.symmetric(
     horizontal: 16,

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
@@ -82,38 +83,49 @@ class _AuthPageState extends AuthPagemodel {
     return SizedBox(
       width: double.infinity,
       height: buttonHeight,
-      child: ClipRRect(
-        borderRadius: borderRadius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Material(
-            color: AppColors.buttonColor.withValues(alpha: 0.45),
-            child: InkWell(
-              onTap: isLoading ? null : handleAuth,
-              splashColor: Colors.white.withValues(alpha: 0.08),
-              highlightColor: Colors.white.withValues(alpha: 0.04),
-              child: SizedBox(
-                height: buttonHeight,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (isLoading)
-                      const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    else
-                      SvgPicture.asset(AppAssets.skylab, height: 20),
-                    const SizedBox(width: 12),
-                    Text(
-                      'e-skylab ile Giriş Yap',
-                      style: context.textTheme.titleMedium,
-                    ),
-                  ],
+      child: AnimatedBuilder(
+        animation: pressController,
+        builder: (context, child) {
+          final scale = 1 - (pressController.value * 0.05);
+
+          return Transform.scale(scale: scale, child: child);
+        },
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Material(
+              color: AppColors.buttonColor.withValues(alpha: 0.45),
+              child: InkWell(
+                onTapDown: isLoading ? null : (_) => animatePress(true),
+                onTapCancel: isLoading ? null : () => animatePress(false),
+                onTapUp: isLoading ? null : (_) => animatePress(false),
+                onTap: isLoading ? null : handleAuth,
+                splashColor: Colors.white.withValues(alpha: 0.08),
+                highlightColor: Colors.white.withValues(alpha: 0.04),
+                child: SizedBox(
+                  height: buttonHeight,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (isLoading)
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      else
+                        SvgPicture.asset(AppAssets.skylab, height: 20),
+                      const SizedBox(width: 12),
+                      Text(
+                        'e-skylab ile Giriş Yap',
+                        style: context.textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

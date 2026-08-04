@@ -20,7 +20,7 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends ProfilePageModel {
+class _ProfilePageState extends ProfilePagemodel {
   @override
   Widget build(BuildContext context) {
     final user = context.read<UserProvider>().user;
