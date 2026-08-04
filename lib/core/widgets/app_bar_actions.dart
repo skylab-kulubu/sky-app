@@ -36,7 +36,9 @@ class AppBarActions extends StatelessWidget {
 
   /// Kapsayıcının dış ölçüsü: içerik + iç boşluk + kenarlık.
   /// [_row] ile birebir aynı sabitlerden türediği için kayma olamaz.
-  double get _width => _contentWidth + (_inset + _borderWidth) * 2;
+  /// İkon yokken 0 — aksi halde boş bir hap görünürdü.
+  double get _width =>
+      icons.isEmpty ? 0 : _contentWidth + (_inset + _borderWidth) * 2;
 
   double get _height => _buttonSize + (_inset + _borderWidth) * 2;
 

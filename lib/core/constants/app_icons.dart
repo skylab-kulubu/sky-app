@@ -14,6 +14,8 @@ class AppIcons {
   static const String widget = 'widget';
   static const String search = 'search';
   static const String settings = 'settings';
+  static const String shuffle = 'shuffle';
+  static const String infoSquare = 'infoSquare';
 
   // Actions
   static const String close = 'xmark';
@@ -34,7 +36,7 @@ class AppIcons {
   static const String camera = 'camera';
 
   // People
-  static const String people = 'people';
+  static const String users2 = 'users2';
   static const String group = 'group';
 
   // Content

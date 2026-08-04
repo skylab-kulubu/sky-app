@@ -94,17 +94,11 @@ class ShellPage extends StatelessWidget {
                   icon: AppIcons.calendar,
                 ),
                 NavItem(
-                  label: 'Biletler',
-                  isSelected: currentLocation == '/tickets',
-                  onTap: () => context.go('/tickets'),
-                  icon: AppIcons.ticket,
+                  label: 'Ekip',
+                  isSelected: currentLocation == '/team',
+                  onTap: () => context.go('/team'),
+                  icon: AppIcons.users2,
                 ),
-                // NavItem(
-                //   label: 'Ekip',
-                //   isSelected: currentLocation == '/team',
-                //   onTap: () => context.go('/team'),
-                //   icon: AppIcons.people,
-                // ),
                 NavItem(
                   label: 'Profil',
                   isSelected: currentLocation == '/profile',
@@ -190,9 +184,10 @@ class _AppBarConfig {
     title: 'Etkinlikler',
     actions: [AppIcons.search],
   );
-  static const _tickets = _AppBarConfig(
-    title: 'Biletler',
-    actions: [AppIcons.scan],
+
+  static const _team = _AppBarConfig(
+    title: 'Ekip',
+    actions: [AppIcons.shuffle, AppIcons.infoSquare],
   );
   static const _profile = _AppBarConfig(
     title: 'Profil',
@@ -201,7 +196,7 @@ class _AppBarConfig {
 
   factory _AppBarConfig.forLocation(String location) {
     if (location.startsWith('/calendar')) return _calendar;
-    if (location.startsWith('/tickets')) return _tickets;
+    if (location.startsWith('/team')) return _team;
     if (location.startsWith('/profile')) return _profile;
     return _home;
   }
