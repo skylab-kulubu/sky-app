@@ -49,11 +49,11 @@ class AppBarActions extends StatelessWidget {
       height: _height,
       decoration: BoxDecoration(
         color: AppColors.tileBackgroundColor,
-        borderRadius: AppRadiuses.appBarActionsBorderRadius,
+        borderRadius: AppRadiuses.stadiumBorderRadius,
         border: Border.all(color: AppColors.navBorder, width: _borderWidth),
       ),
       child: ClipRRect(
-        borderRadius: AppRadiuses.appBarActionsBorderRadius,
+        borderRadius: AppRadiuses.stadiumBorderRadius,
         // Genişleme sırasında yeni ikon, kapsayıcı henüz dar iken eklenir.
         // OverflowBox taşma hatasını engelliyor; sağa hizalı olduğu için
         // sağdaki ikon yerinde kalıp yenisi soldan açılıyor.

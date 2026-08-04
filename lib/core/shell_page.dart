@@ -53,69 +53,65 @@ class ShellPage extends StatelessWidget {
     );
   }
 
-  Padding navBar(String currentLocation, BuildContext context) {
+  Widget navBar(String currentLocation, BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 30, top: 10),
-      child: Container(
-        padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: AppColors.tileBackgroundColor.withValues(alpha: 0.95),
-          borderRadius: BorderRadius.circular(AppRadiuses.navbar),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.50),
-              blurRadius: 32,
-              offset: const Offset(0, 8),
+      padding: AppPaddings.navBar,
+      child: Center(
+        // heightFactor olmadan Center tüm yüksekliği doldurur ve
+        // bottomNavigationBar içinde hap ekranın ortasına düşer.
+        heightFactor: 1,
+        // Hap içeriğe oturuyor; dar ekranda taşmak yerine küçülsün diye
+        // FittedBox ile sarmalanıyor.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Container(
+            padding: AppPaddings.navBarContent,
+            decoration: BoxDecoration(
+              color: AppColors.tileBackgroundColor.withValues(alpha: 0.95),
+              borderRadius: AppRadiuses.stadiumBorderRadius,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.50),
+                  blurRadius: 32,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(
-                child: NavItem(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                NavItem(
                   label: 'Ana Sayfa',
                   isSelected: currentLocation == '/home',
                   onTap: () => context.go('/home'),
                   icon: AppIcons.home,
                 ),
-              ),
-              Expanded(
-                child: NavItem(
+                NavItem(
                   label: 'Etkinlikler',
                   isSelected: currentLocation == '/calendar',
                   onTap: () => context.go('/calendar'),
                   icon: AppIcons.calendar,
                 ),
-              ),
-              Expanded(
-                child: NavItem(
+                NavItem(
                   label: 'Biletler',
                   isSelected: currentLocation == '/tickets',
                   onTap: () => context.go('/tickets'),
                   icon: AppIcons.ticket,
                 ),
-              ),
-              // Expanded(
-              //   child: NavItem(
-              //     label: 'Ekip',
-              //     isSelected: currentLocation == '/team',
-              //     onTap: () => context.go('/team'),
-              //     icon: AppIcons.people,
-              //   ),
-              // ),
-              Expanded(
-                child: NavItem(
+                // NavItem(
+                //   label: 'Ekip',
+                //   isSelected: currentLocation == '/team',
+                //   onTap: () => context.go('/team'),
+                //   icon: AppIcons.people,
+                // ),
+                NavItem(
                   label: 'Profil',
                   isSelected: currentLocation == '/profile',
                   onTap: () => context.go('/profile'),
                   icon: AppIcons.profile,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

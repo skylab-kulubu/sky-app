@@ -18,4 +18,26 @@ class AppPaddings {
   /// AppBar actions'ının sağ kenar boşluğu. Başlığın soldaki
   /// `titleSpacing` (16) değeriyle simetrik olsun diye aynı.
   static const appBarActions = EdgeInsets.only(right: 16);
+
+  /// Yüzen navbar'ın ekran kenarlarına uzaklığı.
+  static const navBar = EdgeInsets.only(
+    left: 16,
+    right: 16,
+    bottom: 30,
+    top: 10,
+  );
+
+  /// Navbar hap'ının, öğelerini saran iç boşluğu.
+  static const navBarContent = EdgeInsets.all(8);
+
+  /// Navbar öğesinin iç boşluğu. Dikey değer, ikon boyutuyla birlikte
+  /// öğe yüksekliğini 48px'e tamamlıyor.
+  static const navItem = EdgeInsets.symmetric(horizontal: 12, vertical: 11);
+
+  /// Seçili navbar öğesinin iç boşluğu; hap'ın etiketiyle birlikte daha
+  /// ferah durması için yatayda [navItem]'dan geniş.
+  static const navItemSelected = EdgeInsets.symmetric(
+    horizontal: 16,
+    vertical: 11,
+  );
 }

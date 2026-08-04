@@ -21,8 +21,10 @@ class AppRadiuses {
   static const double tile = 16;
   static const double iconBox = 12;
 
-  static const double appBarActions = 20;
-  static const BorderRadius appBarActionsBorderRadius = BorderRadius.all(
-    Radius.circular(appBarActions),
+  /// Kutunun yarı yüksekliğini aştığı için çizimde otomatik olarak tam yuvarlak
+  /// (stadium) hâline iner. Yükseklik değişince peşinden güncellemek gerekmez.
+  static const double stadium = 999;
+  static const BorderRadius stadiumBorderRadius = BorderRadius.all(
+    Radius.circular(stadium),
   );
 }
