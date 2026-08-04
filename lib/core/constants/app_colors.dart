@@ -8,7 +8,7 @@ class AppColors {
   static const indicatorColor = Color(0xFFe0c8e5);
   static const secondaryBlue = Color(0xFF00BFFF);
   static const scaffoldBackgroundColor = Color(0xFF000000);
-  static const tileBackgroundColor = Color(0xFF252525);
+  static const tileBackgroundColor = Color.fromARGB(255, 27, 26, 26);
 
   // Bottom Navigation (glass floating nav from design)
   static const navBackground = Color(0xEB1E1E24); // slightly translucent glass

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:sky_app/core/extensions/context_extensions.dart';
-import 'package:sky_app/core/widgets/sky_button.dart';
 
 class CommingSoonPage extends StatelessWidget {
   const CommingSoonPage({super.key});
@@ -21,17 +18,6 @@ class CommingSoonPage extends StatelessWidget {
                 style: Theme.of(
                   context,
                 ).textTheme.titleMedium?.copyWith(color: Colors.grey[400]),
-              ),
-              SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 80.0),
-                child: SkyButton(
-                  backgroundColor: context.colorScheme.primary,
-                  text: "Ekipleri Gör",
-                  onPressed: () {
-                    context.push('/profile/teams');
-                  },
-                ),
               ),
             ],
           ),

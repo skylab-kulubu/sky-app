@@ -21,6 +21,11 @@ class AppRadiuses {
   static const double tile = 16;
   static const double iconBox = 12;
 
+  /// Bottom sheet'in üst köşeleri.
+  static const BorderRadius sheetBorderRadius = BorderRadius.vertical(
+    top: Radius.circular(24),
+  );
+
   /// Kutunun yarı yüksekliğini aştığı için çizimde otomatik olarak tam yuvarlak
   /// (stadium) hâline iner. Yükseklik değişince peşinden güncellemek gerekmez.
   static const double stadium = 999;

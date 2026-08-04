@@ -11,7 +11,7 @@ class AppIcons {
   static const String profile = 'user';
 
   // AppBar actions
-  static const String menu = 'menu';
+  static const String widget = 'widget';
   static const String search = 'search';
   static const String settings = 'settings';
 
@@ -40,7 +40,7 @@ class AppIcons {
   // Content
   static const String clock = 'clock';
   static const String location = 'location';
-  static const String notification = 'notification';
+  static const String bell = 'bell';
   static const String announcement = 'bullhorn';
   static const String task = 'task';
   static const String project = 'category';

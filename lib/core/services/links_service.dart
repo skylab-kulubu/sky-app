@@ -5,6 +5,13 @@ import 'package:sky_app/core/models/link_item.dart';
 class LinksService {
   static const List<LinkItem> list = [
     LinkItem(
+      name: 'Ekipler',
+      description: 'Kulüp ekiplerini keşfet',
+      iconPath: AppAssets.people,
+      color: AppColors.primaryColor,
+      url: 'https://arge.yildizskylab.com/',
+    ),
+    LinkItem(
       name: 'SKY LAB',
       description: 'SKY LAB resmi web sitesi',
       iconPath: AppAssets.skylab,

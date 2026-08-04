@@ -10,7 +10,6 @@ import 'package:sky_app/features/notification/presentation/pages/notification_pa
 import 'package:sky_app/features/profile/presentation/pages/certificates/cert_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/contact/contact_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
-import 'package:sky_app/features/profile/presentation/pages/teams/teams_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/webview_page.dart';
 import 'package:sky_app/features/team/presentation/pages/comming_soon_page.dart';
 import 'package:sky_app/features/tickets/presentation/pages/scanqr/qr_page.dart';
@@ -91,11 +90,6 @@ class RouterManager {
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: ProfilePage()),
             routes: [
-              GoRoute(
-                path: 'teams',
-                parentNavigatorKey: _rootNavigatorKey,
-                builder: (context, state) => const TeamsPage(),
-              ),
               GoRoute(
                 path: 'certificates',
                 parentNavigatorKey: _rootNavigatorKey,

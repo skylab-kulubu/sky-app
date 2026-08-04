@@ -9,6 +9,7 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
+import 'package:sky_app/core/widgets/club_menu_sheet.dart';
 import 'package:sky_app/core/widgets/nav_item.dart';
 
 class ShellPage extends StatelessWidget {
@@ -130,8 +131,18 @@ class ShellPage extends StatelessWidget {
       automaticallyImplyLeading: false,
       title: _appBarTitle(context, config),
       actionsPadding: AppPaddings.appBarActions,
-      actions: [AppBarActions(icons: config.actions)],
+      actions: [
+        AppBarActions(
+          icons: config.actions,
+          onIconTap: (icon) => _onActionTap(context, icon),
+        ),
+      ],
     );
+  }
+
+  /// Diğer ikonların sayfaları henüz yok; bağlanana kadar sessizce yok sayılır.
+  void _onActionTap(BuildContext context, String icon) {
+    if (icon == AppIcons.widget) ClubMenuSheet.show(context);
   }
 
   Widget _appBarTitle(BuildContext context, _AppBarConfig config) {
@@ -173,7 +184,7 @@ class _AppBarConfig {
   static const _home = _AppBarConfig(
     title: 'Sky Lab',
     showLogo: true,
-    actions: [AppIcons.menu, AppIcons.notification],
+    actions: [AppIcons.widget, AppIcons.bell],
   );
   static const _calendar = _AppBarConfig(
     title: 'Etkinlikler',
