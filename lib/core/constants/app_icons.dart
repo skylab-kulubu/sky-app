@@ -10,6 +10,11 @@ class AppIcons {
   static const String ticket = 'ticket';
   static const String profile = 'user';
 
+  // AppBar actions
+  static const String menu = 'menu';
+  static const String search = 'search';
+  static const String settings = 'settings';
+
   // Actions
   static const String close = 'xmark';
   static const String closeCircle = 'closeCircle';

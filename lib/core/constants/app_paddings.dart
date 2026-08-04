@@ -14,4 +14,8 @@ class AppPaddings {
     horizontal: 8,
   );
   static const buttonInternalPadding = EdgeInsets.symmetric(vertical: 10);
+
+  /// AppBar actions'ının sağ kenar boşluğu. Başlığın soldaki
+  /// `titleSpacing` (16) değeriyle simetrik olsun diye aynı.
+  static const appBarActions = EdgeInsets.only(right: 16);
 }

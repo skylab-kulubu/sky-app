@@ -4,7 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
+import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/constants/app_sizes.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/widgets/app_bar_actions.dart';
 import 'package:sky_app/core/widgets/nav_item.dart';
 
 class ShellPage extends StatelessWidget {
@@ -119,48 +123,79 @@ class ShellPage extends StatelessWidget {
   }
 
   AppBar appBar(BuildContext context) {
+    final config = _AppBarConfig.forLocation(
+      GoRouterState.of(context).matchedLocation,
+    );
+
     return AppBar(
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
-      centerTitle: true,
-      title: SvgPicture.asset(
-        AppAssets.skylab,
-        width: 44,
-        height: 44,
-        fit: BoxFit.contain,
-      ),
-      leadingWidth: 60,
-      leading: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Center(
-          child: SvgPicture.asset(
-            AppAssets.mobilab,
-            width: 36,
-            height: 36,
+      centerTitle: false,
+      automaticallyImplyLeading: false,
+      title: _appBarTitle(context, config),
+      actionsPadding: AppPaddings.appBarActions,
+      actions: [AppBarActions(icons: config.actions)],
+    );
+  }
+
+  Widget _appBarTitle(BuildContext context, _AppBarConfig config) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (config.showLogo) ...[
+          SvgPicture.asset(
+            AppAssets.skylab,
+            width: AppSizes.iconLarge,
+            height: AppSizes.iconLarge,
             fit: BoxFit.contain,
           ),
+          const SizedBox(width: AppSizes.midSpace),
+        ],
+        Text(
+          config.title,
+          style: context.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ),
-      // actions: [
-      //   Padding(
-      //     padding: const EdgeInsets.only(right: 5),
-      //     child: SizedBox(
-      //       width: 44,
-      //       height: 44,
-      //       child: IconButton(
-      //         onPressed: () => context.push('/notification'),
-      //         padding: EdgeInsets.zero,
-      //         constraints: const BoxConstraints.tightFor(width: 44, height: 44),
-      //         iconSize: 26,
-      //         icon: Icon(
-      //           AppIcons.notification,
-      //           size: AppSizes.icon,
-      //           color: context.colorScheme.onSurface,
-      //         ),
-      //       ),
-      //     ),
-      //   ),
-      // ],
+      ],
     );
+  }
+}
+
+/// Shell sekmelerinin her biri için appbar içeriği.
+class _AppBarConfig {
+  const _AppBarConfig({
+    required this.title,
+    required this.actions,
+    this.showLogo = false,
+  });
+
+  final String title;
+  final List<String> actions;
+  final bool showLogo;
+
+  static const _home = _AppBarConfig(
+    title: 'Sky Lab',
+    showLogo: true,
+    actions: [AppIcons.menu, AppIcons.notification],
+  );
+  static const _calendar = _AppBarConfig(
+    title: 'Etkinlikler',
+    actions: [AppIcons.search],
+  );
+  static const _tickets = _AppBarConfig(
+    title: 'Biletler',
+    actions: [AppIcons.scan],
+  );
+  static const _profile = _AppBarConfig(
+    title: 'Profil',
+    actions: [AppIcons.edit, AppIcons.settings],
+  );
+
+  factory _AppBarConfig.forLocation(String location) {
+    if (location.startsWith('/calendar')) return _calendar;
+    if (location.startsWith('/tickets')) return _tickets;
+    if (location.startsWith('/profile')) return _profile;
+    return _home;
   }
 }

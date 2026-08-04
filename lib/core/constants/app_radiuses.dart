@@ -20,4 +20,9 @@ class AppRadiuses {
   );
   static const double tile = 16;
   static const double iconBox = 12;
+
+  static const double appBarActions = 20;
+  static const BorderRadius appBarActionsBorderRadius = BorderRadius.all(
+    Radius.circular(appBarActions),
+  );
 }
