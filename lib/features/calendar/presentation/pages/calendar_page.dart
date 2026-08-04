@@ -47,9 +47,10 @@ class _CalendarPageState extends State<CalendarPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 100.0),
                     child: Text(
-                      'Gösterilecek etkinlik bulunamadı.',
-                      style: context.textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textGray,
+                      'Gösterilecek etkinlik yok.',
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        color: Colors.grey[400],
                       ),
                     ),
                   ),
