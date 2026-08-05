@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 
 class AppPaddings {
   static const mainPaddingAll = EdgeInsets.all(16);
+  static const mainPaddingHorizontal = EdgeInsets.symmetric(horizontal: 16);
+  static const newsTile = EdgeInsets.symmetric(horizontal: 16, vertical: 8);
 
   static const all6 = EdgeInsets.all(6);
 
@@ -14,6 +16,9 @@ class AppPaddings {
     horizontal: 8,
   );
   static const buttonInternalPadding = EdgeInsets.symmetric(vertical: 10);
+
+  /// AppBar leading'inin sol kenar boşluğu; actions'ınkiyle simetrik.
+  static const appBarLeading = EdgeInsets.only(left: 16);
 
   /// AppBar actions'ının sağ kenar boşluğu. Başlığın soldaki
   /// `titleSpacing` (16) değeriyle simetrik olsun diye aynı.

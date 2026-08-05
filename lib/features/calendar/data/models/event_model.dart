@@ -38,6 +38,26 @@ class EventModel {
     );
   }
 
+  static DateTime? _parse(String value) {
+    if (value.isEmpty) return null;
+    return DateTime.tryParse(value);
+  }
+
+  DateTime? get startDateTime => _parse(startDate);
+
+  DateTime? get endDateTime => _parse(endDate);
+
+  /// Bitişi henüz geçmemiş etkinlikler "yaklaşan" sayılır.
+  ///
+  /// Başlangıç değil bitiş baz alınıyor; aksi hâlde birden çok gün süren bir
+  /// etkinlik daha devam ederken listeden düşerdi. Tarih okunamıyorsa etkinlik
+  /// listelenmez — belirsiz bir kaydı yaklaşan gibi göstermek yanıltıcı olur.
+  bool get isUpcoming {
+    final reference = endDateTime ?? startDateTime;
+    if (reference == null) return false;
+    return !reference.isBefore(DateTime.now());
+  }
+
   List<DateTime> get eventDays {
     if (startDate.isEmpty || endDate.isEmpty) return [];
     try {

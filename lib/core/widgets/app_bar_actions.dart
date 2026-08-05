@@ -28,17 +28,21 @@ class AppBarActions extends StatelessWidget {
   static const double _inset = AppSizes.smallSpace;
   static const double _borderWidth = 1;
 
-  /// Butonların ve aralarındaki boşlukların toplamı — [Row]'un doğal genişliği.
-  double get _contentWidth {
-    if (icons.isEmpty) return 0;
-    return icons.length * _buttonSize + (icons.length - 1) * _gap;
+  /// Verilen ikon sayısı için kapsayıcının dış genişliği.
+  ///
+  /// `leading` slotunda kullanılırken [AppBar.leadingWidth] bu değerden
+  /// türetilmeli; slot varsayılan genişliğinde kalırsa hap kırpılır.
+  static double widthFor(int iconCount) {
+    if (iconCount == 0) return 0;
+    return iconCount * _buttonSize +
+        (iconCount - 1) * _gap +
+        (_inset + _borderWidth) * 2;
   }
 
   /// Kapsayıcının dış ölçüsü: içerik + iç boşluk + kenarlık.
   /// [_row] ile birebir aynı sabitlerden türediği için kayma olamaz.
   /// İkon yokken 0 — aksi halde boş bir hap görünürdü.
-  double get _width =>
-      icons.isEmpty ? 0 : _contentWidth + (_inset + _borderWidth) * 2;
+  double get _width => widthFor(icons.length);
 
   double get _height => _buttonSize + (_inset + _borderWidth) * 2;
 

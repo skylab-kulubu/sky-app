@@ -27,6 +27,9 @@ class AppRadiuses {
     Radius.circular(skyPassCard),
   );
 
+  /// Liste tile'larındaki kare görselin köşeleri.
+  static const double thumbnail = 14;
+
   /// Bottom sheet'in üst köşeleri.
   static const BorderRadius sheetBorderRadius = BorderRadius.vertical(
     top: Radius.circular(24),

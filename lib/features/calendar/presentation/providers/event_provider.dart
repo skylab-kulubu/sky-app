@@ -13,6 +13,23 @@ class EventProvider extends ChangeNotifier {
 
   List<EventModel> get events => _events;
   List<EventModel> get activeEvents => _activeEvents;
+
+  /// Bitişi geçmemiş etkinlikler, en yakın tarihli önce.
+  ///
+  /// Filtre `active` bayrağına değil tarihe bakıyor; bayrağın anlamı
+  /// (başvuruya açık mı, devam ediyor mu) net olmadığı için tarih daha
+  /// öngörülebilir bir ölçüt.
+  List<EventModel> get upcomingEvents {
+    final upcoming = _events.where((event) => event.isUpcoming).toList();
+    upcoming.sort((a, b) {
+      final aStart = a.startDateTime;
+      final bStart = b.startDateTime;
+      if (aStart == null || bStart == null) return 0;
+      return aStart.compareTo(bStart);
+    });
+    return upcoming;
+  }
+
   EventModel? get activeEvent {
     for (final event in _activeEvents) {
       if (event.active) return event;

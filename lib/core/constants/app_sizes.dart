@@ -12,6 +12,11 @@ class AppSizes {
   static const quickActionCircle = 56.0;
   static const appBarAvatar = 40.0;
 
+  /// Liste tile'larındaki kare görsel (haber, etkinlik). Metin bloğundan
+  /// kasıtlı olarak yüksek: tile yüksekliğini hep görsel belirlesin ve tüm
+  /// satırlar eşit boyda kalsın.
+  static const thumbnail = 72.0;
+
   /// Ayarlar satırındaki dolu renkli ikon dairesi.
   static const settingsIconCircle = 36.0;
 
