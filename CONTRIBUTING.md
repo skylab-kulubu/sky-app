@@ -193,6 +193,7 @@ Zemin, metin ve ayraç renkleri temaya göre farklılaşır. Bunlar `ColorScheme
 | `context.textTertiary` | En soluk metin ve ikonlar |
 | `context.dividerColor` | Ayraç ve ince kenarlıklar |
 | `context.accentColor` | Vurgu rengi (açık temada markanın koyu tonuna düşer) |
+| `context.onAccentColor` | Vurgu zemini üzerindeki metin ve ikon |
 
 ### 2. Temadan bağımsız olanlar → `AppColors`
 

@@ -48,6 +48,13 @@ class AppPaddings {
     vertical: 12,
   );
 
+  /// Bildirim satırının iç boşluğu. Sol dairesi haber satırının görselinden
+  /// alçak olduğu için dikeyde [newsTile]'dan ferah.
+  static const notificationTile = EdgeInsets.symmetric(
+    horizontal: 16,
+    vertical: 12,
+  );
+
   /// Ayarlar bölüm başlığının boşluğu.
   static const sectionHeader = EdgeInsets.only(left: 4, top: 24, bottom: 8);
 

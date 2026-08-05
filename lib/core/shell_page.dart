@@ -157,6 +157,7 @@ class ShellPage extends StatelessWidget {
   /// Diğer ikonların sayfaları henüz yok; bağlanana kadar sessizce yok sayılır.
   void _onActionTap(BuildContext context, String icon) {
     if (icon == AppIcons.widget) ClubMenuSheet.show(context);
+    if (icon == AppIcons.bell) context.push('/notification');
     if (icon == AppIcons.settings) context.push('/settings');
   }
 

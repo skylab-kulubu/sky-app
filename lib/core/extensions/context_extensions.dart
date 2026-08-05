@@ -72,6 +72,14 @@ extension AppColorExtension on BuildContext {
 
   /// Vurgu rengi; açık temada markanın koyu tonuna düşer.
   Color get accentColor => colorScheme.primary;
+
+  /// [accentColor] zemini üzerindeki metin ve ikon.
+  ///
+  /// Vurgu rengi temaya göre açık lila ile koyu mor arasında gidip geldiği
+  /// için üstündeki içerik de yön değiştirir: koyu temada koyu, açık temada
+  /// beyaz. Bu yüzden her iki temada beyaz kalan [AppColors.onAccent]
+  /// buranın yerine kullanılamaz.
+  Color get onAccentColor => colorScheme.onPrimary;
 }
 
 extension PaddingExtension on BuildContext {

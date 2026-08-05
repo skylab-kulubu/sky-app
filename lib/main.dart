@@ -11,6 +11,8 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
   timeago.setLocaleMessages('tr', timeago.TrMessages());
+  // Bildirim satırlarındaki kısa zaman etiketi ("5dk", "2g").
+  timeago.setLocaleMessages('tr_short', timeago.TrShortMessages());
 
   runApp(
     MultiProvider(

@@ -20,6 +20,12 @@ class AppSizes {
   /// Ayarlar satırındaki dolu renkli ikon dairesi.
   static const settingsIconCircle = 36.0;
 
+  /// Bildirim satırındaki yuvarlak ikon dairesi.
+  static const notificationCircle = 44.0;
+
+  /// Okunmamış bildirim rozeti.
+  static const badgeDot = 8.0;
+
   static const double smallSpace = 2.0;
   static const double midSpace = 8.0;
   static const double bigSpace = 12.0;

@@ -99,7 +99,9 @@ Uygulama açık ve koyu temayı birlikte destekliyor. Renkler **iki kaynağa** a
 
 **Temaya göre değişenler `context`'ten okunur** (`core/extensions/context_extensions.dart`):
 
-`backgroundColor` · `tileColor` · `elevatedColor` · `textPrimary` · `textSecondary` · `textTertiary` · `dividerColor` · `accentColor`
+`backgroundColor` · `tileColor` · `elevatedColor` · `textPrimary` · `textSecondary` · `textTertiary` · `dividerColor` · `accentColor` · `onAccentColor`
+
+> `onAccentColor`, `accentColor` zemini üzerindeki içerik içindir. Vurgu rengi koyu temada açık lila, açık temada koyu mor olduğu için üstündeki metin de yön değiştirir; her iki temada beyaz kalan `AppColors.onAccent` onun yerine kullanılamaz.
 
 **Temadan bağımsız olanlar `AppColors`'ta kalır:** marka renkleri (`primaryColor`, `primaryStrong`, `blue`, `red`, `green` ...), doygun zemin üstündeki içerik (`onAccent`), SkyPass kartı renkleri, navbar gölgeleri.
 
@@ -151,7 +153,7 @@ Adlar camelCase: `info-square` → `infoSquare`.
 
 **AppBar sekmeye göre değişir.** `_AppBarConfig` her sekme için başlık, action ikonları ve logo/avatar gösterimini tutar. Action'lar `AppBarActions` hap'ında toplanır ve sekme değişince ikon sayısına göre genişleyip daralır.
 
-Şu an bağlı olan action'lar: **menü** (`AppIcons.widget` → `ClubMenuSheet`) ve **ayarlar** (`/settings`). Diğerleri — bildirim, arama, QR, düzenle, shuffle, info — dokunulabilir ama **hiçbir şey yapmıyor**; sayfaları henüz yok. Bağlamak için `shell_page.dart`'taki `_onActionTap`'e ekle.
+Şu an bağlı olan action'lar: **menü** (`AppIcons.widget` → `ClubMenuSheet`), **bildirim** (`AppIcons.bell` → `/notification`) ve **ayarlar** (`/settings`). Diğerleri — arama, QR, düzenle, shuffle, info — dokunulabilir ama **hiçbir şey yapmıyor**; sayfaları henüz yok. Bağlamak için `shell_page.dart`'taki `_onActionTap`'e ekle.
 
 **Navbar** yüzen bir hap; seçili sekme ikonun yanında etiketini açar. Genişleme `Align.widthFactor` animasyonuyla yapılır — etiket genişliği metne bağlı olduğu için elle genişlik hesabı yapılmaz.
 
