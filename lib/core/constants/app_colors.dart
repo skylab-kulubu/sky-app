@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 
+/// Temadan bağımsız marka ve vurgu renkleri.
+///
+/// Zemin, metin, ayraç gibi **temaya göre değişen** renkler burada değil,
+/// [ThemeData.colorScheme] içinde tanımlı; onlara `context` üzerinden
+/// erişilir (`context.tileColor`, `context.textPrimary` ...).
 class AppColors {
-  // Main Colors
+  // Marka
   static const primaryColor = Color(0xFFe0c8e5);
-  static const cardBackground = Color(0xFF252525);
-  static const buttonBackground = Color(0xFF263238);
-  static const indicatorColor = Color(0xFFe0c8e5);
-  static const secondaryBlue = Color(0xFF00BFFF);
-  static const scaffoldBackgroundColor = Color(0xFF000000);
-  static const tileBackgroundColor = Color.fromARGB(255, 27, 26, 26);
-
-  // Bottom Navigation (glass floating nav from design)
-  static const navBackground = Color(0xEB1E1E24); // slightly translucent glass
   static const primaryDeep = Color(0xFFC9A0D6);
-  static const navTextTertiary = Color(0xFF9A97A6);
-  static final navBorder = Colors.white.withValues(alpha: 0.10);
-  static final navIndicator = const Color(
-    0xFFE0C8E5,
-  ).withValues(alpha: 0.14); // primarySoft
+
+  /// Açık temada zemin beyaz olduğu için lila okunmuyor; vurgu rengi olarak
+  /// markanın koyu tonu kullanılıyor.
+  static const primaryStrong = Color(0xFF8B5FA3);
+
+  static const secondaryBlue = Color(0xFF00BFFF);
+  static const indicatorColor = Color(0xFFe0c8e5);
+  static const buttonBackground = Color(0xFF263238);
 
   // SkyPass Card (açık lila zemin üzerinde koyu metin)
   static const skyPassGradientStart = primaryColor;
@@ -31,21 +30,32 @@ class AppColors {
   // Yüzen navbar'ın gölgesi. Açık temada aynı opaklık beyaz zeminde sert bir
   // leke bırakıyor, o yüzden ağırlık temaya göre ayrışıyor.
   static final navShadowDark = Colors.black.withValues(alpha: 0.6);
-  static final navShadowLight = Colors.black.withValues(alpha: 0.15);
+  static final navShadowLight = Colors.black.withValues(alpha: 0.22);
 
-  // Text Colors
-  static const textWhite = Color(0xFFFFFFFF);
-  static const textWhite70 = Color(0xFFF0F0F0);
-  static const textGray = Color(0xFF888888);
-  static const textGrayDark = Color(0xFF666666);
-  static const textGrayDarker = Color(0xFF555555);
-  static const unselectedLabelColor = Color(0xFF888888);
-  static const buttonColor = Color(0xFF303032);
+  // Temaların ColorScheme'ini besleyen ham değerler. Doğrudan widget'larda
+  // kullanılmaz; karşılıkları context üzerinden okunur.
+  static const darkBackground = Color(0xFF000000);
+  static const darkTile = Color.fromARGB(255, 27, 26, 26);
+  static const darkTileHigh = Color(0xFF303032);
+  static const darkTextPrimary = Color(0xFFFFFFFF);
+  static const darkTextSecondary = Color(0xFF888888);
+  static const darkTextTertiary = Color(0xFF666666);
+  static const darkDivider = Color(0xFF333333);
 
-  // Divider & Border
-  static const dividerColor = Color(0xFF333333);
+  static const lightBackground = Color(0xFFFFFFFF);
+  static const lightTile = Color(0xFFF2F2F7);
+  static const lightTileHigh = Color(0xFFE8E8ED);
+  static const lightTextPrimary = Color(0xFF1A1A1A);
+  static const lightTextSecondary = Color(0xFF6B6B6B);
+  static const lightTextTertiary = Color(0xFF9A9A9A);
+  static const lightDivider = Color(0xFFE3E3E8);
+
+  /// Doygun renkli zeminlerin (ayarlar ikon daireleri gibi) üstündeki
+  /// içerik. Temadan bağımsız: her iki temada da beyaz kalır.
+  static const onAccent = Color(0xFFFFFFFF);
 
   // Status & Icon Colors
+  static const blue = Color(0xFF1E90FF);
   static const teal = Color(0xFF1ABC9C);
   static const green = Color(0xFF2ECC71);
   static const purple = Color(0xFF6C5CE7);

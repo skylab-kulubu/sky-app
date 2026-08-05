@@ -43,6 +43,37 @@ extension ThemeExtension on BuildContext {
   TextTheme get primaryTextTheme => Theme.of(this).primaryTextTheme;
 }
 
+/// Temaya göre değişen renkler.
+///
+/// Marka ve vurgu renkleri (kırmızı, yeşil, lila ...) `AppColors` içinde
+/// sabit kalır; zemin, metin ve ayraç gibi açık/koyu temada farklılaşan
+/// her şey buradan okunur.
+extension AppColorExtension on BuildContext {
+  /// Sayfa zemini.
+  Color get backgroundColor => theme.scaffoldBackgroundColor;
+
+  /// Kart, tile ve sheet zemini.
+  Color get tileColor => colorScheme.surfaceContainer;
+
+  /// Zeminden bir tık yükseltilmiş yüzey: buton, ikon dairesi, navbar.
+  Color get elevatedColor => colorScheme.surfaceContainerHigh;
+
+  /// Başlık ve gövde metni.
+  Color get textPrimary => colorScheme.onSurface;
+
+  /// Açıklama, etiket, ikincil metin.
+  Color get textSecondary => colorScheme.onSurfaceVariant;
+
+  /// En soluk metin ve ikonlar (trailing chevron gibi).
+  Color get textTertiary => colorScheme.outline;
+
+  /// Ayraç ve ince kenarlıklar.
+  Color get dividerColor => theme.dividerColor;
+
+  /// Vurgu rengi; açık temada markanın koyu tonuna düşer.
+  Color get accentColor => colorScheme.primary;
+}
+
 extension PaddingExtension on BuildContext {
   static const double _mainPadding = 0.054;
   static const double _mainPaddingLow = 0.048;

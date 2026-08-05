@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
@@ -27,7 +26,7 @@ class QuickActionButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Material(
-          color: AppColors.tileBackgroundColor,
+          color: context.tileColor,
           shape: const CircleBorder(),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -39,7 +38,7 @@ class QuickActionButton extends StatelessWidget {
                 child: AppIcon(
                   icon,
                   size: AppSizes.iconMedium,
-                  color: AppColors.textWhite,
+                  color: context.textPrimary,
                 ),
               ),
             ),
@@ -52,7 +51,7 @@ class QuickActionButton extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: context.textTheme.labelSmall?.copyWith(
-            color: AppColors.textWhite70,
+            color: context.textPrimary,
           ),
         ),
       ],

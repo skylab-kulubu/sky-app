@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/profile/data/models/cert_model.dart';
 import 'package:sky_app/features/profile/presentation/widgets/cert_item.dart';
@@ -21,7 +21,7 @@ class _CertPageState extends CertPagemodel {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackgroundColor,
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
         title: Text('Sertifikalar'),
         leading: IconButton(
@@ -45,14 +45,14 @@ class _CertPageState extends CertPagemodel {
     );
   }
 
-  Widget subtitleText() => const Text(
+  Widget subtitleText() => Text(
     'Bootcamp ve eğitimlerden kazanılan sertifikalar.',
-    style: TextStyle(color: AppColors.textGray, fontSize: 14),
+    style: TextStyle(color: context.textSecondary, fontSize: 14),
   );
 
   Widget certificatesListContainer() => Container(
     decoration: BoxDecoration(
-      color: AppColors.cardBackground,
+      color: context.tileColor,
       borderRadius: AppRadiuses.containerBorderRadius,
     ),
     child: ListView.separated(
@@ -61,7 +61,7 @@ class _CertPageState extends CertPagemodel {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: listOfCert.length,
       separatorBuilder: (context, index) =>
-          const Divider(color: AppColors.dividerColor, height: 1, thickness: 1),
+          Divider(color: context.dividerColor, height: 1, thickness: 1),
       itemBuilder: (context, index) {
         return CertItem(certificate: listOfCert[index]);
       },

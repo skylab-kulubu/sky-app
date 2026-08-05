@@ -8,6 +8,7 @@ import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
 import 'package:sky_app/core/widgets/club_menu_sheet.dart';
 import 'package:sky_app/core/widgets/nav_item.dart';
@@ -85,8 +86,11 @@ class ShellPage extends StatelessWidget {
           child: Container(
             padding: AppPaddings.navBarContent,
             decoration: BoxDecoration(
-              color: AppColors.tileBackgroundColor.withValues(alpha: 0.95),
+              color: context.tileColor.withValues(alpha: 0.95),
               borderRadius: AppRadiuses.stadiumBorderRadius,
+              // Açık temada hap ile beyaz zemin arasındaki fark çok az
+              // kalıyor; ince kenarlık sınırı belirginleştiriyor.
+              border: Border.all(color: context.dividerColor),
               boxShadow: [
                 BoxShadow(
                   color: Theme.of(context).brightness == Brightness.dark
@@ -166,6 +170,9 @@ class ShellPage extends StatelessWidget {
             width: AppSizes.iconLarge,
             height: AppSizes.iconLarge,
             fit: BoxFit.contain,
+            // Logo beyaz monokrom; açık temada görünmesi için metin rengine
+            // boyanıyor.
+            colorFilter: ColorFilter.mode(context.textPrimary, BlendMode.srcIn),
           ),
           const SizedBox(width: AppSizes.midSpace),
         ],

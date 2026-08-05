@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reicon_flutter/reicon_flutter.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 
 /// Reicon ikonlarını Material'ın [Icon] widget'ı gibi kullanmayı sağlar.
 ///
@@ -27,7 +27,7 @@ class AppIcon extends StatelessWidget {
 
   final double size;
 
-  /// Verilmezse önce [IconTheme], o da yoksa [AppColors.textWhite] kullanılır.
+  /// Verilmezse önce [IconTheme], o da yoksa [context.textPrimary] kullanılır.
   final Color? color;
 
   /// `true` ise Filled, değilse Outline ağırlığı kullanılır.
@@ -43,7 +43,7 @@ class AppIcon extends StatelessWidget {
     }
 
     final resolvedColor =
-        color ?? IconTheme.of(context).color ?? AppColors.textWhite;
+        color ?? IconTheme.of(context).color ?? context.textPrimary;
 
     return SvgPicture.string(
       reiconSvg(pathData, size: size.round()),

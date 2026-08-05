@@ -35,11 +35,11 @@ class _NotificationPageState extends State<NotificationPage> {
                 return Container(
                   decoration: BoxDecoration(
                     color: notifications[index].isRead == true
-                        ? Color(0xFF1E90FF).withAlpha(10)
+                        ? AppColors.blue.withAlpha(10)
                         : null,
                     border: Border(
                       bottom: BorderSide(
-                        color: Color(0xFF2A2A2A),
+                        color: context.dividerColor,
                         width: 0.664,
                       ),
                     ),
@@ -56,8 +56,8 @@ class _NotificationPageState extends State<NotificationPage> {
                         width: 39.999,
                         decoration: BoxDecoration(
                           color: notifications[index].isRead == false
-                              ? Color(0xFF333333)
-                              : Color(0xFF1E90FF).withAlpha(41),
+                              ? context.elevatedColor
+                              : AppColors.blue.withAlpha(41),
                           shape: BoxShape.circle,
                         ),
                         child: const AppIcon(
@@ -88,7 +88,7 @@ class _NotificationPageState extends State<NotificationPage> {
                               locale: 'tr',
                             ),
                             style: context.textTheme.labelSmall?.copyWith(
-                              color: Color(0xFF555555),
+                              color: context.textTertiary,
                             ),
                           ),
                         ],
@@ -96,7 +96,7 @@ class _NotificationPageState extends State<NotificationPage> {
                       trailing: Container(
                         decoration: BoxDecoration(
                           color: notifications[index].isRead == true
-                              ? Color(0xFF1E90FF)
+                              ? AppColors.blue
                               : null,
                           shape: BoxShape.circle,
                         ),
@@ -110,7 +110,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              backgroundColor: AppColors.cardBackground,
+                              backgroundColor: context.tileColor,
                               title: Text(
                                 notifications[index].title,
                                 style: context.textTheme.titleLarge?.copyWith(
@@ -131,7 +131,7 @@ class _NotificationPageState extends State<NotificationPage> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                                 side: BorderSide(
-                                  color: Color(0xFF333333),
+                                  color: context.dividerColor,
                                   width: 2,
                                 ),
                               ),

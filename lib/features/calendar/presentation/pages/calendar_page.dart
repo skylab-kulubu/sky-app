@@ -50,7 +50,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       'Gösterilecek etkinlik yok.',
                       textAlign: TextAlign.center,
                       style: context.textTheme.titleMedium?.copyWith(
-                        color: Colors.grey[400],
+                        color: context.textSecondary,
                       ),
                     ),
                   ),
@@ -78,7 +78,7 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget _eventCard(EventModel event) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+        color: context.tileColor,
         borderRadius: BorderRadius.circular(16.0),
       ),
       child: ListTile(
@@ -114,7 +114,7 @@ class _CalendarPageState extends State<CalendarPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: context.textTheme.titleMedium?.copyWith(
-            color: AppColors.textWhite,
+            color: context.textPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -127,7 +127,7 @@ class _CalendarPageState extends State<CalendarPage> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: context.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textGray,
+                color: context.textSecondary,
               ),
             ),
             const SizedBox(height: 2.0),
@@ -136,7 +136,7 @@ class _CalendarPageState extends State<CalendarPage> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: context.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textGray,
+                color: context.textSecondary,
               ),
             ),
           ],
@@ -153,8 +153,8 @@ class _CalendarPageState extends State<CalendarPage> {
         child: ElevatedButton(
           onPressed: () => showConfirmationDialog(context, event),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryColor,
-            foregroundColor: AppColors.textWhite,
+            backgroundColor: context.accentColor,
+            foregroundColor: context.textPrimary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),
             ),
@@ -259,10 +259,10 @@ class _CalendarPageState extends State<CalendarPage> {
                       const SizedBox(height: 8.0),
                       Row(
                         children: [
-                          const AppIcon(
+                          AppIcon(
                             AppIcons.location,
                             size: 16,
-                            color: AppColors.primaryColor,
+                            color: context.accentColor,
                           ),
                           const SizedBox(width: 4.0),
                           Expanded(
@@ -271,7 +271,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                   ? event.location
                                   : 'Konum Belirtilmemiş',
                               style: context.textTheme.bodyMedium?.copyWith(
-                                color: AppColors.textGray,
+                                color: context.textSecondary,
                               ),
                             ),
                           ),
@@ -337,7 +337,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   child: Text(
                     'İptal',
                     style: context.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textGray,
+                      color: context.textSecondary,
                     ),
                   ),
                 ),
@@ -368,15 +368,15 @@ class _CalendarPageState extends State<CalendarPage> {
                                     ? 'Kaydın başarıyla alındı!'
                                     : 'Katılım kaydı oluşturulamadı.',
                                 style: context.textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.textWhite,
+                                  color: context.textPrimary,
                                 ),
                               ),
                             ),
                           );
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    foregroundColor: AppColors.textWhite,
+                    backgroundColor: context.accentColor,
+                    foregroundColor: context.textPrimary,
                   ),
                   child: isJoining
                       ? SizedBox(
@@ -385,14 +385,14 @@ class _CalendarPageState extends State<CalendarPage> {
                           child: CircularProgressIndicator.adaptive(
                             strokeWidth: 2,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.textWhite,
+                              context.textPrimary,
                             ),
                           ),
                         )
                       : Text(
                           'Onayla',
                           style: context.textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textWhite,
+                            color: context.textPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),

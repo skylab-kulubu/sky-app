@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
@@ -78,7 +77,7 @@ class ProfilePage extends StatelessWidget {
         title,
         style: context.textTheme.titleSmall?.copyWith(
           fontWeight: FontWeight.w600,
-          color: AppColors.textGray,
+          color: context.textSecondary,
         ),
       ),
     );
@@ -86,7 +85,7 @@ class ProfilePage extends StatelessWidget {
 
   Widget _certificatesTile(BuildContext context) {
     return Material(
-      color: AppColors.tileBackgroundColor,
+      color: context.tileColor,
       borderRadius: BorderRadius.circular(AppRadiuses.tile),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -95,10 +94,10 @@ class ProfilePage extends StatelessWidget {
           padding: AppPaddings.settingsTile,
           child: Row(
             children: [
-              const AppIcon(
+              AppIcon(
                 AppIcons.certificate,
                 size: AppSizes.icon,
-                color: AppColors.primaryColor,
+                color: context.accentColor,
               ),
               const SizedBox(width: AppSizes.bigSpace),
               Expanded(
@@ -109,10 +108,10 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
               ),
-              const AppIcon(
+              AppIcon(
                 AppIcons.chevronRight,
                 size: AppSizes.iconSmall,
-                color: AppColors.textGrayDark,
+                color: context.textTertiary,
               ),
             ],
           ),

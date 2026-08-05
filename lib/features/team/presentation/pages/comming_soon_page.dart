@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 
 class CommingSoonPage extends StatelessWidget {
   const CommingSoonPage({super.key});
@@ -17,7 +18,7 @@ class CommingSoonPage extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(
                   context,
-                ).textTheme.titleMedium?.copyWith(color: Colors.grey[400]),
+                ).textTheme.titleMedium?.copyWith(color: context.textSecondary),
               ),
             ],
           ),

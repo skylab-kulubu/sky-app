@@ -16,6 +16,7 @@ class SettingsTile extends StatelessWidget {
     required this.onTap,
     this.trailingIcon = AppIcons.chevronRight,
     this.titleColor,
+    this.value,
   });
 
   /// [AppIcons] içindeki ikon adı.
@@ -31,6 +32,9 @@ class SettingsTile extends StatelessWidget {
   /// eylemlerde vurgulamak için.
   final Color? titleColor;
 
+  /// Ayarın güncel değeri; sağ ikondan önce soluk renkte yazılır.
+  final String? value;
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -41,7 +45,7 @@ class SettingsTile extends StatelessWidget {
           padding: AppPaddings.settingsTile,
           child: Row(
             children: [
-              _iconCircle(),
+              _iconCircle(context),
               const SizedBox(width: AppSizes.bigSpace),
               Expanded(
                 child: Text(
@@ -52,10 +56,19 @@ class SettingsTile extends StatelessWidget {
                   ),
                 ),
               ),
+              if (value != null) ...[
+                Text(
+                  value!,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: context.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: AppSizes.midSpace),
+              ],
               AppIcon(
                 trailingIcon,
                 size: AppSizes.iconSmall,
-                color: AppColors.textGrayDark,
+                color: context.textTertiary,
               ),
             ],
           ),
@@ -76,7 +89,7 @@ class SettingsTile extends StatelessWidget {
 
   static const double _circleDarken = 0.8;
 
-  Widget _iconCircle() {
+  Widget _iconCircle(BuildContext context) {
     return Container(
       width: AppSizes.settingsIconCircle,
       height: AppSizes.settingsIconCircle,
@@ -86,7 +99,7 @@ class SettingsTile extends StatelessWidget {
           icon,
           filled: true,
           size: AppSizes.iconSmall,
-          color: AppColors.textWhite,
+          color: AppColors.onAccent,
         ),
       ),
     );

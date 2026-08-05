@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
@@ -26,7 +25,7 @@ class ClubMenuSheet extends StatelessWidget {
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.scaffoldBackgroundColor,
+      backgroundColor: context.backgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: AppRadiuses.sheetBorderRadius,
       ),
@@ -49,7 +48,7 @@ class ClubMenuSheet extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _handle(),
+              _handle(context),
               Text(
                 'Kulüp',
                 style: context.textTheme.titleMedium?.copyWith(
@@ -65,14 +64,14 @@ class ClubMenuSheet extends StatelessWidget {
     );
   }
 
-  Widget _handle() {
+  Widget _handle(BuildContext context) {
     return Center(
       child: Container(
         width: 40,
         height: 4,
         margin: const EdgeInsets.only(bottom: AppSizes.bigSpace),
         decoration: BoxDecoration(
-          color: AppColors.dividerColor,
+          color: context.dividerColor,
           borderRadius: AppRadiuses.stadiumBorderRadius,
         ),
       ),
@@ -97,7 +96,7 @@ class ClubMenuSheet extends StatelessWidget {
   Widget _item(BuildContext sheetContext, LinkItem link) {
     return Material(
       // Uygulamanın genel deseni: siyah zemin üzerinde tile arka planlı kart.
-      color: AppColors.tileBackgroundColor,
+      color: sheetContext.tileColor,
       borderRadius: BorderRadius.circular(AppRadiuses.tile),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -123,7 +122,7 @@ class ClubMenuSheet extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: sheetContext.textTheme.labelMedium?.copyWith(
-                  color: AppColors.textWhite,
+                  color: sheetContext.textPrimary,
                 ),
               ),
             ],

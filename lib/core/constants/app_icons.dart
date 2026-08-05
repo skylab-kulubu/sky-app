@@ -58,6 +58,12 @@ class AppIcons {
   static const String university = 'buildings';
   static const String email = 'sms';
 
+  // Görünüm / tema
+  static const String appearance = 'palette';
+  static const String themeSystem = 'devices';
+  static const String themeLight = 'sun';
+  static const String themeDark = 'moon';
+
   // Settings
   static const String permissions = 'shieldTick';
   static const String support = 'envelope';

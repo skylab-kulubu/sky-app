@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 
 class SkyTextfield extends StatelessWidget {
   final String hintText;
@@ -21,33 +21,24 @@ class SkyTextfield extends StatelessWidget {
     return TextField(
       controller: controller,
       obscureText: obscureText,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: context.textPrimary),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(color: AppColors.unselectedLabelColor),
+        hintStyle: TextStyle(color: context.textSecondary),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: AppColors.scaffoldBackgroundColor,
+        fillColor: context.backgroundColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadiuses.containerRadius),
-          borderSide: const BorderSide(
-            color: AppColors.buttonColor,
-            width: 1.0,
-          ),
+          borderSide: BorderSide(color: context.elevatedColor, width: 1.0),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadiuses.containerRadius),
-          borderSide: const BorderSide(
-            color: AppColors.unselectedLabelColor,
-            width: 1.0,
-          ),
+          borderSide: BorderSide(color: context.textSecondary, width: 1.0),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadiuses.containerRadius),
-          borderSide: const BorderSide(
-            color: AppColors.primaryColor,
-            width: 1.5,
-          ),
+          borderSide: BorderSide(color: context.accentColor, width: 1.5),
         ),
       ),
     );

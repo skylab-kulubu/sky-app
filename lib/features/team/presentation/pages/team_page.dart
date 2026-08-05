@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
@@ -30,7 +31,7 @@ class _TeamPageState extends State<TeamPage> {
                 height: 64,
                 width: 64,
                 decoration: BoxDecoration(
-                  color: Color(0xff1E90FF).withValues(alpha: 0.15),
+                  color: AppColors.blue.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.all(Radius.circular(16)),
                 ),
                 child: Center(
@@ -38,7 +39,7 @@ class _TeamPageState extends State<TeamPage> {
                     textAlign: TextAlign.center,
                     'M',
                     style: context.textTheme.titleLarge?.copyWith(
-                      color: Color(0xff1E90FF),
+                      color: AppColors.blue,
                     ),
                   ),
                 ),
@@ -61,22 +62,22 @@ class _TeamPageState extends State<TeamPage> {
               SizedBox(height: 16),
               SectionExpansionTile(
                 title: 'Duyurular',
-                color: Color(0xffE74C3C),
+                color: AppColors.red,
                 icon: AppIcons.announcement,
               ),
               SectionExpansionTile(
                 title: 'Görevler',
-                color: Color(0xff1E90FF),
+                color: AppColors.blue,
                 icon: AppIcons.task,
               ),
               SectionExpansionTile(
                 title: 'Proje Atama',
-                color: Color(0xff2ECC71),
+                color: AppColors.green,
                 icon: AppIcons.project,
               ),
               SectionExpansionTile(
                 title: 'Eğitimler',
-                color: Color(0xff9B59B6),
+                color: AppColors.darkPurple,
                 icon: AppIcons.education,
               ),
               SizedBox(height: 100),

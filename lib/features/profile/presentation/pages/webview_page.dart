@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 
 class WebviewPage extends StatefulWidget {
@@ -26,7 +26,7 @@ class _WebviewPageState extends State<WebviewPage> {
     if (!kIsWeb) {
       _controller = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setBackgroundColor(AppColors.scaffoldBackgroundColor)
+        ..setBackgroundColor(context.backgroundColor)
         ..loadRequest(Uri.parse(widget.url));
     } else {
       // Web platformu için otomatik olarak tarayıcıda açalım
@@ -56,16 +56,16 @@ class _WebviewPageState extends State<WebviewPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const AppIcon(
+                  AppIcon(
                     AppIcons.browser,
-                    color: Colors.white,
+                    color: context.textPrimary,
                     size: 48,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Web platformunda site dışarıda açıldı.',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: context.textPrimary,
                       fontFamily: 'Poppins',
                     ),
                   ),

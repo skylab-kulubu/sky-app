@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 
 /// AppBar'ın actions bölümünde duran sarmalayıcı.
@@ -50,9 +50,9 @@ class AppBarActions extends StatelessWidget {
       width: _width,
       height: _height,
       decoration: BoxDecoration(
-        color: AppColors.tileBackgroundColor,
+        color: context.tileColor,
         borderRadius: AppRadiuses.stadiumBorderRadius,
-        border: Border.all(color: AppColors.navBorder, width: _borderWidth),
+        border: Border.all(color: context.dividerColor, width: _borderWidth),
       ),
       child: ClipRRect(
         borderRadius: AppRadiuses.stadiumBorderRadius,
@@ -62,25 +62,28 @@ class AppBarActions extends StatelessWidget {
         child: OverflowBox(
           maxWidth: double.infinity,
           alignment: Alignment.centerRight,
-          child: Padding(padding: const EdgeInsets.all(_inset), child: _row()),
+          child: Padding(
+            padding: const EdgeInsets.all(_inset),
+            child: _row(context),
+          ),
         ),
       ),
     );
   }
 
-  Widget _row() {
+  Widget _row(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         for (var i = 0; i < icons.length; i++) ...[
           if (i > 0) const SizedBox(width: _gap),
-          _button(icons[i]),
+          _button(context, icons[i]),
         ],
       ],
     );
   }
 
-  Widget _button(String icon) {
+  Widget _button(BuildContext context, String icon) {
     return SizedBox(
       width: _buttonSize,
       height: _buttonSize,
@@ -99,7 +102,7 @@ class AppBarActions extends StatelessWidget {
         icon: AppIcon(
           icon,
           size: AppSizes.iconMedium,
-          color: AppColors.textWhite,
+          color: context.textPrimary,
         ),
       ),
     );

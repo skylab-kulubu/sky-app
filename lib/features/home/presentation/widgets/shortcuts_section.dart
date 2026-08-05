@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/models/link_item.dart';
 import 'package:sky_app/core/services/webview_service.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
@@ -32,7 +32,7 @@ class ShortcutsSection extends StatelessWidget {
     return Container(
       padding: AppPaddings.mainPaddingAll,
       decoration: BoxDecoration(
-        color: Colors.grey[850],
+        color: context.tileColor,
         borderRadius: BorderRadius.circular(_containerBorderRadius),
       ),
       child: Column(
@@ -75,8 +75,8 @@ class ShortcutsSection extends StatelessWidget {
           ElevatedButton(
             onPressed: onEditTap,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.scaffoldBackgroundColor,
-              foregroundColor: Colors.white,
+              backgroundColor: context.backgroundColor,
+              foregroundColor: context.textPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(_buttonBorderRadius),
               ),

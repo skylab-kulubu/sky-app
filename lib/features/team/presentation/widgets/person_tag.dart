@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 
 class PersonTag extends StatelessWidget {
@@ -12,14 +13,12 @@ class PersonTag extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: Color(0xff1E90FF).withValues(alpha: 0.1),
+          color: AppColors.blue.withValues(alpha: 0.1),
           borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
         child: Text(
           title,
-          style: context.textTheme.titleSmall?.copyWith(
-            color: Color(0xff1E90FF),
-          ),
+          style: context.textTheme.titleSmall?.copyWith(color: AppColors.blue),
         ),
       ),
     );

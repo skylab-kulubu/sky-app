@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/models/link_item.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 
@@ -50,8 +52,8 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF2A2A2A),
+      decoration: BoxDecoration(
+        color: context.backgroundColor,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(_sheetBorderRadius),
         ),
@@ -64,7 +66,7 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
             height: 4,
             margin: const EdgeInsets.only(top: 12, bottom: 8),
             decoration: BoxDecoration(
-              color: Colors.grey[600],
+              color: context.textTertiary,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -75,14 +77,14 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
                 Text(
                   'Kısayolları Düzenle',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.white,
+                    color: context.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const Spacer(),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const AppIcon(AppIcons.close, color: Colors.white),
+                  icon: AppIcon(AppIcons.close, color: context.textPrimary),
                 ),
               ],
             ),
@@ -101,7 +103,7 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E2E),
+                      color: context.tileColor,
                       borderRadius: BorderRadius.circular(_cardBorderRadius),
                     ),
                     child: Row(
@@ -130,7 +132,7 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
                                 item.name,
                                 style: Theme.of(context).textTheme.bodyMedium
                                     ?.copyWith(
-                                      color: Colors.white,
+                                      color: context.textPrimary,
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),
@@ -138,7 +140,7 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
                               Text(
                                 item.description,
                                 style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: Colors.grey[400]),
+                                    ?.copyWith(color: context.textSecondary),
                               ),
                             ],
                           ),
@@ -149,20 +151,20 @@ class _EditShortcutsSheetState extends State<EditShortcutsSheet> {
                           height: _checkSize,
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? const Color(0xFF1E90FF)
+                                ? AppColors.blue
                                 : Colors.transparent,
                             shape: BoxShape.circle,
                             border: isSelected
                                 ? null
                                 : Border.all(
-                                    color: Colors.grey[600]!,
+                                    color: context.dividerColor,
                                     width: 1.5,
                                   ),
                           ),
                           child: isSelected
-                              ? const AppIcon(
+                              ? AppIcon(
                                   AppIcons.check,
-                                  color: Colors.white,
+                                  color: context.textPrimary,
                                   size: 18,
                                 )
                               : null,

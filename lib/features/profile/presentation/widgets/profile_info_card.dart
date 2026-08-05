@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
@@ -22,14 +21,14 @@ class ProfileInfoCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppRadiuses.tile),
       child: Container(
-        color: AppColors.tileBackgroundColor,
+        color: context.tileColor,
         child: Column(
           // stretch olmadan satırlar kendi içerik genişliğinde kalıp
           // yatayda ortalanıyor; kartın tamamını kaplamaları gerekiyor.
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (var i = 0; i < visible.length; i++) ...[
-              if (i > 0) _divider(),
+              if (i > 0) _divider(context),
               _row(context, visible[i]),
             ],
           ],
@@ -47,14 +46,14 @@ class ProfileInfoCard extends StatelessWidget {
           Text(
             row.label,
             style: context.textTheme.bodySmall?.copyWith(
-              color: AppColors.textGray,
+              color: context.textSecondary,
             ),
           ),
           const SizedBox(height: AppSizes.smallSpace),
           Text(
             row.value,
             style: context.textTheme.bodyLarge?.copyWith(
-              color: AppColors.textWhite,
+              color: context.textPrimary,
             ),
           ),
         ],
@@ -62,9 +61,9 @@ class ProfileInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _divider() => const Divider(
+  Widget _divider(BuildContext context) => Divider(
     height: 1,
-    color: AppColors.dividerColor,
+    color: context.dividerColor,
     indent: 16,
     endIndent: 16,
   );

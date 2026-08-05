@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/icon_box.dart';
 import 'package:sky_app/features/profile/data/models/cert_model.dart';
 
@@ -22,20 +22,20 @@ class CertItem extends StatelessWidget {
             size: 48,
           ),
           const SizedBox(width: 16),
-          _textsColumn(),
+          _textsColumn(context),
         ],
       ),
     );
   }
 
-  Widget _textsColumn() => Expanded(
+  Widget _textsColumn(BuildContext context) => Expanded(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           certificate.title,
-          style: const TextStyle(
-            color: AppColors.textWhite,
+          style: TextStyle(
+            color: context.textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -43,7 +43,7 @@ class CertItem extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           certificate.subtitle,
-          style: const TextStyle(color: AppColors.textGray, fontSize: 12),
+          style: TextStyle(color: context.textSecondary, fontSize: 12),
         ),
       ],
     ),

@@ -10,7 +10,9 @@ import 'package:sky_app/core/services/links_service.dart';
 import 'package:sky_app/core/services/webview_service.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/core/theme/theme_provider.dart';
 import 'package:sky_app/features/settings/presentation/widgets/settings_tile.dart';
+import 'package:sky_app/features/settings/presentation/widgets/theme_mode_sheet.dart';
 
 part 'settings_pagemodel.dart';
 
@@ -38,6 +40,16 @@ class _SettingsPageState extends SettingsPagemodel {
           _sectionHeader('Tercihler'),
           _group([
             SettingsTile(
+              icon: AppIcons.appearance,
+              iconColor: AppColors.purple,
+              title: 'Görünüm',
+              value: ThemeModeSheet.labelOf(
+                context.watch<ThemeProvider>().themeMode,
+              ),
+              onTap: onAppearanceTap,
+            ),
+            _divider(),
+            SettingsTile(
               icon: AppIcons.bell,
               iconColor: AppColors.red,
               title: 'Bildirimler',
@@ -62,7 +74,7 @@ class _SettingsPageState extends SettingsPagemodel {
             _divider(),
             SettingsTile(
               icon: AppIcons.browser,
-              iconColor: AppColors.primaryColor,
+              iconColor: context.accentColor,
               title: 'SKY LAB Web Sitesi',
               trailingIcon: AppIcons.externalLink,
               onTap: onWebsiteTap,
@@ -90,7 +102,7 @@ class _SettingsPageState extends SettingsPagemodel {
         title,
         style: context.textTheme.titleSmall?.copyWith(
           fontWeight: FontWeight.w600,
-          color: AppColors.textGray,
+          color: context.textSecondary,
         ),
       ),
     );
@@ -101,15 +113,15 @@ class _SettingsPageState extends SettingsPagemodel {
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppRadiuses.tile),
       child: Container(
-        color: AppColors.tileBackgroundColor,
+        color: context.tileColor,
         child: Column(children: children),
       ),
     );
   }
 
-  Widget _divider() => const Divider(
+  Widget _divider() => Divider(
     height: 1,
-    color: AppColors.dividerColor,
+    color: context.dividerColor,
     indent: 64,
     endIndent: 16,
   );

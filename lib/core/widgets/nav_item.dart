@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
@@ -29,6 +28,9 @@ class NavItem extends StatelessWidget {
   static const Duration _duration = Duration(milliseconds: 350);
   static const Curve _curve = Curves.easeOutCubic;
 
+  /// Seçili hap'ın zemini: vurgu renginin çok soluk hâli.
+  static const double _pillTint = 0.14;
+
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
@@ -41,7 +43,11 @@ class NavItem extends StatelessWidget {
 
   Widget _pill(BuildContext context, double t) {
     return Material(
-      color: Color.lerp(Colors.transparent, AppColors.navIndicator, t),
+      color: Color.lerp(
+        Colors.transparent,
+        context.accentColor.withValues(alpha: _pillTint),
+        t,
+      ),
       borderRadius: AppRadiuses.stadiumBorderRadius,
       child: InkWell(
         borderRadius: AppRadiuses.stadiumBorderRadius,
@@ -62,8 +68,8 @@ class NavItem extends StatelessWidget {
                 filled: isSelected,
                 size: AppSizes.icon,
                 color: Color.lerp(
-                  AppColors.navTextTertiary,
-                  AppColors.primaryColor,
+                  context.textSecondary,
+                  context.accentColor,
                   t,
                 ),
               ),
@@ -91,7 +97,7 @@ class NavItem extends StatelessWidget {
             overflow: TextOverflow.clip,
             style: context.textTheme.labelLarge?.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.primaryColor,
+              color: context.accentColor,
             ),
           ),
         ),

@@ -1,50 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
+
+/// Zemin, metin ve ayraç renkleri buradaki [ColorScheme]'lerden gelir;
+/// widget'lar bunlara `context` üzerinden erişir (bkz. context_extensions).
+/// [AppColors] yalnızca temadan bağımsız marka/vurgu renklerini tutar.
 
 //light theme
 ThemeData lightTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.light,
-  cardColor: Colors.blueGrey,
-  scaffoldBackgroundColor: Colors.white,
-  appBarTheme: AppBarTheme(
+  scaffoldBackgroundColor: AppColors.lightBackground,
+  dividerColor: AppColors.lightDivider,
+  colorScheme: const ColorScheme.light(
+    primary: AppColors.primaryStrong,
+    onPrimary: AppColors.lightBackground,
+    secondary: AppColors.primaryDeep,
+    surface: AppColors.lightBackground,
+    onSurface: AppColors.lightTextPrimary,
+    onSurfaceVariant: AppColors.lightTextSecondary,
+    surfaceContainer: AppColors.lightTile,
+    surfaceContainerHigh: AppColors.lightTileHigh,
+    outline: AppColors.lightTextTertiary,
+    outlineVariant: AppColors.lightDivider,
+  ),
+  appBarTheme: const AppBarTheme(
     backgroundColor: Colors.transparent,
     elevation: 0,
     scrolledUnderElevation: 0,
     surfaceTintColor: Colors.transparent,
     centerTitle: false,
     actionsPadding: AppPaddings.appBarActions,
-    // AppIcon rengi verilmediğinde IconTheme'e düşüyor; leading/actions
-    // ikonlarının rengi buradan geliyor.
-    iconTheme: IconThemeData(color: Colors.grey.shade900),
+    // AppBar zemini saydam olduğu için Flutter durum çubuğu parlaklığını
+    // doğru çıkaramıyor; açıkça belirtiliyor.
+    systemOverlayStyle: SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ),
+    iconTheme: IconThemeData(color: AppColors.lightTextPrimary),
     titleTextStyle: TextStyle(
       fontFamily: 'Poppins',
       fontSize: 22,
       fontWeight: FontWeight.w600,
-      color: Colors.grey.shade900,
+      color: AppColors.lightTextPrimary,
     ),
   ),
-  floatingActionButtonTheme: FloatingActionButtonThemeData(
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
     shape: CircleBorder(),
-    backgroundColor: Colors.grey.shade300,
-    foregroundColor: Colors.grey.shade900,
+    backgroundColor: AppColors.lightTileHigh,
+    foregroundColor: AppColors.lightTextPrimary,
   ),
-  colorScheme: ColorScheme.light(
-    primary: AppColors.primaryColor,
-    secondary: Colors.grey.shade400,
-    surfaceContainer: Colors.grey.shade300,
-
-    inversePrimary: Colors.grey.shade800,
-  ),
-  textTheme: TextTheme(
-    bodyMedium: TextStyle(color: Colors.grey.shade900),
+  textTheme: const TextTheme(
+    displaySmall: TextStyle(fontFamily: 'Poppins'),
     titleLarge: TextStyle(fontFamily: 'Poppins'),
+    titleMedium: TextStyle(fontFamily: 'Poppins'),
+    titleSmall: TextStyle(fontFamily: 'Poppins'),
+    labelSmall: TextStyle(fontFamily: 'Poppins'),
+    bodyMedium: TextStyle(color: AppColors.lightTextPrimary),
   ),
-  snackBarTheme: SnackBarThemeData(
-    backgroundColor: Colors.grey.shade200,
-    contentTextStyle: TextStyle(color: Colors.grey.shade900),
-    actionTextColor: Colors.grey.shade800,
+  snackBarTheme: const SnackBarThemeData(
+    backgroundColor: AppColors.lightTileHigh,
+    contentTextStyle: TextStyle(color: AppColors.lightTextPrimary),
+    actionTextColor: AppColors.primaryStrong,
   ),
 );
 
@@ -52,68 +71,56 @@ ThemeData lightTheme = ThemeData(
 ThemeData darkTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.dark,
-  cardColor: Colors.blueGrey.shade900,
-  scaffoldBackgroundColor: AppColors.scaffoldBackgroundColor,
-  appBarTheme: AppBarTheme(
+  scaffoldBackgroundColor: AppColors.darkBackground,
+  dividerColor: AppColors.darkDivider,
+  colorScheme: const ColorScheme.dark(
+    primary: AppColors.primaryColor,
+    onPrimary: AppColors.darkBackground,
+    secondary: AppColors.primaryDeep,
+    surface: AppColors.darkBackground,
+    onSurface: AppColors.darkTextPrimary,
+    onSurfaceVariant: AppColors.darkTextSecondary,
+    surfaceContainer: AppColors.darkTile,
+    surfaceContainerHigh: AppColors.darkTileHigh,
+    outline: AppColors.darkTextTertiary,
+    outlineVariant: AppColors.darkDivider,
+  ),
+  appBarTheme: const AppBarTheme(
     backgroundColor: Colors.transparent,
     elevation: 0,
     scrolledUnderElevation: 0,
     surfaceTintColor: Colors.transparent,
     centerTitle: false,
     actionsPadding: AppPaddings.appBarActions,
-    // AppIcon rengi verilmediğinde IconTheme'e düşüyor; leading/actions
-    // ikonlarının rengi buradan geliyor.
-    iconTheme: IconThemeData(color: AppColors.textWhite),
+    systemOverlayStyle: SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
+    ),
+    iconTheme: IconThemeData(color: AppColors.darkTextPrimary),
     titleTextStyle: TextStyle(
       fontFamily: 'Poppins',
       fontSize: 22,
       fontWeight: FontWeight.w600,
-      color: AppColors.textWhite,
+      color: AppColors.darkTextPrimary,
     ),
   ),
-  floatingActionButtonTheme: FloatingActionButtonThemeData(
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
     shape: CircleBorder(),
-    backgroundColor: Colors.grey.shade700,
-    foregroundColor: Colors.grey.shade300,
+    backgroundColor: AppColors.darkTileHigh,
+    foregroundColor: AppColors.darkTextPrimary,
   ),
-  colorScheme: ColorScheme.dark(
-    primary: AppColors.primaryColor,
-    secondary: Colors.grey.shade700,
-    surfaceContainer: Colors.grey.shade800,
-    inversePrimary: Colors.grey.shade100,
-    onSurface: Colors.white,
-    onSurfaceVariant: AppColors.unselectedLabelColor,
-  ),
-  textTheme: TextTheme(
+  textTheme: const TextTheme(
     displaySmall: TextStyle(fontFamily: 'Poppins'),
-    bodyMedium: TextStyle(color: Colors.grey.shade400),
-    labelSmall: TextStyle(fontFamily: 'Poppins'),
-    titleMedium: TextStyle(fontFamily: 'Poppins'),
     titleLarge: TextStyle(fontFamily: 'Poppins'),
+    titleMedium: TextStyle(fontFamily: 'Poppins'),
+    titleSmall: TextStyle(fontFamily: 'Poppins'),
+    labelSmall: TextStyle(fontFamily: 'Poppins'),
+    bodyMedium: TextStyle(color: AppColors.darkTextSecondary),
   ),
-  snackBarTheme: SnackBarThemeData(
-    backgroundColor: Colors.grey.shade800,
-    contentTextStyle: TextStyle(color: Colors.grey.shade300),
-    actionTextColor: Colors.grey.shade300,
+  snackBarTheme: const SnackBarThemeData(
+    backgroundColor: AppColors.darkTileHigh,
+    contentTextStyle: TextStyle(color: AppColors.darkTextPrimary),
+    actionTextColor: AppColors.primaryColor,
   ),
 );
-
-/// The **2021** spec has fifteen text styles:
-///
-/// | NAME           | SIZE |  HEIGHT |  WEIGHT |  SPACING |             |
-/// |----------------|------|---------|---------|----------|-------------|
-/// | displayLarge   | 57.0 |   64.0  | regular | -0.25    |             |
-/// | displayMedium  | 45.0 |   52.0  | regular |  0.0     |             |
-/// | displaySmall   | 36.0 |   44.0  | regular |  0.0     |             |
-/// | headlineLarge  | 32.0 |   40.0  | regular |  0.0     |             |
-/// | headlineMedium | 28.0 |   36.0  | regular |  0.0     |             |
-/// | headlineSmall  | 24.0 |   32.0  | regular |  0.0     |             |
-/// | titleLarge     | 22.0 |   28.0  | regular |  0.0     |             |
-/// | titleMedium    | 16.0 |   24.0  | medium  |  0.15    |             |
-/// | titleSmall     | 14.0 |   20.0  | medium  |  0.1     |             |
-/// | bodyLarge      | 16.0 |   24.0  | regular |  0.5     |             |
-/// | bodyMedium     | 14.0 |   20.0  | regular |  0.25    |             |
-/// | bodySmall      | 12.0 |   16.0  | regular |  0.4     |             |
-/// | labelLarge     | 14.0 |   20.0  | medium  |  0.1     |             |
-/// | labelMedium    | 12.0 |   16.0  | medium  |  0.5     |             |
-/// | labelSmall     | 11.0 |   16.0  | medium  |  0.5     |             |

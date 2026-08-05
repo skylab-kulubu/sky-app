@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 
 class SkyButton extends StatelessWidget {
   final String text;
   final Widget? icon;
   final VoidCallback onPressed;
   final Color? backgroundColor;
-  final Color textColor;
+  final Color? textColor;
 
   const SkyButton({
     super.key,
     required this.text,
     this.icon,
     required this.onPressed,
-    this.backgroundColor = AppColors.buttonColor,
-    this.textColor = Colors.white,
+    this.backgroundColor,
+    this.textColor,
   });
 
   @override
@@ -25,7 +25,7 @@ class SkyButton extends StatelessWidget {
       height: 56,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
+          backgroundColor: backgroundColor ?? context.elevatedColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadiuses.containerRadius),
           ),
@@ -39,7 +39,7 @@ class SkyButton extends StatelessWidget {
             Text(
               text,
               style: TextStyle(
-                color: textColor,
+                color: textColor ?? context.textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
 
 class LatestNewsSection extends StatelessWidget {
@@ -47,7 +48,6 @@ class NewsTitleAndDescription extends StatelessWidget {
 
   final NewsItem news;
 
-  static const Color _descriptionColor = Color(0xFFBDBDBD);
   static const double _titleDescriptionSpacing = 4.0;
 
   @override
@@ -60,7 +60,7 @@ class NewsTitleAndDescription extends StatelessWidget {
     ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
     final descriptionStyle = Theme.of(
       context,
-    ).textTheme.bodyMedium?.copyWith(color: _descriptionColor);
+    ).textTheme.bodyMedium?.copyWith(color: context.textSecondary);
 
     return Expanded(
       child: Column(
@@ -87,7 +87,6 @@ class NewsThumbnail extends StatelessWidget {
 
   static const double _size = 80.0;
   static const double _borderRadius = 12.0;
-  static const Color _backgroundColor = Color(0xFF303030);
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +95,7 @@ class NewsThumbnail extends StatelessWidget {
       height: _size,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(_borderRadius),
-        color: _backgroundColor,
+        color: context.elevatedColor,
       ),
       child: Image.network(news.imageUrl, fit: BoxFit.cover),
     );

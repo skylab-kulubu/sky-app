@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/icon_box.dart';
@@ -36,7 +35,7 @@ class ProfileTile extends StatelessWidget {
               const SizedBox(width: 16),
               _textSection(context),
               if (trailingIcon != null)
-                AppIcon(trailingIcon!, color: AppColors.textGrayDark, size: 20),
+                AppIcon(trailingIcon!, color: context.textTertiary, size: 20),
             ],
           ),
         ),
@@ -59,7 +58,7 @@ class ProfileTile extends StatelessWidget {
             Text(
               subtitle!,
               style: context.textTheme.labelSmall?.copyWith(
-                color: AppColors.textGray,
+                color: context.textSecondary,
                 fontWeight: FontWeight.w300,
                 overflow: TextOverflow.ellipsis,
               ),

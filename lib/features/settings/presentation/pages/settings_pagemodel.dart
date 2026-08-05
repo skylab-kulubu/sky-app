@@ -10,6 +10,8 @@ abstract class SettingsPagemodel extends State<SettingsPage> {
 
   void onWebsiteTap() => WebviewService.openLink(context, LinksService.website);
 
+  void onAppearanceTap() => ThemeModeSheet.show(context);
+
   // Sayfaları henüz yok; bağlanana kadar bir şey yapmıyorlar.
   void onNotificationsTap() {}
 

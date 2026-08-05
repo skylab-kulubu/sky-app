@@ -5,7 +5,6 @@ import 'package:flutter/physics.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
@@ -69,7 +68,7 @@ class _AuthPageState extends AuthPagemodel {
         const SizedBox(height: 6),
         Text(
           'Bilgisayar Bilimleri Kulübü',
-          style: TextStyle(fontSize: 12, color: AppColors.unselectedLabelColor),
+          style: TextStyle(fontSize: 12, color: context.textSecondary),
         ),
         const SizedBox(height: 48),
       ],
@@ -95,30 +94,37 @@ class _AuthPageState extends AuthPagemodel {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: Material(
-              color: AppColors.buttonColor.withValues(alpha: 0.45),
+              color: context.elevatedColor.withValues(alpha: 0.45),
               child: InkWell(
                 onTapDown: isLoading ? null : (_) => animatePress(true),
                 onTapCancel: isLoading ? null : () => animatePress(false),
                 onTapUp: isLoading ? null : (_) => animatePress(false),
                 onTap: isLoading ? null : handleAuth,
-                splashColor: Colors.white.withValues(alpha: 0.08),
-                highlightColor: Colors.white.withValues(alpha: 0.04),
+                splashColor: context.textPrimary.withValues(alpha: 0.08),
+                highlightColor: context.textPrimary.withValues(alpha: 0.04),
                 child: SizedBox(
                   height: buttonHeight,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (isLoading)
-                        const SizedBox(
+                        SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: context.textPrimary,
                           ),
                         )
                       else
-                        SvgPicture.asset(AppAssets.skylab, height: 20),
+                        SvgPicture.asset(
+                          AppAssets.skylab,
+                          height: 20,
+                          colorFilter: ColorFilter.mode(
+                            context.textPrimary,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                       const SizedBox(width: 12),
                       Text(
                         'e-skylab ile Giriş Yap',
@@ -141,10 +147,10 @@ class _AuthPageState extends AuthPagemodel {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             'Developed by ',
             style: TextStyle(
-              color: AppColors.unselectedLabelColor,
+              color: context.textSecondary,
               fontSize: 12,
               fontWeight: FontWeight.w400,
             ),
@@ -152,8 +158,8 @@ class _AuthPageState extends AuthPagemodel {
           SvgPicture.asset(
             AppAssets.mobilab,
             height: 22,
-            colorFilter: const ColorFilter.mode(
-              AppColors.unselectedLabelColor,
+            colorFilter: ColorFilter.mode(
+              context.textSecondary,
               BlendMode.srcIn,
             ),
           ),

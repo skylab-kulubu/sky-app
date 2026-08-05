@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 
 /// Kullanıcı avatarı. Görsel yoksa ya da yüklenemezse baş harflerine düşer.
@@ -31,8 +31,8 @@ class UserAvatar extends StatelessWidget {
     return Container(
       width: _size,
       height: _size,
-      decoration: const BoxDecoration(
-        color: AppColors.tileBackgroundColor,
+      decoration: BoxDecoration(
+        color: context.tileColor,
         shape: BoxShape.circle,
       ),
       clipBehavior: Clip.antiAlias,
@@ -40,19 +40,19 @@ class UserAvatar extends StatelessWidget {
           ? Image.network(
               imageUrl!,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => _fallback(),
+              errorBuilder: (_, _, _) => _fallback(context),
             )
-          : _fallback(),
+          : _fallback(context),
     );
   }
 
-  Widget _fallback() {
+  Widget _fallback(BuildContext context) {
     if (_initials.isEmpty) {
       return Center(
         child: AppIcon(
           AppIcons.profile,
           size: _size * 0.5,
-          color: AppColors.primaryColor,
+          color: context.accentColor,
         ),
       );
     }
@@ -61,7 +61,7 @@ class UserAvatar extends StatelessWidget {
       child: Text(
         _initials,
         style: TextStyle(
-          color: AppColors.primaryColor,
+          color: context.accentColor,
           fontFamily: 'Poppins',
           fontWeight: FontWeight.w600,
           fontSize: _size * 0.36,
