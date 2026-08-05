@@ -122,8 +122,8 @@ Birden fazla yerde kullanılan ya da karmaşık hale gelen widget'lar `widgets/`
 // features/home/presentation/widgets/news_thumbnail.dart
 
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
 
 class NewsThumbnail extends StatelessWidget {
   const NewsThumbnail({
@@ -136,8 +136,8 @@ class NewsThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.cardBackground, // core/constants kullanılmalı
+      decoration: BoxDecoration(
+        color: context.tileColor, // temaya göre değişen renk
         borderRadius: AppRadiuses.cardBorderRadius,
       ),
       child: Text(title),
@@ -175,20 +175,59 @@ Widget build(BuildContext context) {
 
 ---
 
-##  Core Constants Kullanımı
+##  Renk Kullanımı
 
-Renk, padding, radius ve boyut değerleri **kesinlikle** hard-code yazılmaz. `core/constants/` altındaki ilgili sabit dosyası kullanılır.
+Uygulama açık ve koyu temayı birlikte destekliyor (Ayarlar → Görünüm). Bu yüzden renkler **iki kaynağa** ayrılır; hangisini kullanacağını seçmek zorundasın.
+
+### 1. Temaya göre değişenler → `context`
+
+Zemin, metin ve ayraç renkleri temaya göre farklılaşır. Bunlar `ColorScheme`'den gelir ve `core/extensions/context_extensions.dart` üzerinden okunur:
+
+| Erişimci | Nerede kullanılır |
+|---|---|
+| `context.backgroundColor` | Sayfa zemini |
+| `context.tileColor` | Kart, tile ve sheet zemini |
+| `context.elevatedColor` | Buton, ikon dairesi, navbar gibi yükseltilmiş yüzeyler |
+| `context.textPrimary` | Başlık ve gövde metni |
+| `context.textSecondary` | Açıklama, etiket, ikincil metin |
+| `context.textTertiary` | En soluk metin ve ikonlar |
+| `context.dividerColor` | Ayraç ve ince kenarlıklar |
+| `context.accentColor` | Vurgu rengi (açık temada markanın koyu tonuna düşer) |
+
+### 2. Temadan bağımsız olanlar → `AppColors`
+
+Marka ve vurgu renkleri (`primaryColor`, `blue`, `red`, `green`, `orange` ...), doygun renkli zemin üstündeki içerik (`onAccent`) ve her iki temada aynı duran bileşenlerin renkleri (SkyPass kartı gibi) `AppColors`'ta kalır.
+
+> ⚠️ `AppColors` içindeki `dark*` / `light*` sabitleri yalnızca `theme.dart`'taki `ColorScheme`'leri besler — widget'larda **doğrudan kullanılmaz**.
+
+```dart
+// ❌ Yanlış — açık temada sessizce kırılır
+color: Colors.black
+color: Colors.white
+color: AppColors.darkTextPrimary
+
+// ✅ Doğru
+color: context.backgroundColor
+color: context.textPrimary
+color: AppColors.red        // marka rengi: temadan bağımsız
+```
+
+`context`'ten gelen renk derleme zamanı sabiti olmadığı için o widget `const` olamaz; `const` anahtarını kaldır.
+
+---
+
+##  Padding, Radius, Boyut ve Asset
+
+Bu değerler de **kesinlikle** hard-code yazılmaz; `core/constants/` altındaki ilgili dosya kullanılır.
 
 ```dart
 // ❌ Yanlış
-color: Colors.black
 padding: EdgeInsets.all(16)
 borderRadius: BorderRadius.circular(16)
 size: 26
 'assets/icons/email.svg'
 
 // ✅ Doğru
-color: AppColors.scaffoldBackgroundColor
 padding: AppPaddings.mainPaddingAll
 borderRadius: AppRadiuses.cardBorderRadius
 size: AppSizes.icon
@@ -197,13 +236,27 @@ AppAssets.email
 
 | Dosya | Sınıf | İçerik |
 |---|---|---|
-| `app_colors.dart` | `AppColors` | Renk sabitleri |
+| `app_colors.dart` | `AppColors` | Temadan bağımsız marka ve vurgu renkleri |
 | `app_paddings.dart` | `AppPaddings` | `EdgeInsets` padding değerleri |
 | `app_radiuses.dart` | `AppRadiuses` | Border radius değerleri (`double` ve `BorderRadius`) |
 | `app_sizes.dart` | `AppSizes` | İkon boyutları ve boşluk (space) değerleri |
 | `app_assets.dart` | `AppAssets` | Asset dosya yolları (svg, png) |
+| `app_icons.dart` | `AppIcons` | Reicon ikon adları |
 
 İhtiyaç duyduğun değer sabit dosyasında yoksa, hard-code yazmak yerine ilgili dosyaya anlamlı bir isimle yeni sabit ekle.
+
+---
+
+##  İkonlar
+
+Material ikonları kullanılmaz; ikonlar `reicon_flutter` paketinden gelir. Reicon `IconData` **döndürmez**, ham SVG path verisi verir — bu yüzden çizim `AppIcon` widget'ı üzerinden yapılır:
+
+```dart
+AppIcon(AppIcons.home)
+AppIcon(AppIcons.home, filled: true, size: AppSizes.icon, color: context.accentColor)
+```
+
+İkon adları `core/constants/app_icons.dart` içinde tutulur. Yeni ikon eklerken adın pakette **hem Outline hem Filled** ağırlığında bulunduğunu doğrula; bulunmayan ad sessizce boş kutu çizer. Widget imzalarında ikon alanları `IconData` değil `String` tipindedir.
 
 ---
 
@@ -215,4 +268,6 @@ PR açmadan önce aşağıdaki maddeleri kontrol et:
 - [ ] Sayfa kalabalıklaştıysa Page ve PageModel `part`/`part of` ile ayrılmış
 - [ ] Tekrar eden widget'lar `widgets/` klasörüne extract edilmiş
 - [ ] Uzun UI blokları extract method olarak ayrılmış
-- [ ] Hard-coded renk, padding, radius, boyut ve asset yolu yok; `core/constants` kullanılıyor
+- [ ] Zemin/metin/ayraç renkleri `context` erişimcilerinden alınmış; `AppColors` yalnızca marka renkleri için kullanılmış
+- [ ] Hard-coded padding, radius, boyut ve asset yolu yok; `core/constants` kullanılıyor
+- [ ] Değişiklik hem açık hem koyu temada kontrol edilmiş
