@@ -3,6 +3,16 @@ import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/models/link_item.dart';
 
 class LinksService {
+  /// Kulübün ana web sitesi. Hem [list] içinde hem de ayarlar sayfasından
+  /// doğrudan kullanıldığı için ayrıca isimlendirildi.
+  static const LinkItem website = LinkItem(
+    name: 'SKY LAB',
+    description: 'SKY LAB resmi web sitesi',
+    iconPath: AppAssets.skylab,
+    color: AppColors.primaryColor,
+    url: 'https://yildizskylab.com',
+  );
+
   static const List<LinkItem> list = [
     LinkItem(
       name: 'Ekipler',
@@ -11,13 +21,7 @@ class LinksService {
       color: AppColors.primaryColor,
       url: 'https://arge.yildizskylab.com/',
     ),
-    LinkItem(
-      name: 'SKY LAB',
-      description: 'SKY LAB resmi web sitesi',
-      iconPath: AppAssets.skylab,
-      color: AppColors.primaryColor,
-      url: 'https://yildizskylab.com',
-    ),
+    website,
     LinkItem(
       name: 'YıldızPlace',
       description: 'YTÜ kampüs haritası ve mekan rehberi',

@@ -49,7 +49,12 @@ class AppIcons {
   static const String education = 'presentation';
   static const String research = 'flask';
 
+  // Settings
+  static const String permissions = 'shieldTick';
+  static const String support = 'envelope';
+  static const String logout = 'logout6';
+
   // External links
   static const String browser = 'global';
-  static const String externalLink = 'export';
+  static const String externalLink = 'arrowRightUp';
 }

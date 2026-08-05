@@ -1,0 +1,116 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
+import 'package:sky_app/core/constants/app_paddings.dart';
+import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/services/links_service.dart';
+import 'package:sky_app/core/services/webview_service.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
+import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/features/settings/presentation/widgets/settings_tile.dart';
+
+part 'settings_pagemodel.dart';
+
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends SettingsPagemodel {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Ayarlar'),
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: const AppIcon(AppIcons.arrowBack),
+        ),
+      ),
+      body: ListView(
+        padding: AppPaddings.mainPaddingAll,
+        children: [
+          _sectionHeader('Tercihler'),
+          _group([
+            SettingsTile(
+              icon: AppIcons.bell,
+              iconColor: AppColors.red,
+              title: 'Bildirimler',
+              onTap: onNotificationsTap,
+            ),
+            _divider(),
+            SettingsTile(
+              icon: AppIcons.permissions,
+              iconColor: AppColors.green,
+              title: 'İzinler',
+              onTap: onPermissionsTap,
+            ),
+          ]),
+          _sectionHeader('Kaynaklar'),
+          _group([
+            SettingsTile(
+              icon: AppIcons.support,
+              iconColor: AppColors.secondaryBlue,
+              title: 'Destek ile İletişime Geç',
+              onTap: onSupportTap,
+            ),
+            _divider(),
+            SettingsTile(
+              icon: AppIcons.browser,
+              iconColor: AppColors.primaryColor,
+              title: 'SKY LAB Web Sitesi',
+              trailingIcon: AppIcons.externalLink,
+              onTap: onWebsiteTap,
+            ),
+          ]),
+          const SizedBox(height: 24),
+          _group([
+            SettingsTile(
+              icon: AppIcons.logout,
+              iconColor: AppColors.red,
+              title: 'Çıkış Yap',
+              onTap: onLogoutTap,
+            ),
+          ]),
+          const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionHeader(String title) {
+    return Padding(
+      padding: AppPaddings.sectionHeader,
+      child: Text(
+        title,
+        style: context.textTheme.titleSmall?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: AppColors.textGray,
+        ),
+      ),
+    );
+  }
+
+  /// Satırları tek bir kart içinde toplar.
+  Widget _group(List<Widget> children) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadiuses.tile),
+      child: Container(
+        color: AppColors.tileBackgroundColor,
+        child: Column(children: children),
+      ),
+    );
+  }
+
+  Widget _divider() => const Divider(
+    height: 1,
+    color: AppColors.dividerColor,
+    indent: 64,
+    endIndent: 16,
+  );
+}

@@ -45,21 +45,9 @@ class _WebviewPageState extends State<WebviewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(
-          widget.title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontFamily: 'Poppins',
-          ),
-        ),
+        title: Text(widget.title),
         leading: IconButton(
-          icon: const AppIcon(
-            AppIcons.arrowBack,
-            color: Colors.white,
-            size: 20,
-          ),
+          icon: const AppIcon(AppIcons.arrowBack),
           onPressed: () => context.pop(),
         ),
       ),

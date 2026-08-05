@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
@@ -19,8 +20,11 @@ class _NotificationPageState extends State<NotificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: Text('Bildirimler', style: context.textTheme.titleMedium),
+        title: Text('Bildirimler'),
+        leading: IconButton(
+          icon: const AppIcon(AppIcons.arrowBack),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: Column(
         children: [

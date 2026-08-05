@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/profile/data/models/cert_model.dart';
 import 'package:sky_app/features/profile/presentation/widgets/cert_item.dart';
 
@@ -19,7 +22,13 @@ class _CertPageState extends CertPagemodel {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackgroundColor,
-      appBar: appBar(),
+      appBar: AppBar(
+        title: Text('Sertifikalar'),
+        leading: IconButton(
+          icon: const AppIcon(AppIcons.arrowBack),
+          onPressed: () => context.pop(),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: AppPaddings.mainPaddingAll,
@@ -35,20 +44,6 @@ class _CertPageState extends CertPagemodel {
       ),
     );
   }
-
-  AppBar appBar() => AppBar(
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    titleSpacing: 12,
-    title: const Text(
-      'Sertifikalar',
-      style: TextStyle(
-        color: AppColors.textWhite,
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-  );
 
   Widget subtitleText() => const Text(
     'Bootcamp ve eğitimlerden kazanılan sertifikalar.',

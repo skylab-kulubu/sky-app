@@ -7,7 +7,6 @@ import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
-import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
 import 'package:sky_app/core/widgets/club_menu_sheet.dart';
 import 'package:sky_app/core/widgets/nav_item.dart';
@@ -119,12 +118,8 @@ class ShellPage extends StatelessWidget {
     );
 
     return AppBar(
-      scrolledUnderElevation: 0,
-      surfaceTintColor: Colors.transparent,
-      centerTitle: false,
       automaticallyImplyLeading: false,
       title: _appBarTitle(context, config),
-      actionsPadding: AppPaddings.appBarActions,
       actions: [
         AppBarActions(
           icons: config.actions,
@@ -137,6 +132,7 @@ class ShellPage extends StatelessWidget {
   /// Diğer ikonların sayfaları henüz yok; bağlanana kadar sessizce yok sayılır.
   void _onActionTap(BuildContext context, String icon) {
     if (icon == AppIcons.widget) ClubMenuSheet.show(context);
+    if (icon == AppIcons.settings) context.push('/settings');
   }
 
   Widget _appBarTitle(BuildContext context, _AppBarConfig config) {
@@ -152,12 +148,7 @@ class ShellPage extends StatelessWidget {
           ),
           const SizedBox(width: AppSizes.midSpace),
         ],
-        Text(
-          config.title,
-          style: context.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text(config.title),
       ],
     );
   }

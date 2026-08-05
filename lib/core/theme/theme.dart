@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_paddings.dart';
 
 //light theme
 ThemeData lightTheme = ThemeData(
@@ -7,6 +8,23 @@ ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   cardColor: Colors.blueGrey,
   scaffoldBackgroundColor: Colors.white,
+  appBarTheme: AppBarTheme(
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    surfaceTintColor: Colors.transparent,
+    centerTitle: false,
+    actionsPadding: AppPaddings.appBarActions,
+    // AppIcon rengi verilmediğinde IconTheme'e düşüyor; leading/actions
+    // ikonlarının rengi buradan geliyor.
+    iconTheme: IconThemeData(color: Colors.grey.shade900),
+    titleTextStyle: TextStyle(
+      fontFamily: 'Poppins',
+      fontSize: 22,
+      fontWeight: FontWeight.w600,
+      color: Colors.grey.shade900,
+    ),
+  ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     shape: CircleBorder(),
     backgroundColor: Colors.grey.shade300,
@@ -19,7 +37,10 @@ ThemeData lightTheme = ThemeData(
 
     inversePrimary: Colors.grey.shade800,
   ),
-  textTheme: TextTheme(bodyMedium: TextStyle(color: Colors.grey.shade900)),
+  textTheme: TextTheme(
+    bodyMedium: TextStyle(color: Colors.grey.shade900),
+    titleLarge: TextStyle(fontFamily: 'Poppins'),
+  ),
   snackBarTheme: SnackBarThemeData(
     backgroundColor: Colors.grey.shade200,
     contentTextStyle: TextStyle(color: Colors.grey.shade900),
@@ -36,7 +57,19 @@ ThemeData darkTheme = ThemeData(
   appBarTheme: AppBarTheme(
     backgroundColor: Colors.transparent,
     elevation: 0,
+    scrolledUnderElevation: 0,
     surfaceTintColor: Colors.transparent,
+    centerTitle: false,
+    actionsPadding: AppPaddings.appBarActions,
+    // AppIcon rengi verilmediğinde IconTheme'e düşüyor; leading/actions
+    // ikonlarının rengi buradan geliyor.
+    iconTheme: IconThemeData(color: AppColors.textWhite),
+    titleTextStyle: TextStyle(
+      fontFamily: 'Poppins',
+      fontSize: 22,
+      fontWeight: FontWeight.w600,
+      color: AppColors.textWhite,
+    ),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     shape: CircleBorder(),
@@ -56,6 +89,7 @@ ThemeData darkTheme = ThemeData(
     bodyMedium: TextStyle(color: Colors.grey.shade400),
     labelSmall: TextStyle(fontFamily: 'Poppins'),
     titleMedium: TextStyle(fontFamily: 'Poppins'),
+    titleLarge: TextStyle(fontFamily: 'Poppins'),
   ),
   snackBarTheme: SnackBarThemeData(
     backgroundColor: Colors.grey.shade800,

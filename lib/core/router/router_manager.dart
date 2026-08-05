@@ -8,9 +8,10 @@ import 'package:sky_app/features/calendar/presentation/pages/calendar_page.dart'
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
 import 'package:sky_app/features/notification/presentation/pages/notification_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/certificates/cert_page.dart';
-import 'package:sky_app/features/profile/presentation/pages/contact/contact_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/webview_page.dart';
+import 'package:sky_app/features/settings/presentation/pages/contact/contact_page.dart';
+import 'package:sky_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:sky_app/features/team/presentation/pages/comming_soon_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -53,6 +54,17 @@ class RouterManager {
         },
       ),
 
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsPage(),
+        routes: [
+          GoRoute(
+            path: 'contact',
+            builder: (context, state) => const ContactPage(),
+          ),
+        ],
+      ),
+
       ShellRoute(
         builder: (context, state, child) => ShellPage(child: child),
         routes: [
@@ -80,10 +92,6 @@ class RouterManager {
                 path: 'certificates',
                 parentNavigatorKey: _rootNavigatorKey,
                 builder: (context, state) => const CertPage(),
-              ),
-              GoRoute(
-                path: 'contact',
-                builder: (context, state) => const ContactPage(),
               ),
             ],
           ),

@@ -27,6 +27,15 @@ class AppPaddings {
     top: 10,
   );
 
+  /// Ayarlar satırının iç boşluğu.
+  static const settingsTile = EdgeInsets.symmetric(
+    horizontal: 16,
+    vertical: 12,
+  );
+
+  /// Ayarlar bölüm başlığının boşluğu.
+  static const sectionHeader = EdgeInsets.only(left: 4, top: 24, bottom: 8);
+
   /// Navbar hap'ının, öğelerini saran iç boşluğu.
   static const navBarContent = EdgeInsets.all(8);
 
