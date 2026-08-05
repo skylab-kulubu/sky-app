@@ -49,6 +49,15 @@ class AppIcons {
   static const String education = 'presentation';
   static const String research = 'flask';
 
+  // SkyPass hızlı eylemleri
+  static const String studentCard = 'personalcard';
+  static const String nfc = 'signalStream';
+
+  // Profil bilgi satırları
+  static const String certificate = 'awardCertificate';
+  static const String university = 'buildings';
+  static const String email = 'sms';
+
   // Settings
   static const String permissions = 'shieldTick';
   static const String support = 'envelope';

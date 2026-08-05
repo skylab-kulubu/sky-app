@@ -11,6 +11,13 @@ class UserModel {
   final bool emailVerified;
   final List<String> realmRoles;
 
+  // Yalnızca profil API'sinden gelen alanlar; JWT'de karşılıkları yok.
+  final String schoolEmail;
+  final String faculty;
+  final String profilePictureUrl;
+  final String linkedin;
+  final bool ldapUser;
+
   const UserModel({
     required this.id,
     required this.name,
@@ -23,6 +30,11 @@ class UserModel {
     required this.skyNumber,
     required this.emailVerified,
     required this.realmRoles,
+    this.schoolEmail = '',
+    this.faculty = '',
+    this.profilePictureUrl = '',
+    this.linkedin = '',
+    this.ldapUser = false,
   });
 
   factory UserModel.fromJwt(Map<String, dynamic> payload) {
@@ -38,6 +50,64 @@ class UserModel {
       skyNumber: payload['sky_number'] ?? '',
       emailVerified: payload['email_verified'] ?? false,
       realmRoles: List<String>.from(payload['realm_access']?['roles'] ?? []),
+    );
+  }
+
+  /// Profil API'sinin `data` objesinden kurar.
+  ///
+  /// Yanıtta rol bilgisi bulunmadığı için [realmRoles] boş kalır; roller
+  /// yalnızca JWT'de olduğundan bu nesne tek başına değil, [mergeWith] ile
+  /// JWT'den gelen nesnenin üzerine uygulanmalıdır.
+  factory UserModel.fromJson(Map<String, dynamic> data) {
+    final firstName = data['firstName'] as String? ?? '';
+    final lastName = data['lastName'] as String? ?? '';
+
+    return UserModel(
+      id: data['id'] ?? '',
+      name: '$firstName $lastName'.trim(),
+      givenName: firstName,
+      familyName: lastName,
+      email: data['email'] ?? '',
+      preferredUsername: data['username'] ?? '',
+      university: data['university'] ?? '',
+      department: data['department'] ?? '',
+      skyNumber: data['skyNumber'] ?? '',
+      emailVerified: false,
+      realmRoles: const [],
+      schoolEmail: data['schoolEmail'] ?? '',
+      faculty: data['faculty'] ?? '',
+      profilePictureUrl: data['profilePictureUrl'] ?? '',
+      linkedin: data['linkedin'] ?? '',
+      ldapUser: data['ldapUser'] ?? false,
+    );
+  }
+
+  /// JWT'den gelen nesnenin üzerine profil API'sinden geleni uygular.
+  ///
+  /// Roller ve [emailVerified] JWT'de kalır (API bunları döndürmüyor);
+  /// diğer alanlarda API kazanır, ama boş gelen bir alan JWT'deki değeri
+  /// silmez.
+  UserModel mergeWith(UserModel profile) {
+    String pick(String fromProfile, String fromJwt) =>
+        fromProfile.trim().isNotEmpty ? fromProfile : fromJwt;
+
+    return UserModel(
+      id: pick(profile.id, id),
+      name: pick(profile.name, name),
+      givenName: pick(profile.givenName, givenName),
+      familyName: pick(profile.familyName, familyName),
+      email: pick(profile.email, email),
+      preferredUsername: pick(profile.preferredUsername, preferredUsername),
+      university: pick(profile.university, university),
+      department: pick(profile.department, department),
+      skyNumber: pick(profile.skyNumber, skyNumber),
+      emailVerified: emailVerified,
+      realmRoles: realmRoles,
+      schoolEmail: pick(profile.schoolEmail, schoolEmail),
+      faculty: pick(profile.faculty, faculty),
+      profilePictureUrl: pick(profile.profilePictureUrl, profilePictureUrl),
+      linkedin: pick(profile.linkedin, linkedin),
+      ldapUser: profile.ldapUser || ldapUser,
     );
   }
 

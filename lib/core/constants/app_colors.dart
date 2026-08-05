@@ -19,6 +19,20 @@ class AppColors {
     0xFFE0C8E5,
   ).withValues(alpha: 0.14); // primarySoft
 
+  // SkyPass Card (açık lila zemin üzerinde koyu metin)
+  static const skyPassGradientStart = primaryColor;
+  static const skyPassGradientEnd = primaryDeep;
+  static const skyPassForeground = Color(0xFF231A2B);
+  static final skyPassForegroundMuted = const Color(
+    0xFF231A2B,
+  ).withValues(alpha: 0.60);
+  static final skyPassChip = const Color(0xFF231A2B).withValues(alpha: 0.18);
+
+  // Yüzen navbar'ın gölgesi. Açık temada aynı opaklık beyaz zeminde sert bir
+  // leke bırakıyor, o yüzden ağırlık temaya göre ayrışıyor.
+  static final navShadowDark = Colors.black.withValues(alpha: 0.6);
+  static final navShadowLight = Colors.black.withValues(alpha: 0.15);
+
   // Text Colors
   static const textWhite = Color(0xFFFFFFFF);
   static const textWhite70 = Color(0xFFF0F0F0);

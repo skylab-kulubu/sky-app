@@ -21,6 +21,12 @@ class AppRadiuses {
   static const double tile = 16;
   static const double iconBox = 12;
 
+  /// SkyPass kartı ve hızlı eylem dairesi.
+  static const double skyPassCard = 24;
+  static const BorderRadius skyPassCardBorderRadius = BorderRadius.all(
+    Radius.circular(skyPassCard),
+  );
+
   /// Bottom sheet'in üst köşeleri.
   static const BorderRadius sheetBorderRadius = BorderRadius.vertical(
     top: Radius.circular(24),

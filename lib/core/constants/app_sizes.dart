@@ -8,6 +8,10 @@ class AppSizes {
   static const iconBoxLarge = 52.0;
   static const iconBoxLargePadding = 13.0;
 
+  /// Profildeki hızlı eylem dairesi ve appbar avatarı.
+  static const quickActionCircle = 56.0;
+  static const appBarAvatar = 40.0;
+
   /// Ayarlar satırındaki dolu renkli ikon dairesi.
   static const settingsIconCircle = 36.0;
 

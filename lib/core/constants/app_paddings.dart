@@ -27,6 +27,16 @@ class AppPaddings {
     top: 10,
   );
 
+  /// SkyPass kartının iç boşluğu.
+  static const skyPassCard = EdgeInsets.all(20);
+
+  /// Hesap bilgisi satırının iç boşluğu; etiket ve değer alt alta durduğu
+  /// için dikeyde daha ferah.
+  static const profileInfoRow = EdgeInsets.symmetric(
+    horizontal: 16,
+    vertical: 14,
+  );
+
   /// Ayarlar satırının iç boşluğu.
   static const settingsTile = EdgeInsets.symmetric(
     horizontal: 16,
