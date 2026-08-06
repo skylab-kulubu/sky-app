@@ -49,6 +49,13 @@ class AppPaddings {
     vertical: 12,
   );
 
+  /// Giriş sayfasının içeriği; sayfada tek bir sütun olduğu için ana
+  /// boşluktan geniş.
+  static const authContent = EdgeInsets.symmetric(horizontal: 32);
+
+  /// Ayarların en altındaki "Developed by" künyesi.
+  static const credit = EdgeInsets.only(top: 36, bottom: 8);
+
   /// Etkinlik kartının iç boşluğu; kapak görselinin dört yanında kart
   /// zemininden bir çerçeve kalmasını sağlıyor. Köşe rozetleri görselin
   /// dışına taştığı için bu boşluk onlara da yer açıyor.

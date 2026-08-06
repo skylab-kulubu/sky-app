@@ -7,9 +7,9 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 /// Uygulamanın birincil butonu.
 ///
 /// Navbar ve appbar hap'larıyla aynı tam yuvarlak köşeye sahip. Basılınca
-/// auth sayfasındaki giriş butonuyla aynı yay (spring) hissiyle küçülür ve
-/// bırakılınca yerine oturur; bu yüzden [ElevatedButton] değil,
-/// [InkWell] üzerine kurulu (dokunmanın başlangıç/bitişi gerekiyor).
+/// yay (spring) hissiyle küçülür ve bırakılınca yerine oturur; bu yüzden
+/// [ElevatedButton] değil, [InkWell] üzerine kurulu (dokunmanın başlangıç ve
+/// bitişi gerekiyor).
 class SkyButton extends StatefulWidget {
   final String text;
   final Widget? icon;
@@ -44,7 +44,7 @@ class _SkyButtonState extends State<SkyButton>
 
   static const double _height = 56;
 
-  /// Basılıyken küçülme oranı; auth butonuyla aynı.
+  /// Basılıyken küçülme oranı.
   static const double _pressScale = 0.05;
 
   static const double _spinnerSize = 20;
@@ -139,9 +139,13 @@ class _SkyButtonState extends State<SkyButton>
         child: SizedBox(
           height: _spinnerSize,
           width: _spinnerSize,
-          child: CircularProgressIndicator.adaptive(
+          // `.adaptive` değil: iOS'ta Cupertino göstergesine düşüyor ve
+          // rengi buradan almıyor, butonun üstünde platformun varsayılan
+          // grisi/siyahı kalıyordu. Material göstergesi metinle aynı rengi
+          // alıyor.
+          child: CircularProgressIndicator(
             strokeWidth: _spinnerStroke,
-            valueColor: AlwaysStoppedAnimation<Color>(_foreground(context)),
+            color: _foreground(context),
           ),
         ),
       );

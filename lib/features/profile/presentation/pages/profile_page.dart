@@ -20,7 +20,12 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<UserProvider>().user!;
+    final user = context.watch<UserProvider>().user;
+
+    // Çıkışta kullanıcı temizleniyor ve sayfa hemen yeniden çiziliyor, ama
+    // `/auth`'a yönlendirme bir sonraki karede gerçekleşiyor. O kare boyunca
+    // çizilecek veri yok; `user!` burada patlıyordu.
+    if (user == null) return const SizedBox.shrink();
 
     return ListView(
       padding: AppPaddings.mainPaddingAll,

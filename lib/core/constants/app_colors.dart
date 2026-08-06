@@ -83,6 +83,10 @@ class AppColors {
   static const darkOrange = Color(0xFFF39C12);
   static const brightRed = Color(0xFFFB2C36);
 
+  /// Giriş sayfasındaki alt başlığın gökkuşağı geçişi. Vurgu renklerinden
+  /// kuruluyor, temadan bağımsız: iki temada da aynı canlılıkta okunuyor.
+  static const brandGradient = <Color>[secondaryBlue, purple, pink, darkOrange];
+
   // Opacity Backgrounds (For icon boxes)
   static final primaryBlue10 = const Color(0xFF1E90FF).withValues(alpha: 0.1);
   static final secondaryBlue9 = const Color(

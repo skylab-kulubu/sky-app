@@ -56,7 +56,7 @@ lib/
 │   ├── router/               # router_manager.dart (GoRouter)
 │   ├── services/             # links_service.dart, webview_service.dart
 │   ├── theme/                # theme.dart (light/dark), theme_provider.dart
-│   ├── widgets/              # AppIcon, AppBarActions, NavItem, UserAvatar, CoverImage, BottomScrim, SkyButton ...
+│   ├── widgets/              # AppIcon, AppBarActions, NavItem, UserAvatar, CoverImage, BottomScrim, ColorGlow, SkyButton ...
 │   └── shell_page.dart       # appbar + navbar kabuğu
 └── features/<ad>/
     ├── data/{models,services}
@@ -90,6 +90,18 @@ Feature'lar: `auth`, `calendar`, `home`, `notification`, `profile`, `qr`, `setti
 
 - REST: `https://api.yildizskylab.com` — yanıtlar `{success, message, data, ...}` zarfıyla geliyor, `data` açılarak kullanılıyor (`EventService`'e bak).
 - Kimlik doğrulama: Keycloak, `https://e.yildizskylab.com/realms/e-skylab`, `flutter_appauth` ile OAuth/PKCE. Token'lar `flutter_secure_storage`'da.
+
+> Çıkışta `UserProvider.user` null'a düşüyor ve sayfalar aynı karede yeniden çiziliyor; `/auth`'a yönlendirme ancak bir sonraki karede oluyor. Kullanıcıyı okuyan sayfalar bu tek kareyi karşılamak zorunda — `user!` yazmak orada patlar (bkz. `profile_page.dart`).
+
+### Dikkat çeken paketler
+
+| Paket | Nerede |
+|---|---|
+| `reicon_flutter` | Bütün ikonlar (`AppIcon` üzerinden) |
+| `animations` | Yalnızca haber tile'ının `OpenContainer` geçişi |
+| `palette_generator` | Etkinlik kapağından zemin rengi (`EventPaletteService`) |
+| `share_plus` | Etkinlik detayındaki paylaş butonu — **native bağımlılık**, eklendiğinde hot reload yetmez |
+| `timeago` | Bildirim listesindeki göreli zaman (`tr` ve `tr_short` locale'leri `main.dart`'ta kayıtlı) |
 
 ---
 

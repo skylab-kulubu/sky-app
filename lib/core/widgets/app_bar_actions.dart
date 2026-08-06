@@ -58,6 +58,18 @@ class AppBarActions extends StatelessWidget {
 
   double get _height => _buttonSize + (_inset + _borderWidth) * 2;
 
+  /// Kenarlık yalnızca açık temada görünür: orada hap ile beyaz zemin
+  /// arasındaki fark çok az kalıyor ve sınırı belirginleştiriyor. Koyu temada
+  /// hap zaten siyah zeminden ayrıştığı için çizgi fazladan duruyor.
+  ///
+  /// Zemini dışarıdan verilen hap'larda da çizgi yok; o durumda rengi veren
+  /// sayfa kendi kontrastını kuruyor.
+  Color _borderColor(BuildContext context) {
+    if (backgroundColor != null) return Colors.transparent;
+    if (context.theme.brightness == Brightness.dark) return Colors.transparent;
+    return context.dividerColor;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
@@ -68,12 +80,9 @@ class AppBarActions extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor ?? context.tileColor,
         borderRadius: AppRadiuses.stadiumBorderRadius,
-        border: Border.all(
-          color: backgroundColor != null
-              ? Colors.transparent
-              : context.dividerColor,
-          width: _borderWidth,
-        ),
+        // Kenarlık kaldırılmıyor, saydamlaştırılıyor: genişliği hap'ın
+        // ölçüsüne dahil ve [widthFor] o hesaba dayanıyor.
+        border: Border.all(color: _borderColor(context), width: _borderWidth),
       ),
       child: ClipRRect(
         borderRadius: AppRadiuses.stadiumBorderRadius,

@@ -10,6 +10,7 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/bottom_scrim.dart';
+import 'package:sky_app/core/widgets/color_glow.dart';
 import 'package:sky_app/core/widgets/cover_image.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
@@ -78,13 +79,9 @@ class _EventDetailPageState extends EventDetailPagemodel {
 
   static const Duration _tintFade = Duration(milliseconds: 450);
 
-  /// Zemindeki renk lekeleri: merkez, yarıçap ve yoğunluk.
-  ///
-  /// Tek yönlü bir gradyan mekanik duruyordu; birbirinin üstüne binen
-  /// dairesel lekeler rengi sayfaya dağınık biçimde yayıyor. Konumlar sabit,
-  /// renkler kapaktan geldiği için her etkinlikte farklı bir dağılım çıkıyor.
-  static const List<({Alignment center, double radius, double opacity})>
-  _blobs = [
+  /// Zemindeki renk lekelerinin yerleşimi. Konumlar sabit, renkler kapaktan
+  /// geldiği için her etkinlikte farklı bir dağılım çıkıyor.
+  static const List<GlowSpot> _glowSpots = [
     (center: Alignment(-0.7, -1.0), radius: 1.15, opacity: 0.70),
     (center: Alignment(1.0, -0.45), radius: 0.95, opacity: 0.55),
     (center: Alignment(-0.6, 0.45), radius: 1.25, opacity: 0.42),
@@ -145,35 +142,8 @@ class _EventDetailPageState extends EventDetailPagemodel {
           // değişmiyorlar. Sınır olmadan sayfanın her yeniden çiziminde
           // (açılış animasyonu boyunca her kare) baştan hesaplanıyorlar.
           child: RepaintBoundary(
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                if (tints.isNotEmpty)
-                  for (var i = 0; i < _blobs.length; i++)
-                    _blob(_blobs[i], tints[i % tints.length]),
-              ],
-            ),
+            child: ColorGlow(colors: tints, spots: _glowSpots),
           ),
-        ),
-      ),
-    );
-  }
-
-  /// Kenarına doğru şeffaflaşan tek bir renk lekesi. Kenarda sıfıra indiği
-  /// için lekelerin sınırı belli olmuyor, üst üste bindiklerinde karışıyorlar.
-  Widget _blob(
-    ({Alignment center, double radius, double opacity}) blob,
-    Color color,
-  ) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          center: blob.center,
-          radius: blob.radius,
-          colors: [
-            color.withValues(alpha: blob.opacity),
-            color.withValues(alpha: 0),
-          ],
         ),
       ),
     );

@@ -34,6 +34,8 @@ class ShellPage extends StatelessWidget {
   }
 
   Widget navBar(String currentLocation, BuildContext context) {
+    final isDark = context.theme.brightness == Brightness.dark;
+
     return Padding(
       padding: AppPaddings.navBar,
       child: Center(
@@ -49,12 +51,14 @@ class ShellPage extends StatelessWidget {
             decoration: BoxDecoration(
               color: context.tileColor.withValues(alpha: 0.95),
               borderRadius: AppRadiuses.stadiumBorderRadius,
-              // Açık temada hap ile beyaz zemin arasındaki fark çok az
-              // kalıyor; ince kenarlık sınırı belirginleştiriyor.
-              border: Border.all(color: context.dividerColor),
+              // Kenarlık yalnızca açık temada: orada hap ile beyaz zemin
+              // arasındaki fark çok az kalıyor ve sınırı belirginleştiriyor.
+              // Koyu temada hap zaten siyah zeminden ayrıştığı için kenarlık
+              // fazladan bir çizgi gibi duruyor.
+              border: isDark ? null : Border.all(color: context.dividerColor),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).brightness == Brightness.dark
+                  color: isDark
                       ? AppColors.navShadowDark
                       : AppColors.navShadowLight,
                   blurRadius: 36,

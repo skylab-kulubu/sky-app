@@ -20,6 +20,9 @@ class AppSizes {
   /// Ayarlar satırındaki dolu renkli ikon dairesi.
   static const settingsIconCircle = 36.0;
 
+  /// Giriş sayfasında ortada duran logo animasyonunun kenar uzunluğu.
+  static const authLogo = 280.0;
+
   /// Bildirim satırındaki yuvarlak ikon dairesi.
   static const notificationCircle = 44.0;
 
@@ -37,7 +40,7 @@ class AppSizes {
 
   /// İki bölüm arasındaki boşluk (detay sayfasındaki bilgi kartı ile
   /// açıklama gibi).
-  static const double sectionSpace = 24.0;
+  static const double sectionSpace = 40.0;
 
   /// Yüzen navbar'ın altında kalmasın diye listelerin sonuna eklenen pay.
   static const double navBarClearance = 100.0;

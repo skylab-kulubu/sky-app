@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/services/links_service.dart';
 import 'package:sky_app/core/services/webview_service.dart';
@@ -89,7 +92,35 @@ class _SettingsPageState extends SettingsPagemodel {
               onTap: onLogoutTap,
             ),
           ]),
-          const SizedBox(height: 40),
+          const SizedBox(height: AppSizes.sectionSpace),
+          _credit(),
+        ],
+      ),
+    );
+  }
+
+  /// Geliştirici künyesi. Giriş sayfasındaydı; oraya her açılışta bakılıyor
+  /// ama bilgi aranarak bulunacak türden, o yüzden ayarların sonunda.
+  Widget _credit() {
+    return Padding(
+      padding: AppPaddings.credit,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Developed by ',
+            style: context.textTheme.labelSmall?.copyWith(
+              color: context.textTertiary,
+            ),
+          ),
+          SvgPicture.asset(
+            AppAssets.mobilab,
+            height: AppSizes.iconMedium,
+            colorFilter: ColorFilter.mode(
+              context.textTertiary,
+              BlendMode.srcIn,
+            ),
+          ),
         ],
       ),
     );
