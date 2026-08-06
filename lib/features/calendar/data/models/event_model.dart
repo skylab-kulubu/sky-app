@@ -92,9 +92,81 @@ class EventModel {
     if (startDate.isEmpty) return '';
     try {
       final date = DateTime.parse(startDate);
-      return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+      return _clock(date);
     } catch (e) {
       return '';
     }
+  }
+
+  static const List<String> _months = [
+    'Ocak',
+    'Şubat',
+    'Mart',
+    'Nisan',
+    'Mayıs',
+    'Haziran',
+    'Temmuz',
+    'Ağustos',
+    'Eylül',
+    'Ekim',
+    'Kasım',
+    'Aralık',
+  ];
+
+  static const List<String> _weekdays = [
+    'Pazartesi',
+    'Salı',
+    'Çarşamba',
+    'Perşembe',
+    'Cuma',
+    'Cumartesi',
+    'Pazar',
+  ];
+
+  static String _clock(DateTime date) =>
+      '${date.hour.toString().padLeft(2, '0')}:'
+      '${date.minute.toString().padLeft(2, '0')}';
+
+  /// Etkinlik birden fazla güne yayılıyor mu.
+  bool get isMultiDay {
+    final start = startDateTime;
+    final end = endDateTime;
+    if (start == null || end == null) return false;
+    return start.year != end.year ||
+        start.month != end.month ||
+        start.day != end.day;
+  }
+
+  /// Detay sayfasındaki okunur tarih: "14 Ağustos Cuma".
+  ///
+  /// Birden çok güne yayılan etkinlikte aralık veriliyor ("14 – 16 Ağustos
+  /// 2026"); gün adı o durumda anlamını yitiriyor.
+  String get formattedDayLabel {
+    final start = startDateTime;
+    if (start == null) return '';
+
+    final end = endDateTime;
+    if (isMultiDay && end != null) {
+      if (start.month == end.month && start.year == end.year) {
+        return '${start.day} – ${end.day} ${_months[end.month - 1]} ${end.year}';
+      }
+      return '${start.day} ${_months[start.month - 1]} – '
+          '${end.day} ${_months[end.month - 1]} ${end.year}';
+    }
+
+    return '${start.day} ${_months[start.month - 1]} '
+        '${_weekdays[start.weekday - 1]}';
+  }
+
+  /// "10:00 – 18:00". Bitiş saati yoksa ya da etkinlik günlere yayılıyorsa
+  /// yalnızca başlangıç saati; aralık o durumda yanıltıcı olurdu.
+  String get formattedTimeRange {
+    final start = startDateTime;
+    if (start == null) return '';
+
+    final end = endDateTime;
+    if (end == null || isMultiDay) return _clock(start);
+
+    return '${_clock(start)} – ${_clock(end)}';
   }
 }

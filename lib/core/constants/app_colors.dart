@@ -54,6 +54,22 @@ class AppColors {
   /// içerik. Temadan bağımsız: her iki temada da beyaz kalır.
   static const onAccent = Color(0xFFFFFFFF);
 
+  /// Etkinlik detayında kapak renklerinin üstüne bindiği koyu taban. Sayfa
+  /// her iki temada da koyu kalıyor — kapaktan gelen renk açık bir zemine
+  /// karıştırıldığında soluyor ve etkinliğin kimliği kayboluyor.
+  ///
+  /// Saf siyah değil: renk lekeleri altında taban ne kadar koyuysa sayfa o
+  /// kadar ölü görünüyor.
+  static const coverBackdropBase = Color(0xFF1C1C21);
+
+  /// [coverBackdropBase] üzerindeki içerik. Zemin temadan bağımsız koyu
+  /// olduğu için bu renkler de `context` erişimcilerinden okunmaz.
+  static const onCover = onAccent;
+  static final onCoverMuted = onAccent.withValues(alpha: 0.74);
+  static final onCoverFaint = onAccent.withValues(alpha: 0.55);
+  static final onCoverDivider = onAccent.withValues(alpha: 0.15);
+  static final onCoverSurface = onAccent.withValues(alpha: 0.14);
+
   // Status & Icon Colors
   static const blue = Color(0xFF1E90FF);
   static const teal = Color(0xFF1ABC9C);

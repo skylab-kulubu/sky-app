@@ -13,7 +13,14 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 class SkyButton extends StatefulWidget {
   final String text;
   final Widget? icon;
-  final VoidCallback onPressed;
+
+  /// `null` ise buton pasif: soluk zeminde durur, dokunmaya yanıt vermez.
+  final VoidCallback? onPressed;
+
+  /// İstek sürerken metin yerine ilerleme göstergesi çizilir ve dokunma
+  /// yok sayılır; aynı isteğin iki kez gönderilmesini engeller.
+  final bool isLoading;
+
   final Color? backgroundColor;
   final Color? textColor;
 
@@ -22,6 +29,7 @@ class SkyButton extends StatefulWidget {
     required this.text,
     this.icon,
     required this.onPressed,
+    this.isLoading = false,
     this.backgroundColor,
     this.textColor,
   });
@@ -39,6 +47,9 @@ class _SkyButtonState extends State<SkyButton>
   /// Basılıyken küçülme oranı; auth butonuyla aynı.
   static const double _pressScale = 0.05;
 
+  static const double _spinnerSize = 20;
+  static const double _spinnerStroke = 2;
+
   static const SpringDescription _spring = SpringDescription(
     mass: 1,
     stiffness: 520,
@@ -48,12 +59,7 @@ class _SkyButtonState extends State<SkyButton>
   @override
   void initState() {
     super.initState();
-    _pressController = AnimationController(
-      vsync: this,
-      value: 0,
-      lowerBound: 0,
-      upperBound: 1,
-    );
+    _pressController = AnimationController(vsync: this);
   }
 
   @override
@@ -68,11 +74,30 @@ class _SkyButtonState extends State<SkyButton>
     );
   }
 
+  /// Dokunma işleniyor mu; pasif ve yükleniyor durumlarında hem basma
+  /// animasyonu hem de geri çağrı devre dışı.
+  bool get _isEnabled => widget.onPressed != null && !widget.isLoading;
+
   /// Zemin üzerindeki metin ve ripple rengi. Vurgu zemini temaya göre açık
   /// lila ile koyu mor arasında yer değiştirdiği için kontrast rengi de
   /// temadan okunur.
-  Color _foreground(BuildContext context) =>
-      widget.textColor ?? context.onAccentColor;
+  ///
+  /// Açıkça verilen renk pasif durumda da geçerli: butonu temadan bağımsız
+  /// bir zeminin üstüne koyan sayfalar (etkinlik detayı) iki durumu da
+  /// kendisi belirliyor.
+  Color _foreground(BuildContext context) {
+    if (widget.textColor != null) return widget.textColor!;
+    if (widget.onPressed == null) return context.textTertiary;
+    return context.onAccentColor;
+  }
+
+  /// Pasif buton vurgu renginde durursa hâlâ basılabilir görünüyor; nötr
+  /// yükseltilmiş yüzeye düşüyor.
+  Color _background(BuildContext context) {
+    if (widget.backgroundColor != null) return widget.backgroundColor!;
+    if (widget.onPressed == null) return context.elevatedColor;
+    return context.accentColor;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,38 +113,55 @@ class _SkyButtonState extends State<SkyButton>
           );
         },
         child: Material(
-          color: widget.backgroundColor ?? context.accentColor,
+          color: _background(context),
           borderRadius: AppRadiuses.stadiumBorderRadius,
           // Ripple'ın köşelerden taşmaması için.
           clipBehavior: Clip.antiAlias,
           child: InkWell(
-            onTapDown: (_) => _animatePress(true),
-            onTapCancel: () => _animatePress(false),
-            onTapUp: (_) => _animatePress(false),
-            onTap: widget.onPressed,
+            onTapDown: _isEnabled ? (_) => _animatePress(true) : null,
+            onTapCancel: _isEnabled ? () => _animatePress(false) : null,
+            onTapUp: _isEnabled ? (_) => _animatePress(false) : null,
+            onTap: _isEnabled ? widget.onPressed : null,
             // Varsayılan ripple metin renginden türüyor; renkli zeminde
             // doğru tarafta kalması için açıkça veriliyor.
             splashColor: _foreground(context).withValues(alpha: 0.10),
             highlightColor: _foreground(context).withValues(alpha: 0.05),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (widget.icon != null) ...[
-                  widget.icon!,
-                  const SizedBox(width: AppSizes.bigSpace),
-                ],
-                Text(
-                  widget.text,
-                  style: context.textTheme.titleMedium?.copyWith(
-                    color: _foreground(context),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+            child: _content(context),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _content(BuildContext context) {
+    if (widget.isLoading) {
+      return Center(
+        child: SizedBox(
+          height: _spinnerSize,
+          width: _spinnerSize,
+          child: CircularProgressIndicator.adaptive(
+            strokeWidth: _spinnerStroke,
+            valueColor: AlwaysStoppedAnimation<Color>(_foreground(context)),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (widget.icon != null) ...[
+          widget.icon!,
+          const SizedBox(width: AppSizes.bigSpace),
+        ],
+        Text(
+          widget.text,
+          style: context.textTheme.titleMedium?.copyWith(
+            color: _foreground(context),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }

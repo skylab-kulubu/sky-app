@@ -6,7 +6,7 @@ import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/home/data/models/news_item.dart';
 import 'package:sky_app/features/home/presentation/pages/news_detail_page.dart';
-import 'package:sky_app/features/home/presentation/widgets/cover_image.dart';
+import 'package:sky_app/core/widgets/cover_image.dart';
 
 /// Haber listesindeki tek satır: solda kare görsel, sağda başlık ve iki
 /// satır açıklama. Kart zemini yok, sayfa zemini üzerinde düz durur.
@@ -29,6 +29,9 @@ class NewsTile extends StatelessWidget {
       // navbar'ın altında açılırdı.
       useRootNavigator: true,
       transitionDuration: _transitionDuration,
+      // Etkinlik kartındaki `fade`'in aksine burada fadeThrough: tile küçük
+      // olduğu için kutu çok kısa mesafede büyüyor ve iki içeriğin üst üste
+      // binmesi karışık görünüyor. Sıralı geçiş bu ölçekte daha temiz.
       transitionType: ContainerTransitionType.fadeThrough,
       // Varsayılanlar beyaz zemin ve yükseltidir; tile sayfa zemini üzerinde
       // düz durduğu için ikisi de sıfırlanıyor.

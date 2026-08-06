@@ -23,10 +23,22 @@ class AppSizes {
   /// Bildirim satırındaki yuvarlak ikon dairesi.
   static const notificationCircle = 44.0;
 
+  /// Etkinlik kartındaki kapak görselinin en/boy oranı. Detay sayfasındaki
+  /// kapak kare; liste kartında kare bir görsel satırları gereğinden uzun
+  /// yapıyor.
+  static const eventCoverAspect = 16 / 10;
+
   /// Okunmamış bildirim rozeti.
   static const badgeDot = 8.0;
 
   static const double smallSpace = 2.0;
   static const double midSpace = 8.0;
   static const double bigSpace = 12.0;
+
+  /// İki bölüm arasındaki boşluk (detay sayfasındaki bilgi kartı ile
+  /// açıklama gibi).
+  static const double sectionSpace = 24.0;
+
+  /// Yüzen navbar'ın altında kalmasın diye listelerin sonuna eklenen pay.
+  static const double navBarClearance = 100.0;
 }

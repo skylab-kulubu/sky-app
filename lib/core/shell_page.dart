@@ -10,6 +10,7 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
+import 'package:sky_app/core/widgets/bottom_scrim.dart';
 import 'package:sky_app/core/widgets/club_menu_sheet.dart';
 import 'package:sky_app/core/widgets/nav_item.dart';
 import 'package:sky_app/core/widgets/user_avatar.dart';
@@ -20,11 +21,6 @@ class ShellPage extends StatelessWidget {
 
   final Widget child;
 
-  /// Gövdenin altındaki karartma gradyanının yüksekliği. Navbar alttan
-  /// ~94px yukarıda başladığı için içeriğin hap'ın iki yanından sızmaması
-  /// adına o hizayı rahatça aşması gerekiyor.
-  static const double _scrimHeight = 100;
-
   @override
   Widget build(BuildContext context) {
     final currentLocation = GoRouterState.of(context).matchedLocation;
@@ -32,43 +28,8 @@ class ShellPage extends StatelessWidget {
     return Scaffold(
       extendBody: true,
       appBar: appBar(context),
-      body: Stack(children: [child, _bottomScrim(context)]),
+      body: Stack(children: [child, const BottomScrim()]),
       bottomNavigationBar: navBar(currentLocation, context),
-    );
-  }
-
-  /// Navbar'ın arkasındaki içeriği yumuşatan alt gradyan.
-  ///
-  /// Zemin rengi temadan geliyor: koyu temada siyaha, açık temada beyaza
-  /// gidiyor. Sabit siyah verilseydi açık temada içeriğin üstüne koyu bir
-  /// bant binerdi.
-  Widget _bottomScrim(BuildContext context) {
-    final base = Theme.of(context).scaffoldBackgroundColor;
-
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: IgnorePointer(
-        child: Container(
-          height: _scrimHeight,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              // Navbar'ın hizasına gelmeden önce büyük ölçüde koyulaşsın
-              // diye ara duraklar yukarı çekildi.
-              stops: const [0.0, 0.15, 0.6, 1.0],
-              colors: [
-                base.withValues(alpha: 0.0),
-                base.withValues(alpha: 0.3),
-                base.withValues(alpha: 0.7),
-                base,
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 

@@ -34,7 +34,7 @@ class _HomePageState extends HomePagemodel {
 
     return Scaffold(
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: AppPaddings.mainPaddingVertical,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -55,7 +55,7 @@ class _HomePageState extends HomePagemodel {
             ),
             const SizedBox(height: HomePagemodel._titleSpacing),
             _newsList(),
-            const SizedBox(height: 100),
+            const SizedBox(height: AppSizes.navBarClearance),
           ],
         ),
       ),

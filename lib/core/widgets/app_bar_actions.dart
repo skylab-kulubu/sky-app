@@ -12,10 +12,22 @@ import 'package:sky_app/core/widgets/app_icon.dart';
 /// AppBarActions(icons: [AppIcons.menu, AppIcons.notification])
 /// ```
 class AppBarActions extends StatelessWidget {
-  const AppBarActions({super.key, required this.icons, this.onIconTap});
+  const AppBarActions({
+    super.key,
+    required this.icons,
+    this.onIconTap,
+    this.backgroundColor,
+    this.iconColor,
+  });
 
   /// Soldan sağa çizilecek [AppIcons] adları.
   final List<String> icons;
+
+  /// Hap'ın zemini ve ikon rengi. Temadan bağımsız bir zeminin üstünde
+  /// duran sayfalar (etkinlik detayı) kendi renklerini veriyor; verilmezse
+  /// tema renkleri kullanılıyor.
+  final Color? backgroundColor;
+  final Color? iconColor;
 
   /// Şimdilik sayfalar hazır olmadığı için verilmiyor; verilmezse dokunma
   /// görsel olarak çalışır ama bir şey yapmaz.
@@ -54,9 +66,14 @@ class AppBarActions extends StatelessWidget {
       width: _width,
       height: _height,
       decoration: BoxDecoration(
-        color: context.tileColor,
+        color: backgroundColor ?? context.tileColor,
         borderRadius: AppRadiuses.stadiumBorderRadius,
-        border: Border.all(color: context.dividerColor, width: _borderWidth),
+        border: Border.all(
+          color: backgroundColor != null
+              ? Colors.transparent
+              : context.dividerColor,
+          width: _borderWidth,
+        ),
       ),
       child: ClipRRect(
         borderRadius: AppRadiuses.stadiumBorderRadius,
@@ -106,7 +123,7 @@ class AppBarActions extends StatelessWidget {
         icon: AppIcon(
           icon,
           size: AppSizes.iconMedium,
-          color: context.textPrimary,
+          color: iconColor ?? context.textPrimary,
         ),
       ),
     );

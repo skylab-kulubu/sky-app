@@ -5,7 +5,7 @@ import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
 import 'package:sky_app/features/home/data/models/news_item.dart';
-import 'package:sky_app/features/home/presentation/widgets/cover_image.dart';
+import 'package:sky_app/core/widgets/cover_image.dart';
 
 /// Haberin tam metnini gösteren sayfa.
 ///

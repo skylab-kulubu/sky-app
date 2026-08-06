@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 class AppPaddings {
   static const mainPaddingAll = EdgeInsets.all(16);
   static const mainPaddingHorizontal = EdgeInsets.symmetric(horizontal: 16);
+  static const mainPaddingVertical = EdgeInsets.symmetric(vertical: 16);
   static const newsTile = EdgeInsets.symmetric(horizontal: 16, vertical: 8);
 
   static const all6 = EdgeInsets.all(6);
@@ -47,6 +48,15 @@ class AppPaddings {
     horizontal: 16,
     vertical: 12,
   );
+
+  /// Etkinlik kartının iç boşluğu; kapak görselinin dört yanında kart
+  /// zemininden bir çerçeve kalmasını sağlıyor. Köşe rozetleri görselin
+  /// dışına taştığı için bu boşluk onlara da yer açıyor.
+  static const eventCard = EdgeInsets.all(12);
+
+  /// Etkinlik kartında görselin altındaki metin bloğunun ek boşluğu; metin
+  /// görselden biraz daha içeride başlasın diye.
+  static const eventCardContent = EdgeInsets.fromLTRB(4, 12, 4, 4);
 
   /// Bildirim satırının iç boşluğu. Sol dairesi haber satırının görselinden
   /// alçak olduğu için dikeyde [newsTile]'dan ferah.

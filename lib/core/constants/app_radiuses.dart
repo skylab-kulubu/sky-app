@@ -6,7 +6,7 @@ class AppRadiuses {
   static const double navitem = 16;
   static const double navIndicator = 18;
 
-  static const double cardRadius = 16;
+  static const double cardRadius = 24;
   static const double containerRadius = 10;
   //static const double buttonRadius = 8;
   static const BorderRadius cardBorderRadius = BorderRadius.all(
@@ -19,6 +19,11 @@ class AppRadiuses {
     Radius.circular(8),
   );
   static const double tile = 16;
+
+  /// Kart içindeki görselin köşeleri. Kartın kendi yarıçapının içine
+  /// oturduğu için ondan küçük; eşit olsaydı iç köşe dıştakinden daha
+  /// yuvarlak görünürdü.
+  static const double innerTile = 12;
   static const double iconBox = 12;
 
   /// SkyPass kartı ve hızlı eylem dairesi.

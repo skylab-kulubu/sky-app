@@ -10,6 +10,7 @@ import 'package:sky_app/core/constants/app_paddings.dart';
 //light theme
 ThemeData lightTheme = ThemeData(
   useMaterial3: true,
+  fontFamily: 'Poppins',
   brightness: Brightness.light,
   scaffoldBackgroundColor: AppColors.lightBackground,
   dividerColor: AppColors.lightDivider,
@@ -53,11 +54,6 @@ ThemeData lightTheme = ThemeData(
     foregroundColor: AppColors.lightTextPrimary,
   ),
   textTheme: const TextTheme(
-    displaySmall: TextStyle(fontFamily: 'Poppins'),
-    titleLarge: TextStyle(fontFamily: 'Poppins'),
-    titleMedium: TextStyle(fontFamily: 'Poppins'),
-    titleSmall: TextStyle(fontFamily: 'Poppins'),
-    labelSmall: TextStyle(fontFamily: 'Poppins'),
     bodyMedium: TextStyle(color: AppColors.lightTextPrimary),
   ),
   snackBarTheme: const SnackBarThemeData(
@@ -70,6 +66,7 @@ ThemeData lightTheme = ThemeData(
 //dark theme
 ThemeData darkTheme = ThemeData(
   useMaterial3: true,
+  fontFamily: 'Poppins',
   brightness: Brightness.dark,
   scaffoldBackgroundColor: AppColors.darkBackground,
   dividerColor: AppColors.darkDivider,
@@ -111,11 +108,6 @@ ThemeData darkTheme = ThemeData(
     foregroundColor: AppColors.darkTextPrimary,
   ),
   textTheme: const TextTheme(
-    displaySmall: TextStyle(fontFamily: 'Poppins'),
-    titleLarge: TextStyle(fontFamily: 'Poppins'),
-    titleMedium: TextStyle(fontFamily: 'Poppins'),
-    titleSmall: TextStyle(fontFamily: 'Poppins'),
-    labelSmall: TextStyle(fontFamily: 'Poppins'),
     bodyMedium: TextStyle(color: AppColors.darkTextSecondary),
   ),
   snackBarTheme: const SnackBarThemeData(

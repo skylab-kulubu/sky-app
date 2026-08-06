@@ -44,6 +44,8 @@ dependencies:
   crypto: 3.0.7
   reicon_flutter: ^1.0.1
   animations: ^2.2.0
+  palette_generator: ^0.3.3+7
+  share_plus: ^13.3.0
 
 
 dev_dependencies:

@@ -24,6 +24,7 @@ class AppIcons {
   static const String checkCircle = 'checkCircle';
   static const String edit = 'edit';
   static const String refresh = 'refresh';
+  static const String share = 'share';
   static const String play = 'play';
 
   // Navigation arrows

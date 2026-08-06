@@ -12,7 +12,7 @@ Bu dosya, projede çalışacak yapay zekâ ajanları içindir. Kod yazmadan önc
 
 Kullanıcılar kulüp üyesi öğrenciler. Uygulama üyelik kartı (SkyPass), etkinlik takibi, kulüp haberleri ve kulübün alt servislerine erişim sağlıyor.
 
-Flutter 3.44.5 (stable), Material 3.
+Flutter 3.44.5 (stable), Material 3. Yazı tipi `theme.dart`'ta `fontFamily: 'Poppins'` ile bir kez veriliyor ve bütün kademelere uygulanıyor; `textTheme` yalnızca yazı tipi dışında bir şey söyleyecekse (gövde metninin rengi gibi) girdi içeriyor.
 
 ---
 
@@ -56,7 +56,7 @@ lib/
 │   ├── router/               # router_manager.dart (GoRouter)
 │   ├── services/             # links_service.dart, webview_service.dart
 │   ├── theme/                # theme.dart (light/dark), theme_provider.dart
-│   ├── widgets/              # AppIcon, AppBarActions, NavItem, UserAvatar, ClubMenuSheet ...
+│   ├── widgets/              # AppIcon, AppBarActions, NavItem, UserAvatar, CoverImage, BottomScrim, SkyButton ...
 │   └── shell_page.dart       # appbar + navbar kabuğu
 └── features/<ad>/
     ├── data/{models,services}
@@ -117,6 +117,8 @@ color: AppColors.red   // marka rengi
 
 `AppColors` içindeki `dark*` / `light*` sabitleri **yalnızca** `theme.dart`'taki `ColorScheme`'leri besler; widget'larda doğrudan kullanılmaz.
 
+> **İstisna — etkinlik detay sayfası.** `event_detail_page.dart` her iki temada da koyu: zemini kapak görselinin baskın renginden (`palette_generator`) türetiliyor ve o renk açık bir zemine karıştırıldığında soluyor. Bu sayfadaki renkler `context` erişimcilerinden değil `AppColors.coverBackdropBase` ve `onCover*` sabitlerinden okunur. Aynı nedenle `SkyButton` ve `AppBarActions` kendilerine açıkça renk verildiğinde tema varsayılanlarını kullanmaz.
+
 `context`'ten gelen renk derleme zamanı sabiti olmadığı için o widget `const` olamaz — `const`'u kaldır. Refactor sırasında en sık karşılaşılan derleme hatası budur.
 
 Ortak AppBar özellikleri (`backgroundColor`, `elevation`, `centerTitle`, `actionsPadding`, `iconTheme`, `titleTextStyle`, `systemOverlayStyle`) `appBarTheme`'de merkezîdir; sayfalarda tekrar edilmez.
@@ -172,7 +174,28 @@ Adlar camelCase: `info-square` → `infoSquare`.
 
 **Yakın geçmişte kaldırılanlar** — geri getirmeden önce sor: biletler (tickets) özelliği, duyuru carousel'i, ana sayfadaki kısayollar, Ekipler sayfası, ana sayfadaki karşılama metni. Hepsi git geçmişinde.
 
-**Etkinlik filtresi:** `EventModel.active` bayrağının anlamı bilinmiyor; "yaklaşan etkinlik" filtresi bilinçli olarak **tarihe** göre kuruldu (`EventProvider.upcomingEvents`, bitiş tarihi baz alınır ki çok günlü etkinlikler devam ederken düşmesin).
+**Etkinlik filtresi:** `EventModel.active` bayrağının anlamı bilinmiyor; "yaklaşan etkinlik" filtresi bilinçli olarak **tarihe** göre kuruldu (`EventProvider.upcomingEvents`, bitiş tarihi baz alınır ki çok günlü etkinlikler devam ederken düşmesin). Arayüzde `active`, "başvuru açık mı" olarak yorumlanıyor: kartta "Yakında" rozeti, detayda durum satırı ve pasif Katıl butonu buna bağlı.
+
+---
+
+## Etkinlik detayı — bilmen gerekenler
+
+Bu sayfa uygulamanın en çok parçası olan ekranı; dokunmadan önce oku.
+
+**Açılış tek yerden yapılır:** `EventDetailPage.open(context, event)`. Hem Etkinlikler sekmesindeki `EventCard` hem ana sayfadaki `UpcomingEventTile` bunu çağırıyor. Route kök navigator'a push ediliyor (yoksa navbar'ın altında kalır) ve sayfa `FadeTransition` ile biniyor.
+
+**Kapak görseli `Hero` ile uçuyor.** Etiket ve uçuş yolu `EventCoverHero` widget'ında; kapağı gösteren üç yer de onu kullanıyor, ayar tek yerden değişir. Uçuş yolu bilinçli olarak `RectTween` (düz) — Hero'nun varsayılan `MaterialRectArcTween`'i küçük bir satırdan tam genişlikte kapağa giderken görseli savuruyor.
+
+> `OpenContainer` (container transform) burada **kullanılamaz**: kutuyu büyütür ama iki içeriği cross-fade eder, yani görsel yerinden hareket etmez. Hero ile birlikte de çalışmaz — ikisi de kaynak widget'ı gizleyip kendi katmanında çizer.
+
+**Zemin rengi kapaktan geliyor.** `EventPaletteService` görselin baskın renklerini çıkarıp bellekte tutuyor; sayfa bunları dağınık radial lekeler hâlinde koyu bir tabana bindiriyor. Servisin iki kritik ayrıntısı var:
+
+- Görsel `ResizeImage` ile ~120 pikselde çözülüyor. Verilmezse afiş tam çözünürlükte, üstelik kartın gösterdiği kopyadan **ayrı** olarak çözülür (farklı boyut isteyen her istek kendi önbellek anahtarını alır).
+- Hesaplar sıraya dizili ve her biri `endOfFrame` sonrası başlıyor. Hepsi birden çalışınca sekme açılışında kareler düşüyordu.
+
+Hesap, kart/satır göründüğü anda başlatılıyor (`initState`); sayfa açıldığında renk çoğu zaman hazır oluyor, değilse açılış animasyonu bittikten sonra tamamlanıyor.
+
+**Kapak sayfada sabit duruyor:** `_pinnedCover` kaydırma ilerledikçe yüksekliği büzülen bir `Positioned`; üstteki başlık çubuğunda etkinlik adı ancak kapak yukarı kaybolunca beliriyor.
 
 ---
 
