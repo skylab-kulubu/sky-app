@@ -1,17 +1,17 @@
 name: sky_app
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0+1
 
 environment:
-  sdk: '>=3.12.0 <4.0.0'
+  sdk: ">=3.12.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  
+
   #Storage
   shared_preferences: 2.5.5
   flutter_secure_storage: 10.3.0
@@ -33,12 +33,6 @@ dependencies:
   webview_flutter: 4.13.1
   url_launcher: 6.3.2
 
-  #QR Code Scanner
-  mobile_scanner: 7.2.0
-
-  #Permissions
-  permission_handler: ^12.0.1
-
   #Auth
   flutter_appauth: 12.0.1
   crypto: 3.0.7
@@ -47,6 +41,10 @@ dependencies:
   palette_generator: ^0.3.3+7
   share_plus: ^13.3.0
 
+  #Other
+  sensors_plus: ^7.1.0
+  mobile_scanner: 7.2.0
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   flutter_test:

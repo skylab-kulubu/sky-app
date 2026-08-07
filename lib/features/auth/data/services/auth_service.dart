@@ -6,7 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:sky_app/features/auth/data/models/user_model.dart';
+import 'package:sky_app/features/auth/data/models/user.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AuthService {
@@ -207,12 +207,12 @@ class AuthService {
     return token != null;
   }
 
-  Future<UserModel?> getUser() async {
+  Future<User?> getUser() async {
     final token = await _storage.read(key: 'access_token');
     if (token == null) return null;
 
     final payload = _decodeJwt(token);
-    return UserModel.fromJwt(payload);
+    return User.fromJwt(payload);
   }
 
   String _generateCodeVerifier() {

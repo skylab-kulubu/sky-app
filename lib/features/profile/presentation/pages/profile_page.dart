@@ -3,12 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
-import 'package:sky_app/core/constants/app_radiuses.dart';
-import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
-import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
-import 'package:sky_app/features/profile/presentation/widgets/profile_info_card.dart';
+import 'package:sky_app/features/profile/data/services/activity_service.dart';
+import 'package:sky_app/features/profile/presentation/widgets/activity_tile.dart';
 import 'package:sky_app/features/profile/presentation/widgets/quick_action_button.dart';
 import 'package:sky_app/features/profile/presentation/widgets/skypass_card.dart';
 
@@ -17,6 +15,9 @@ class ProfilePage extends StatelessWidget {
 
   /// Navbar'ın kartların üstüne binmemesi için liste sonuna bırakılan boşluk.
   static const double _bottomInset = 120;
+
+  static const double _sectionSpacing = 32;
+  static const double _titleSpacing = 12;
 
   @override
   Widget build(BuildContext context) {
@@ -38,89 +39,57 @@ class ProfilePage extends StatelessWidget {
               : user.department,
         ),
         const SizedBox(height: 24),
-        _quickActions(),
-        const SizedBox(height: 12),
-        _sectionHeader(context, 'Hesap Bilgileri'),
-        ProfileInfoCard(
-          rows: [
-            ProfileInfoRow(label: 'E-posta', value: user.email),
-            ProfileInfoRow(label: 'Üniversite', value: user.university),
-            ProfileInfoRow(label: 'Bölüm', value: user.department),
-          ],
-        ),
-        const SizedBox(height: 24),
-        _certificatesTile(context),
+        _quickActions(context),
+        const SizedBox(height: _sectionSpacing),
+        _sectionTitle(context, 'Aktivitelerim'),
+        const SizedBox(height: _titleSpacing),
+        _activities(),
         const SizedBox(height: _bottomInset),
       ],
     );
   }
 
-  Widget _quickActions() {
-    return const Row(
+  /// QR artık kartın arka yüzünde olduğu için "QR'ı Göster"in yeri
+  /// sertifikalara devredildi.
+  Widget _quickActions(BuildContext context) {
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: QuickActionButton(icon: AppIcons.qr, label: "QR'ı Göster"),
+          child: QuickActionButton(
+            icon: AppIcons.certificate,
+            label: 'Sertifikalarım',
+            onTap: () => context.push('/profile/certificates'),
+          ),
         ),
-        Expanded(
+        const Expanded(
           child: QuickActionButton(
             icon: AppIcons.studentCard,
             label: 'Öğrenci Kartını Eşle',
           ),
         ),
-        Expanded(
+        const Expanded(
           child: QuickActionButton(icon: AppIcons.nfc, label: "NFC'yi Aç"),
         ),
       ],
     );
   }
 
-  Widget _sectionHeader(BuildContext context, String title) {
-    return Padding(
-      padding: AppPaddings.sectionHeader,
-      child: Text(
-        title,
-        style: context.textTheme.titleSmall?.copyWith(
-          fontWeight: FontWeight.w600,
-          color: context.textSecondary,
-        ),
-      ),
+  Widget _activities() {
+    final activities = ActivityService.list;
+
+    return Column(
+      children: [
+        for (final activity in activities) ActivityTile(item: activity),
+      ],
     );
   }
 
-  Widget _certificatesTile(BuildContext context) {
-    return Material(
-      color: context.tileColor,
-      borderRadius: BorderRadius.circular(AppRadiuses.tile),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => context.push('/profile/certificates'),
-        child: Padding(
-          padding: AppPaddings.settingsTile,
-          child: Row(
-            children: [
-              AppIcon(
-                AppIcons.certificate,
-                size: AppSizes.icon,
-                color: context.accentColor,
-              ),
-              const SizedBox(width: AppSizes.bigSpace),
-              Expanded(
-                child: Text(
-                  'Sertifikalarım',
-                  style: context.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              AppIcon(
-                AppIcons.chevronRight,
-                size: AppSizes.iconSmall,
-                color: context.textTertiary,
-              ),
-            ],
-          ),
-        ),
+  Widget _sectionTitle(BuildContext context, String title) {
+    return Text(
+      title,
+      style: context.textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.w600,
       ),
     );
   }

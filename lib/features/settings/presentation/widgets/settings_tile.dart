@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
+import 'package:sky_app/core/widgets/icon_circle.dart';
 
 /// Ayarlar sayfasındaki tek satır: dolu renkli ikon dairesi + başlık + sağ ikon.
 class SettingsTile extends StatelessWidget {
@@ -45,7 +45,7 @@ class SettingsTile extends StatelessWidget {
           padding: AppPaddings.settingsTile,
           child: Row(
             children: [
-              _iconCircle(context),
+              IconCircle(icon: icon, color: iconColor),
               const SizedBox(width: AppSizes.bigSpace),
               Expanded(
                 child: Text(
@@ -72,34 +72,6 @@ class SettingsTile extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  /// Paletteki renkler koyu tema üzerinde fazla parlak kalıyor; dairenin
-  /// zeminini bir tık koyultuyoruz. Doygunluğu korumak için siyaha karıştırmak
-  /// yerine HSL parlaklığı düşürülüyor.
-  Color get _circleColor {
-    final hsl = HSLColor.fromColor(iconColor);
-    return hsl
-        .withLightness((hsl.lightness * _circleDarken).clamp(0.0, 1.0))
-        .toColor();
-  }
-
-  static const double _circleDarken = 0.8;
-
-  Widget _iconCircle(BuildContext context) {
-    return Container(
-      width: AppSizes.settingsIconCircle,
-      height: AppSizes.settingsIconCircle,
-      decoration: BoxDecoration(color: _circleColor, shape: BoxShape.circle),
-      child: Center(
-        child: AppIcon(
-          icon,
-          filled: true,
-          size: AppSizes.iconSmall,
-          color: AppColors.onAccent,
         ),
       ),
     );

@@ -6,6 +6,8 @@ abstract class SettingsPagemodel extends State<SettingsPage> {
     if (mounted) context.go('/auth');
   }
 
+  void onAccountTap() => context.push('/settings/account');
+
   void onSupportTap() => context.push('/settings/contact');
 
   void onWebsiteTap() => WebviewService.openLink(context, LinksService.website);

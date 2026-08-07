@@ -1,4 +1,4 @@
-class UserModel {
+class User {
   final String id;
   final String name;
   final String givenName;
@@ -18,7 +18,7 @@ class UserModel {
   final String linkedin;
   final bool ldapUser;
 
-  const UserModel({
+  const User({
     required this.id,
     required this.name,
     required this.givenName,
@@ -37,8 +37,8 @@ class UserModel {
     this.ldapUser = false,
   });
 
-  factory UserModel.fromJwt(Map<String, dynamic> payload) {
-    return UserModel(
+  factory User.fromJwt(Map<String, dynamic> payload) {
+    return User(
       id: payload['sub'] ?? '',
       name: payload['name'] ?? '',
       givenName: payload['given_name'] ?? '',
@@ -58,11 +58,11 @@ class UserModel {
   /// Yanıtta rol bilgisi bulunmadığı için [realmRoles] boş kalır; roller
   /// yalnızca JWT'de olduğundan bu nesne tek başına değil, [mergeWith] ile
   /// JWT'den gelen nesnenin üzerine uygulanmalıdır.
-  factory UserModel.fromJson(Map<String, dynamic> data) {
+  factory User.fromJson(Map<String, dynamic> data) {
     final firstName = data['firstName'] as String? ?? '';
     final lastName = data['lastName'] as String? ?? '';
 
-    return UserModel(
+    return User(
       id: data['id'] ?? '',
       name: '$firstName $lastName'.trim(),
       givenName: firstName,
@@ -87,11 +87,11 @@ class UserModel {
   /// Roller ve [emailVerified] JWT'de kalır (API bunları döndürmüyor);
   /// diğer alanlarda API kazanır, ama boş gelen bir alan JWT'deki değeri
   /// silmez.
-  UserModel mergeWith(UserModel profile) {
+  User mergeWith(User profile) {
     String pick(String fromProfile, String fromJwt) =>
         fromProfile.trim().isNotEmpty ? fromProfile : fromJwt;
 
-    return UserModel(
+    return User(
       id: pick(profile.id, id),
       name: pick(profile.name, name),
       givenName: pick(profile.givenName, givenName),
@@ -148,4 +148,8 @@ class UserModel {
   }
 
   String get teamsDisplay => teams.isEmpty ? '' : teams.join(' • ');
+
+  /// Kullanıcı adının gösterim hâli; arayüzde hep `@` ile yazılıyor.
+  String get usernameDisplay =>
+      preferredUsername.isEmpty ? '' : '@$preferredUsername';
 }

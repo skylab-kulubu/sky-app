@@ -1,14 +1,14 @@
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
-import 'package:sky_app/features/auth/data/models/user_model.dart';
+import 'package:sky_app/features/auth/data/models/user.dart';
 import 'package:sky_app/features/auth/data/services/auth_service.dart';
 
 class UserProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
-  UserModel? _user;
+  User? _user;
   bool _isInitialized = false;
 
-  UserModel? get user => _user;
+  User? get user => _user;
   bool get isInitialized => _isInitialized;
 
   Future<bool> login() async {

@@ -72,7 +72,7 @@ Feature'lar: `auth`, `calendar`, `home`, `notification`, `profile`, `qr`, `setti
 | Provider | Sorumluluk |
 |---|---|
 | `ThemeProvider` | `ThemeMode` (sistem/açık/koyu), `SharedPreferences`'ta saklanır |
-| `UserProvider` | Oturum ve `UserModel`; `AuthService` üzerinden |
+| `UserProvider` | Oturum ve `User`; `AuthService` üzerinden |
 | `EventProvider` | Etkinlik listeleri; splash'te doldurulur |
 
 ### Yönlendirme
@@ -179,7 +179,7 @@ Adlar camelCase: `info-square` → `infoSquare`.
 
 **Bağlanmayı bekleyenler:**
 
-- `UserModel.fromJson` ve `mergeWith` yazıldı ama **hiç çağrılmıyor**. Profil API'si (`profilePictureUrl`, `faculty`, `linkedin` ...) bağlandığında kullanılacak. Endpoint yolu henüz bilinmiyor. **Önemli:** API yanıtında rol bilgisi yok; `teams`/`teamsDisplay`/`isOrganizerFor` yalnızca JWT'deki `realmRoles`'a bağlı. Bu yüzden API nesnesi JWT'nin yerine geçemez, `mergeWith` ile üzerine uygulanır.
+- `User.fromJson` ve `mergeWith` yazıldı ama **hiç çağrılmıyor**. Profil API'si (`profilePictureUrl`, `faculty`, `linkedin` ...) bağlandığında kullanılacak. Endpoint yolu henüz bilinmiyor. **Önemli:** API yanıtında rol bilgisi yok; `teams`/`teamsDisplay`/`isOrganizerFor` yalnızca JWT'deki `realmRoles`'a bağlı. Bu yüzden API nesnesi JWT'nin yerine geçemez, `mergeWith` ile üzerine uygulanır.
 - Ana sayfadaki haberler (`NewsService`) ve bildirimler mock veridir.
 - Profildeki hızlı eylemler (QR'ı Göster, Öğrenci Kartını Eşle, NFC'yi Aç) ve ayarlardaki Bildirimler / İzinler satırları no-op.
 - `lib/features/qr/presentation/pages/qr_page.dart` **tamamen yorum içinde** ve hiçbir yerden import edilmiyor.

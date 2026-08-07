@@ -56,6 +56,7 @@ class AppIcons {
 
   // Profil bilgi satırları
   static const String certificate = 'awardCertificate';
+  static const String medal = 'medalStar';
   static const String university = 'buildings';
   static const String email = 'sms';
 
@@ -64,6 +65,9 @@ class AppIcons {
   static const String themeSystem = 'devices';
   static const String themeLight = 'sun';
   static const String themeDark = 'moon';
+
+  // Hesap
+  static const String verified = 'verified';
 
   // Settings
   static const String permissions = 'shieldTick';

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sky_app/core/shell_page.dart';
+import 'package:sky_app/core/pages/shell_page.dart';
 import 'package:sky_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:sky_app/features/auth/presentation/pages/splash_page.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/presentation/pages/calendar_page.dart';
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
 import 'package:sky_app/features/notification/presentation/pages/notification_page.dart';
-import 'package:sky_app/features/profile/presentation/pages/certificates/cert_page.dart';
+import 'package:sky_app/features/profile/presentation/pages/certificates/certificates_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
-import 'package:sky_app/features/profile/presentation/pages/webview_page.dart';
+import 'package:sky_app/core/pages/webview_page.dart';
+import 'package:sky_app/features/settings/presentation/pages/account/account_page.dart';
 import 'package:sky_app/features/settings/presentation/pages/contact/contact_page.dart';
 import 'package:sky_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:sky_app/features/team/presentation/pages/comming_soon_page.dart';
@@ -59,6 +60,10 @@ class RouterManager {
         builder: (context, state) => const SettingsPage(),
         routes: [
           GoRoute(
+            path: 'account',
+            builder: (context, state) => const AccountPage(),
+          ),
+          GoRoute(
             path: 'contact',
             builder: (context, state) => const ContactPage(),
           ),
@@ -91,7 +96,7 @@ class RouterManager {
               GoRoute(
                 path: 'certificates',
                 parentNavigatorKey: _rootNavigatorKey,
-                builder: (context, state) => const CertPage(),
+                builder: (context, state) => const CertificatesPage(),
               ),
             ],
           ),

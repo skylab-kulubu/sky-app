@@ -42,6 +42,16 @@ Birden fazla feature'ın ortak kullandığı widget, servis, model ve sabitler `
 
 ---
 
+## 📦 Model İsimlendirme
+
+`models/` klasörü altındaki veri modelleri için dosya ve sınıf isimlerinde `_model` / `Model` takısı **kullanılmaz**; doğrudan nesnenin kendi adı verilir:
+
+- Dosya: `user.dart` → Sınıf: `User`
+- Dosya: `certificate.dart` → Sınıf: `Certificate`
+- Dosya: `activity.dart` → Sınıf: `Activity`
+
+---
+
 ##  Page & PageModel Ayrımı (`part` / `part of`)
 
 **Bu ayrım her sayfa için zorunlu değildir.** Sayfa büyüdükçe — özellikle `StatefulWidget` sayfalarda fonksiyon sayısı arttıkça — UI tarafı kalabalıklaşır ve okunması zorlaşır. Böyle durumlarda sayfa ikiye bölünür:

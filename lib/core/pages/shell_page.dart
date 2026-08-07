@@ -193,7 +193,7 @@ class _AppBarConfig {
   static const _profile = _AppBarConfig(
     title: 'Profil',
     showAvatar: true,
-    actions: [AppIcons.edit, AppIcons.settings],
+    actions: [AppIcons.settings],
   );
 
   factory _AppBarConfig.forLocation(String location) {

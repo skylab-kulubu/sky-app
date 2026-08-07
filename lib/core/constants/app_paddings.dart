@@ -36,18 +36,33 @@ class AppPaddings {
   /// SkyPass kartının iç boşluğu.
   static const skyPassCard = EdgeInsets.all(20);
 
-  /// Hesap bilgisi satırının iç boşluğu; etiket ve değer alt alta durduğu
-  /// için dikeyde daha ferah.
-  static const profileInfoRow = EdgeInsets.symmetric(
-    horizontal: 16,
-    vertical: 14,
-  );
+  /// SkyPass'in arka yüzündeki QR'ın beyaz zemini ile deseni arasındaki
+  /// boşluk (QR'ın sessiz bölgesi).
+  static const skyPassQr = EdgeInsets.all(8);
 
-  /// Ayarlar satırının iç boşluğu.
-  static const settingsTile = EdgeInsets.symmetric(
-    horizontal: 16,
-    vertical: 12,
-  );
+  /// Ayarlar satırının iç boşluğu. Satır yüksekliğini metin değil ikon
+  /// dairesi belirlediği için dikeyde dar: 36 + 2×8 = 52.
+  static const settingsTile = EdgeInsets.symmetric(horizontal: 16, vertical: 8);
+
+  /// Etiket + değer satırının iç boşluğu (hesap bilgileri, sertifikalar).
+  /// İkon dairesi olmadığı için yüksekliği metin belirliyor; [settingsTile]
+  /// kadar daraltılırsa satır sıkışık görünüyor.
+  static const infoTile = EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+
+  /// Ayarların en üstündeki hesap satırının iç boşluğu. Avatarı diğer
+  /// satırların ikon dairesinden büyük; satır bilinçli olarak onlardan uzun
+  /// duruyor, listenin başındaki kullanıcı kimliği sıradan bir ayar değil.
+  static const accountTile = EdgeInsets.symmetric(horizontal: 16, vertical: 10);
+
+  /// Hesap sayfasının başındaki avatar + ad bloğu. Yatayda [sectionHeader]
+  /// ile hizalı kalsın diye 4.
+  static const accountHeader = EdgeInsets.only(left: 4, right: 4, bottom: 4);
+
+  /// Hesap sayfasının altındaki bilgilendirme notu.
+  static const accountNote = EdgeInsets.only(left: 4, right: 4, top: 20);
+
+  /// Hesap sayfasındaki ekip rozeti.
+  static const teamChip = EdgeInsets.symmetric(horizontal: 12, vertical: 6);
 
   /// Giriş sayfasının içeriği; sayfada tek bir sütun olduğu için ana
   /// boşluktan geniş.
@@ -71,6 +86,10 @@ class AppPaddings {
     horizontal: 16,
     vertical: 12,
   );
+
+  /// Profildeki aktivite satırının iç boşluğu. Yatayda boşluk yok: sayfanın
+  /// kendi kenar boşluğu zaten var, satır onu ikinci kez eklemiyor.
+  static const activityTile = EdgeInsets.symmetric(vertical: 8);
 
   /// Ayarlar bölüm başlığının boşluğu.
   static const sectionHeader = EdgeInsets.only(left: 4, top: 24, bottom: 8);
