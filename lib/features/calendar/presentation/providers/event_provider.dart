@@ -40,6 +40,21 @@ class EventProvider extends ChangeNotifier {
   bool get isInitialized => _isInitialized;
   bool get isLoading => _isLoading;
 
+  /// Etkinlikler elde yoksa bir kez yükler, varsa hiçbir şey yapmaz.
+  ///
+  /// Sayfalar açılışta koşulsuz çağırabilsin diye idempotent: arka arkaya
+  /// gelen çağrılar tek bir isteğe karşılık gelir. Veriyi hangi sayfanın
+  /// tetiklediği önemsiz; ilk gelen yükler, sonrakiler hazır bulur.
+  ///
+  /// İki istek sırayla: `fetchEvents` ve `fetchActiveEvents` aynı
+  /// [_isLoading] bayrağını paylaşıyor ve ikisi de bayrak kalkıkken erken
+  /// dönüyor. Paralel başlatılırsa ikincisi sessizce hiç çalışmaz.
+  Future<void> ensureLoaded() async {
+    if (_isInitialized || _isLoading) return;
+    await fetchEvents();
+    await fetchActiveEvents();
+  }
+
   Future<void> fetchEvents({bool forceRefresh = false}) async {
     if (_isLoading) return;
     if (_events.isNotEmpty && !forceRefresh) {

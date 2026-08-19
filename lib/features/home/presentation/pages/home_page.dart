@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +24,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends HomePagemodel {
+  @override
+  void initState() {
+    super.initState();
+    // Yaklaşan etkinlikler bölümü de aynı provider'dan besleniyor; sayfa
+    // kendi verisini istiyor. Çağrı idempotent, Etkinlikler sekmesiyle
+    // yarışması sorun değil.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(context.read<EventProvider>().ensureLoaded());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
