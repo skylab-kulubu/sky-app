@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
@@ -19,6 +21,22 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends CalendarPagemodel {
+  @override
+  void initState() {
+    super.initState();
+    // Sayfa ihtiyacı olan veriyi kendisi istiyor; splash'teki çağrı yalnızca
+    // bir ön yükleme. Yoksa splash'i atlayan her giriş yolunda (taze giriş,
+    // web callback) liste kalıcı olarak boş kalıyordu.
+    //
+    // Kare bitişi bekleniyor: initState hâlâ build fazının içinde ve
+    // yükleme senkron bir `notifyListeners` ile başlıyor — build sırasında
+    // çağrılırsa markNeedsBuild hatası veriyor.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(context.read<EventProvider>().ensureLoaded());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<EventProvider>(

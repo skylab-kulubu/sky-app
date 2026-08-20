@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,8 +34,7 @@ class _SplashPageState extends State<SplashPage> {
         await userProvider.handleWebAuth(code);
 
         if (userProvider.user != null) {
-          await eventProvider.fetchEvents();
-          await eventProvider.fetchActiveEvents();
+          unawaited(eventProvider.ensureLoaded());
         }
         return;
       }
@@ -42,8 +43,7 @@ class _SplashPageState extends State<SplashPage> {
     await userProvider.tryAutoLogin();
 
     if (userProvider.user != null) {
-      await eventProvider.fetchEvents();
-      await eventProvider.fetchActiveEvents();
+      unawaited(eventProvider.ensureLoaded());
     }
   }
 
