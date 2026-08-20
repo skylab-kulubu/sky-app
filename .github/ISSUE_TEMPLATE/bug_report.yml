@@ -1,0 +1,105 @@
+name: Hata bildirimi
+description: Uygulamada beklenmedik bir davranış ya da çökme bildir
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bildirdiğin için teşekkürler. Aynı hata daha önce açılmış mı diye kısaca kontrol edersen iyi olur.
+
+  - type: textarea
+    id: ne-oldu
+    attributes:
+      label: Ne oldu?
+      description: Karşılaştığın davranışı anlat.
+      placeholder: Etkinlik kartına basınca sayfa açılmıyor, uygulama ana ekrana dönüyor.
+    validations:
+      required: true
+
+  - type: textarea
+    id: beklenen
+    attributes:
+      label: Ne olmasını bekliyordun?
+    validations:
+      required: true
+
+  - type: textarea
+    id: adimlar
+    attributes:
+      label: Tekrar etme adımları
+      description: Hatayı sıfırdan oluşturmak için izlenecek adımlar.
+      value: |
+        1. 
+        2. 
+        3. 
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - Android
+        - iOS
+        - Web
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tema
+    attributes:
+      label: Hangi temada görülüyor?
+      description: Uygulama açık ve koyu temayı birlikte destekliyor; hatanın temaya bağlı olup olmadığı önemli.
+      options:
+        - Her iki temada
+        - Sadece koyu tema
+        - Sadece açık tema
+        - Temayla ilgisi yok / denemedim
+    validations:
+      required: true
+
+  - type: dropdown
+    id: alan
+    attributes:
+      label: Hangi ekran / özellik?
+      options:
+        - auth (giriş)
+        - calendar (takvim)
+        - home (ana sayfa)
+        - notification (bildirimler)
+        - profile (profil)
+        - settings (ayarlar)
+        - team (ekip)
+        - core / genel
+        - Bilmiyorum
+    validations:
+      required: true
+
+  - type: input
+    id: cihaz
+    attributes:
+      label: Cihaz ve işletim sistemi sürümü
+      description: Hata koddan kaynaklanıyor ve her cihazda aynıysa boş bırakabilirsin.
+      placeholder: iPhone 14 Pro / iOS 18.2 — ya da Pixel 7 / Android 15
+
+  - type: input
+    id: surum
+    attributes:
+      label: Uygulama sürümü
+      description: pubspec.yaml'daki sürüm; bilmiyorsan boş bırak.
+      placeholder: 0.1.0+1
+
+  - type: textarea
+    id: gorsel
+    attributes:
+      label: Ekran görüntüsü / video
+      description: Görsel varsa buraya sürükleyip bırakabilirsin. Hata görsel bir sorunsa açık ve koyu tema için ayrı ayrı ekle.
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Hata çıktısı (varsa)
+      description: Konsol çıktısı ya da stack trace.
+      render: shell

@@ -1,0 +1,86 @@
+name: Teknik iş / bakım
+description: Temizlik, refactor, test, CI, bağımlılık ya da performans işi
+labels: ["chore"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Kullanıcıya yansıyan bir hata ya da yeni bir özellik değil de kod tarafında
+        yapılması gereken bir iş için burayı kullan. Kullanıcı bir şeyin bozuk
+        olduğunu görüyorsa hata bildirimi, yeni bir akış isteniyorsa özellik önerisi
+        daha doğru yer.
+
+  - type: dropdown
+    id: tur
+    attributes:
+      label: İşin türü
+      options:
+        - Ölü kod / temizlik
+        - Refactor
+        - Test
+        - CI / derleme
+        - Bağımlılık güncellemesi
+        - Performans
+        - Dokümantasyon
+        - Diğer
+    validations:
+      required: true
+
+  - type: textarea
+    id: durum
+    attributes:
+      label: Şu an ne var?
+      description: Mevcut durumu ve neden sorun olduğunu anlat.
+      placeholder: Palet hesaplaması ana isolate'te çalışıyor; etkinlik sekmesi ilk açıldığında kare düşüyor.
+    validations:
+      required: true
+
+  - type: textarea
+    id: hedef
+    attributes:
+      label: Ne yapılmalı?
+      description: İşin bittiğini nasıl anlayacağımızı da yazarsan iyi olur.
+    validations:
+      required: true
+
+  - type: textarea
+    id: dosyalar
+    attributes:
+      label: İlgili dosyalar
+      description: Repo köküne göre yol ver; biliniyorsa satır numarasıyla.
+      placeholder: |
+        lib/features/calendar/data/services/event_palette_service.dart
+        .github/workflows/ci.yml
+
+  - type: dropdown
+    id: alan
+    attributes:
+      label: Hangi ekran / özellik?
+      multiple: true
+      options:
+        - auth (giriş)
+        - calendar (takvim)
+        - home (ana sayfa)
+        - notification (bildirimler)
+        - profile (profil)
+        - settings (ayarlar)
+        - team (ekip)
+        - core / genel
+        - ci / altyapı
+        - bağımlılıklar
+    validations:
+      required: true
+
+  - type: textarea
+    id: risk
+    attributes:
+      label: Davranış değişikliği / risk
+      description: Kullanıcıya yansıyan bir değişiklik olacak mı, dikkat edilmesi gereken bir şey var mı?
+
+  - type: checkboxes
+    id: katki
+    attributes:
+      label: Katkı
+      options:
+        - label: Bu işi kendim yapmak istiyorum
+          required: false

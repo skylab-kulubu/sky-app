@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Katkı kuralları
+    url: https://github.com/skylab-kulubu/sky-app/blob/main/CONTRIBUTING.md
+    about: Kod yazmadan önce klasör yapısı, renk ve sabit kullanımı kurallarına göz at.

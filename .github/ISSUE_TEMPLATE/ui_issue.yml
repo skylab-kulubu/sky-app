@@ -1,0 +1,67 @@
+name: Tasarım / arayüz tutarsızlığı
+description: Renk, boşluk, ikon ya da tema uyumsuzluğu bildir
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Arayüz kuralları CONTRIBUTING.md'de tanımlı: renkler `context` erişimcilerinden,
+        boşluk ve radius değerleri `core/constants` altından, ikonlar `AppIcon` üzerinden gelir.
+
+  - type: textarea
+    id: sorun
+    attributes:
+      label: Tutarsızlık ne?
+      placeholder: Ekip sayfasındaki kartların köşe yuvarlaklığı diğer sayfalardaki kartlardan farklı.
+    validations:
+      required: true
+
+  - type: input
+    id: konum
+    attributes:
+      label: Nerede görülüyor?
+      description: Ekran adı, mümkünse dosya yolu.
+      placeholder: features/team/presentation/widgets/section_expansion_tile.dart
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tur
+    attributes:
+      label: Tutarsızlık türü
+      multiple: true
+      options:
+        - Renk (tema uyumsuzluğu)
+        - Boşluk / padding
+        - Köşe yuvarlaklığı (radius)
+        - Yazı tipi / boyutu
+        - İkon
+        - Hizalama / yerleşim
+        - Diğer
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tema
+    attributes:
+      label: Hangi temada görülüyor?
+      options:
+        - Her iki temada
+        - Sadece koyu tema
+        - Sadece açık tema
+    validations:
+      required: true
+
+  - type: textarea
+    id: gorsel
+    attributes:
+      label: Ekran görüntüsü
+      description: Açık ve koyu tema için ayrı ayrı ekle; tema uyumsuzluklarının çoğu ancak yan yana görünce fark ediliyor.
+    validations:
+      required: true
+
+  - type: textarea
+    id: beklenen
+    attributes:
+      label: Nasıl olmalıydı?
+      description: Referans aldığın ekran ya da CONTRIBUTING'deki ilgili kural varsa belirt.

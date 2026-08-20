@@ -1,0 +1,56 @@
+name: Özellik önerisi
+description: Yeni bir özellik ya da mevcut bir akışta iyileştirme öner
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Hangi ihtiyacı karşılıyor?
+      description: Önerinin çözdüğü problemi anlat. Doğrudan çözümü değil, sorunu yazmak daha faydalı.
+      placeholder: Etkinlik listesinde geçmiş etkinlikleri filtreleyemiyoruz, liste zamanla çok uzuyor.
+    validations:
+      required: true
+
+  - type: textarea
+    id: cozum
+    attributes:
+      label: Önerdiğin çözüm
+    validations:
+      required: true
+
+  - type: dropdown
+    id: alan
+    attributes:
+      label: Hangi ekran / özellik?
+      options:
+        - auth (giriş)
+        - calendar (takvim)
+        - home (ana sayfa)
+        - notification (bildirimler)
+        - profile (profil)
+        - settings (ayarlar)
+        - team (ekip)
+        - core / genel
+        - Yeni bir feature
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasarim
+    attributes:
+      label: Tasarım referansı / görsel
+      description: Varsa ekran taslağı, benzer bir uygulamadan örnek ya da Figma bağlantısı ekle.
+
+  - type: textarea
+    id: alternatif
+    attributes:
+      label: Düşündüğün alternatifler
+      description: Başka bir yol denendi ya da elendiyse yaz.
+
+  - type: checkboxes
+    id: katki
+    attributes:
+      label: Katkı
+      options:
+        - label: Bu özelliği kendim geliştirmek istiyorum
+          required: false
