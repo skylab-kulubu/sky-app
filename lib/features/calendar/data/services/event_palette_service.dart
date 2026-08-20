@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:palette_generator/palette_generator.dart';
+import 'package:palette_generator_master/palette_generator_master.dart';
 import 'package:sky_app/core/widgets/cover_image.dart';
 
 /// Etkinlik kapaklarından çıkarılan zemin renklerini hesaplar ve saklar.
@@ -77,7 +77,7 @@ class EventPaletteService {
     if (provider == null) return _store(eventId, const []);
 
     try {
-      final palette = await PaletteGenerator.fromImageProvider(
+      final palette = await PaletteGeneratorMaster.fromImageProvider(
         ResizeImage(provider, width: _decodeWidth, allowUpscaling: false),
         size: _sampleSize,
         maximumColorCount: _maxColors,

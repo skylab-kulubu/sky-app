@@ -12,7 +12,6 @@
 .swiftpm/
 migrate_working_dir/
 graphify-out/
-test/
 
 # IntelliJ related
 *.iml
