@@ -34,17 +34,17 @@ dependencies:
   url_launcher: 6.3.2
 
   #Auth
-  flutter_appauth: 12.0.1
+  flutter_appauth: 12.0.2
   crypto: 3.0.7
-  reicon_flutter: ^1.0.1
-  animations: ^2.2.0
-  palette_generator: ^0.3.3+7
-  share_plus: ^13.3.0
+  reicon_flutter: 1.0.1
+  animations: 2.2.0
+  palette_generator: 0.3.3+7
+  share_plus: 13.3.0
 
   #Other
-  sensors_plus: ^7.1.0
+  sensors_plus: 7.1.0
   mobile_scanner: 7.2.0
-  permission_handler: ^12.0.1
+  permission_handler: 13.0.1
 
 dev_dependencies:
   flutter_test:
