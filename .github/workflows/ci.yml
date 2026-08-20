@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Aynı PR'a arka arkaya push atılırsa önceki çalışmayı iptal et.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: 3.47.1
+  JAVA_VERSION: 17
+
+jobs:
+  analyze:
+    name: Format & Analiz
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Bağımlılıkları indir
+        run: flutter pub get
+
+      - name: Format kontrolü
+        run: |
+          if [ -d test ]; then
+            dart format --output=none --set-exit-if-changed lib test
+          else
+            dart format --output=none --set-exit-if-changed lib
+          fi
+
+      - name: Statik analiz
+        run: flutter analyze --fatal-infos
+
+  test:
+    name: Testler
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Bağımlılıkları indir
+        run: flutter pub get
+
+      - name: Testleri çalıştır
+        run: |
+          if find test -name '*_test.dart' -print -quit 2>/dev/null | grep -q .; then
+            flutter test --reporter compact
+          else
+            echo "test/ altında henüz test dosyası yok, adım atlanıyor."
+          fi
+
+  build-android:
+    name: Android derleme
+    needs: analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # AGP 8.11 ve build.gradle.kts JDK 17 hedefliyor; runner'ın varsayılanına güvenme.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: gradle
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Bağımlılıkları indir
+        run: flutter pub get
+
+      - name: APK derle (debug)
+        run: flutter build apk --debug
+
+      # Test edecek arkadaşlar APK'yı doğrudan PR sayfasından indirebilsin.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sky-app-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
+
+  build-web:
+    name: Web derleme
+    needs: analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Bağımlılıkları indir
+        run: flutter pub get
+
+      - name: Web derle
+        run: flutter build web
+
+  build-ios:
+    name: iOS derleme
+    needs: analyze
+    # macOS runner yavaş; PR'ları bekletmemek için sadece main'e push ve elle tetiklemede çalışır.
+    if: github.event_name != 'pull_request'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Bağımlılıkları indir
+        run: flutter pub get
+
+      # İmzalama sertifikası olmadığı için --no-codesign; amaç native tarafın derlendiğini görmek.
+      - name: iOS derle (imzasız)
+        run: flutter build ios --no-codesign
