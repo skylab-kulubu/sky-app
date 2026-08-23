@@ -1,220 +1,231 @@
 # AGENTS.md
 
-Bu dosya, projede çalışacak yapay zekâ ajanları içindir. Kod yazmadan önce baştan sona oku.
+This file is for AI agents working on this project. Read it end to end before writing any code.
 
-**`CONTRIBUTING.md` bu dosyanın tamamlayıcısıdır ve kod yazım kurallarında bağlayıcıdır.** Burada projenin ne olduğu, nasıl kurulduğu ve hangi tuzakların bulunduğu anlatılır; oradaki klasör yapısı, Page/PageModel ayrımı, widget extraction ve sabit kullanımı kuralları aynen geçerlidir.
-
----
-
-## Proje
-
-**sky-app** — Yıldız Teknik Üniversitesi **SKY LAB** öğrenci kulübünün mobil uygulaması. Flutter ile yazılmış; iOS, Android ve web hedefleniyor.
-
-Kullanıcılar kulüp üyesi öğrenciler. Uygulama üyelik kartı (SkyPass), etkinlik takibi, kulüp haberleri ve kulübün alt servislerine erişim sağlıyor.
-
-Flutter 3.44.5 (stable), Material 3. Yazı tipi `theme.dart`'ta `fontFamily: 'Poppins'` ile bir kez veriliyor ve bütün kademelere uygulanıyor; `textTheme` yalnızca yazı tipi dışında bir şey söyleyecekse (gövde metninin rengi gibi) girdi içeriyor.
+**`CONTRIBUTING.md` is the companion to this file and is binding for coding rules.** This file explains what the project is, how it is set up and which pitfalls exist; the folder structure, the Page/PageModel split, widget extraction and constant usage rules described there apply as written.
 
 ---
 
-## İletişim ve çalışma biçimi
+## Project
 
-**Türkçe yaz.** Kullanıcı Türkçe yazıyor ve Türkçe yanıt bekliyor. Kod içi yorumlar, `///` doküman yorumları ve kullanıcıya görünen tüm metinler Türkçe. Değişken ve sınıf adları İngilizce kalır — mevcut kod tabanının deseni bu.
+**sky-app** — the mobile app of the **SKY LAB** student club at Yıldız Technical University. Written in Flutter; targets iOS, Android and web.
 
-**Asla commit atma.** `git commit` ya da `git push` çalıştırma. Bir iş bitince değişen dosyaları özetle ve dur; commit'i kullanıcı kendisi atar. Bu kesin bir kural.
+The users are club member students. The app provides the membership card (SkyPass), event tracking, club news and access to the club's sub-services.
 
-**Görsel doğrulamayı kullanıcı yapıyor.** Uygulamayı çalıştırıp ekran görüntüsü gönderen ve düzeltmeleri isteyen o. `flutter analyze`'ın temiz olması "derleniyor" demektir, "doğru görünüyor" demek değildir — ikisini karıştırma. Görsel bir değişiklik yaptıysan ekranda doğrulamadığını açıkça söyle ve neye bakması gerektiğini belirt.
-
-> iOS simülatörü bu makinede kullanılamıyor: `xcode-select` Xcode'a ayarlı değil ve düzeltme sudo istediği için ajan çalıştıramaz. Denemeye değer, ama çalışmazsa kullanıcıya söyleyip devam et.
-
-**Tasarım referansı: Luma (lu.ma).** Kullanıcı arayüz işlerinde sürekli Luma'nın ekran görüntülerini paylaşıyor ve ölçüt olarak kullanıyor. Luma'dan **desen** alınır, renk alınmaz — uygulamanın kendi teması korunur. Özellikle **tutarlılık** önemseniyor: liste öğeleri eşit yükseklikte olmalı, tipografi kademeleri ölçülü olmalı.
+Flutter 3.47.1 (stable), Dart SDK `>=3.12.0`, Material 3. The font is set once in `theme.dart` via `fontFamily: 'Poppins'` and applies to every text scale; `textTheme` only carries an entry when it needs to say something beyond the font (such as the body text color).
 
 ---
 
-## Komutlar
+## Communication and ways of working
+
+**Write in Turkish.** The user writes in Turkish and expects Turkish answers. In-code comments, `///` doc comments and all user-facing strings are Turkish. Variable and class names stay English — that is the pattern of the existing codebase.
+
+**Never commit.** Do not run `git commit` or `git push`. When a task is done, summarize the changed files and stop; the user commits themselves. This is an absolute rule.
+
+**Visual verification is done by the user.** They are the one who runs the app, sends screenshots and asks for fixes. A clean `flutter analyze` means "it compiles", not "it looks right" — do not conflate the two. If you made a visual change, say explicitly that you did not verify it on screen and point out what to look at.
+
+> The iOS simulator is unavailable on this machine: `xcode-select` is not pointed at Xcode and the fix requires sudo, so an agent cannot run it. It is worth trying, but if it fails, tell the user and move on.
+
+**Design reference: Luma (lu.ma).** For UI work the user keeps sharing Luma screenshots and uses them as the benchmark. Take **patterns** from Luma, not colors — the app keeps its own theme. **Consistency** matters in particular: list items must have equal heights, typography scales must be measured.
+
+---
+
+## Commands
 
 ```bash
-flutter analyze --no-pub     # her değişiklikten sonra; temiz kalmalı
-dart format lib/             # commit öncesi
+flutter analyze --no-pub     # after every change; must stay clean
+dart format lib/             # before committing
 flutter pub get
 ```
 
-Projede **test yok** (`test/` klasörü bulunmuyor). Kullanıcı daha önce test istemediğini belirtti; istenmedikçe test yazma.
+> Do not run `flutter build ios`. The iOS project is on Swift Package Manager; the build triggers CocoaPods and breaks that setup.
+
+The project has **no tests** (there is no `test/` folder). The user has stated before that they do not want tests; do not write tests unless asked.
 
 ---
 
-## Mimari
+## Architecture
 
-### Klasör düzeni
+### Folder layout
 
 ```
 lib/
-├── main.dart                 # provider kayıtları + uygulama girişi
-├── core/                     # birden fazla feature'ın paylaştığı her şey
+├── main.dart                 # provider registrations + app entry point
+├── core/                     # everything shared by more than one feature
+│   ├── main_app.dart         # MaterialApp.router, themeMode, status bar style
 │   ├── constants/            # AppColors, AppPaddings, AppRadiuses, AppSizes, AppAssets, AppIcons
-│   ├── extensions/           # context_extensions.dart — tema renkleri buradan okunur
+│   ├── extensions/           # context_extensions.dart — theme colors are read from here
 │   ├── models/               # link_item.dart
+│   ├── pages/                # shell_page.dart (appbar + navbar shell), webview_page.dart
 │   ├── router/               # router_manager.dart (GoRouter)
 │   ├── services/             # links_service.dart, webview_service.dart
 │   ├── theme/                # theme.dart (light/dark), theme_provider.dart
-│   ├── widgets/              # AppIcon, AppBarActions, NavItem, UserAvatar, CoverImage, BottomScrim, ColorGlow, SkyButton ...
-│   └── shell_page.dart       # appbar + navbar kabuğu
-└── features/<ad>/
+│   └── widgets/              # AppIcon, AppBarActions, NavItem, UserAvatar, CoverImage, BottomScrim, ColorGlow,
+│                             # SkyButton, SkyTextfield, IconBox, IconCircle, TileGroup, SectionHeader, ClubMenuSheet ...
+└── features/<name>/
     ├── data/{models,services}
     └── presentation/{pages,widgets,providers}
 ```
 
-Feature'lar: `auth`, `calendar`, `home`, `notification`, `profile`, `qr`, `settings`, `team`.
+Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `team`.
 
-### Durum yönetimi
+### State management
 
-`provider` kullanılıyor. `main.dart`'ta kayıtlı üç global provider var:
+`provider` is used. Three global providers are registered in `main.dart`:
 
-| Provider | Sorumluluk |
+| Provider | Responsibility |
 |---|---|
-| `ThemeProvider` | `ThemeMode` (sistem/açık/koyu), `SharedPreferences`'ta saklanır |
-| `UserProvider` | Oturum ve `User`; `AuthService` üzerinden |
-| `EventProvider` | Etkinlik listeleri; splash'te doldurulur |
+| `ThemeProvider` | `ThemeMode` (system/light/dark), persisted in `SharedPreferences` |
+| `UserProvider` | Session and `User`; through `AuthService` |
+| `EventProvider` | Event lists; filled on splash |
 
-### Yönlendirme
+### Routing
 
-`go_router`. `router_manager.dart` içinde tek bir `GoRouter`. Yapı:
+`go_router`. A single `GoRouter` inside `router_manager.dart`. Structure:
 
-- **Üst seviye** (tam ekran, kök navigator): `/`, `/auth`, `/notification`, `/webview`, `/settings` (alt rota: `/settings/contact`)
-- **`ShellRoute`** (appbar + navbar kabuğu içinde): `/home`, `/calendar`, `/team`, `/profile` (alt rota: `/profile/certificates`)
+- **Top level** (full screen, root navigator): `/`, `/auth`, `/notification`, `/webview`, `/settings` (sub-routes: `/settings/account`, `/settings/contact`)
+- **`ShellRoute`** (inside the appbar + navbar shell): `/home`, `/calendar`, `/team`, `/profile`. `/profile/certificates` is nested under `/profile` but carries `parentNavigatorKey: _rootNavigatorKey`, so it opens full screen.
 
-`redirect` oturum durumuna göre `/`, `/auth` ve `/home` arasında yönlendiriyor.
+`redirect` routes between `/`, `/auth` and `/home` depending on session state.
 
-> ⚠️ **Kabuğun içindeyken tam ekran bir şey açacaksan** rotayı üst seviyeye koy ya da `parentNavigatorKey: _rootNavigatorKey` ver. Aksi hâlde sayfa navbar'ın altında kalır. Aynı tuzak `OpenContainer` için de geçerli: `useRootNavigator: true` vermezsen detay sayfası kabuğun içinde açılır.
+> ⚠️ **If you open something full screen while inside the shell**, put the route at top level or pass `parentNavigatorKey: _rootNavigatorKey`. Otherwise the page stays underneath the navbar. The same pitfall applies to `OpenContainer`: without `useRootNavigator: true` the detail page opens inside the shell.
 
 ### Backend
 
-- REST: `https://api.yildizskylab.com` — yanıtlar `{success, message, data, ...}` zarfıyla geliyor, `data` açılarak kullanılıyor (`EventService`'e bak).
-- Kimlik doğrulama: Keycloak, `https://e.yildizskylab.com/realms/e-skylab`, `flutter_appauth` ile OAuth/PKCE. Token'lar `flutter_secure_storage`'da.
+- REST: `https://api.yildizskylab.com` — responses come wrapped in a `{success, message, data, ...}` envelope, `data` is unwrapped before use (see `EventService`).
+- Authentication: Keycloak, `https://e.yildizskylab.com/realms/e-skylab`, OAuth/PKCE via `flutter_appauth`. Tokens live in `flutter_secure_storage`.
 
-> Çıkışta `UserProvider.user` null'a düşüyor ve sayfalar aynı karede yeniden çiziliyor; `/auth`'a yönlendirme ancak bir sonraki karede oluyor. Kullanıcıyı okuyan sayfalar bu tek kareyi karşılamak zorunda — `user!` yazmak orada patlar (bkz. `profile_page.dart`).
+> On logout `UserProvider.user` drops to null and pages rebuild in the same frame; the redirect to `/auth` only happens on the next frame. Pages that read the user must survive that single frame — writing `user!` blows up there (see `profile_page.dart`).
 
-### Dikkat çeken paketler
+### Notable packages
 
-| Paket | Nerede |
+| Package | Where |
 |---|---|
-| `reicon_flutter` | Bütün ikonlar (`AppIcon` üzerinden) |
-| `animations` | Yalnızca haber tile'ının `OpenContainer` geçişi |
-| `palette_generator` | Etkinlik kapağından zemin rengi (`EventPaletteService`) |
-| `share_plus` | Etkinlik detayındaki paylaş butonu — **native bağımlılık**, eklendiğinde hot reload yetmez |
-| `timeago` | Bildirim listesindeki göreli zaman (`tr` ve `tr_short` locale'leri `main.dart`'ta kayıtlı) |
+| `reicon_flutter` | All icons (through `AppIcon`) |
+| `animations` | Only the `OpenContainer` transition of the news tile |
+| `palette_generator_master` | Backdrop color from the event cover (`EventPaletteService`) — the maintained fork, not `palette_generator` |
+| `share_plus` | Share button on the event detail — **native dependency**, hot reload is not enough when it is added |
+| `timeago` | Relative time in the notification list (`tr` and `tr_short` locales are registered in `main.dart`) |
+| `flutter_nfc_kit` | Student card scanning (`NfcService`) — **native dependency**, needs the iOS NFC entitlement |
+| `sensors_plus` | The tilt of the SkyPass card (`TiltBuilder`) |
+| `cached_network_image_ce` | Network images (`CoverImage`) |
+| `dio` | All REST calls |
 
 ---
 
-## Tema ve renk — en kritik kural
+## Theme and color — the most critical rule
 
-Uygulama açık ve koyu temayı birlikte destekliyor. Renkler **iki kaynağa** ayrılmıştır ve karıştırılması açık temayı sessizce bozar.
+The app supports light and dark themes together. Colors are split across **two sources** and mixing them silently breaks the light theme.
 
-**Temaya göre değişenler `context`'ten okunur** (`core/extensions/context_extensions.dart`):
+**Colors that change with the theme are read from `context`** (`core/extensions/context_extensions.dart`):
 
 `backgroundColor` · `tileColor` · `elevatedColor` · `textPrimary` · `textSecondary` · `textTertiary` · `dividerColor` · `accentColor` · `onAccentColor`
 
-> `onAccentColor`, `accentColor` zemini üzerindeki içerik içindir. Vurgu rengi koyu temada açık lila, açık temada koyu mor olduğu için üstündeki metin de yön değiştirir; her iki temada beyaz kalan `AppColors.onAccent` onun yerine kullanılamaz.
+> `onAccentColor` is for content on top of an `accentColor` surface. Because the accent is light lilac in the dark theme and dark purple in the light theme, the text on top of it flips as well; `AppColors.onAccent`, which stays white in both themes, cannot be used in its place.
 
-**Temadan bağımsız olanlar `AppColors`'ta kalır:** marka renkleri (`primaryColor`, `primaryStrong`, `blue`, `red`, `green` ...), doygun zemin üstündeki içerik (`onAccent`), SkyPass kartı renkleri, navbar gölgeleri.
+**Theme-independent colors stay in `AppColors`:** brand colors (`primaryColor`, `primaryStrong`, `blue`, `red`, `green` ...), content on a saturated surface (`onAccent`), SkyPass card colors, navbar shadows.
 
 ```dart
-// ❌ açık temada kırılır
+// ❌ breaks in the light theme
 color: Colors.white
 color: AppColors.darkTextPrimary
 
 // ✅
 color: context.textPrimary
-color: AppColors.red   // marka rengi
+color: AppColors.red   // brand color
 ```
 
-`AppColors` içindeki `dark*` / `light*` sabitleri **yalnızca** `theme.dart`'taki `ColorScheme`'leri besler; widget'larda doğrudan kullanılmaz.
+The `dark*` / `light*` constants inside `AppColors` **only** feed the `ColorScheme`s in `theme.dart`; they are not used directly in widgets.
 
-> **İstisna — etkinlik detay sayfası.** `event_detail_page.dart` her iki temada da koyu: zemini kapak görselinin baskın renginden (`palette_generator`) türetiliyor ve o renk açık bir zemine karıştırıldığında soluyor. Bu sayfadaki renkler `context` erişimcilerinden değil `AppColors.coverBackdropBase` ve `onCover*` sabitlerinden okunur. Aynı nedenle `SkyButton` ve `AppBarActions` kendilerine açıkça renk verildiğinde tema varsayılanlarını kullanmaz.
+> **Exception — the event detail page.** `features/calendar/presentation/pages/event_detail/event_detail_page.dart` is dark in both themes: its backdrop is derived from the dominant color of the cover image (`palette_generator`) and that color washes out when blended into a light surface. Colors on this page are read from the `AppColors.coverBackdropBase` and `onCover*` constants instead of the `context` accessors. For the same reason `SkyButton` and `AppBarActions` skip the theme defaults when they are given explicit colors.
 
-`context`'ten gelen renk derleme zamanı sabiti olmadığı için o widget `const` olamaz — `const`'u kaldır. Refactor sırasında en sık karşılaşılan derleme hatası budur.
+A color coming from `context` is not a compile-time constant, so that widget cannot be `const` — remove the `const`. This is the compile error you will hit most often while refactoring.
 
-Ortak AppBar özellikleri (`backgroundColor`, `elevation`, `centerTitle`, `actionsPadding`, `iconTheme`, `titleTextStyle`, `systemOverlayStyle`) `appBarTheme`'de merkezîdir; sayfalarda tekrar edilmez.
+Shared AppBar properties (`backgroundColor`, `elevation`, `centerTitle`, `actionsPadding`, `iconTheme`, `titleTextStyle`, `systemOverlayStyle`) are centralized in `appBarTheme`; they are not repeated in pages.
 
 ---
 
-## İkonlar
+## Icons
 
-Material ikonları **kullanılmıyor**. İkonlar `reicon_flutter` paketinden geliyor.
+Material icons are **not used**. Icons come from the `reicon_flutter` package.
 
-**Kritik fark:** Reicon `IconData` döndürmez, ham SVG path string'i verir. Bu yüzden `Icon(Icons.x)` → `Icon(Reicon...)` şeklinde bir bul-değiştir mümkün değildir; çizim `SvgPicture.string` ile yapılır ve bu iş `AppIcon` widget'ında toplanmıştır.
+**Critical difference:** Reicon does not return `IconData`, it gives a raw SVG path string. So an `Icon(Icons.x)` → `Icon(Reicon...)` find-and-replace is not possible; drawing goes through `SvgPicture.string` and that work is collected in the `AppIcon` widget.
 
 ```dart
 AppIcon(AppIcons.home)
 AppIcon(AppIcons.home, filled: true, size: AppSizes.icon, color: context.accentColor)
 ```
 
-İkon adları `core/constants/app_icons.dart` içinde. Widget imzalarında ikon alanları `IconData` değil **`String`** tipindedir.
+Icon names live in `core/constants/app_icons.dart`. In widget signatures, icon fields are typed **`String`**, not `IconData`.
 
-Yeni ikon eklerken adın **hem Outline hem Filled** ağırlığında bulunduğunu doğrula; bulunmayan ad sessizce boş kutu çizer:
+When adding a new icon, verify the name exists in **both the Outline and the Filled** weight; a missing name silently draws an empty box:
 
 ```bash
 grep -o "^  '[a-zA-Z0-9]*':" ~/.pub-cache/hosted/pub.dev/reicon_flutter-*/lib/src/icons.dart \
   | sed "s/^  '//;s/'://" | sort -u
 ```
 
-Adlar camelCase: `info-square` → `infoSquare`.
+Names are camelCase: `info-square` → `infoSquare`.
 
 ---
 
-## Kabuk: AppBar ve Navbar
+## The shell: AppBar and Navbar
 
-`core/shell_page.dart` shell rotalarının ortak kabuğunu çizer.
+`core/pages/shell_page.dart` draws the shared shell of the shell routes.
 
-**AppBar sekmeye göre değişir.** `_AppBarConfig` her sekme için başlık, action ikonları ve logo/avatar gösterimini tutar. Action'lar `AppBarActions` hap'ında toplanır ve sekme değişince ikon sayısına göre genişleyip daralır.
+**The AppBar changes per tab.** `_AppBarConfig` holds the title, action icons and logo/avatar display for each tab. Actions are collected in the `AppBarActions` pill and it grows or shrinks with the icon count as the tab changes.
 
-Şu an bağlı olan action'lar: **menü** (`AppIcons.widget` → `ClubMenuSheet`), **bildirim** (`AppIcons.bell` → `/notification`) ve **ayarlar** (`/settings`). Diğerleri — arama, QR, düzenle, shuffle, info — dokunulabilir ama **hiçbir şey yapmıyor**; sayfaları henüz yok. Bağlamak için `shell_page.dart`'taki `_onActionTap`'e ekle.
+Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **notification** (`AppIcons.bell` → `/notification`) and **settings** (`/settings`). The others — search on Events, shuffle and info on Team — are tappable but **do nothing**; their pages do not exist yet. To wire one up, add it to `_onActionTap` in `core/pages/shell_page.dart`.
 
-**Navbar** yüzen bir hap; seçili sekme ikonun yanında etiketini açar. Genişleme `Align.widthFactor` animasyonuyla yapılır — etiket genişliği metne bağlı olduğu için elle genişlik hesabı yapılmaz.
+**The navbar** is a floating pill; the selected tab reveals its label next to the icon. The expansion is animated with `Align.widthFactor` — since the label width depends on the text, no manual width math is done.
 
-> `AppBarActions`'ı `leading` slotunda kullanacaksan `Center` ile sarmala ve `leadingWidth`'i `AppBarActions.widthFor(n)` ile hesapla. Slot sıkı yükseklik kısıtı verdiği için sarmalanmazsa hap dikeyde uzar; `leadingWidth` verilmezse kırpılır.
-
----
-
-## Bilinmesi gereken durum
-
-**Bağlanmayı bekleyenler:**
-
-- `User.fromJson` ve `mergeWith` yazıldı ama **hiç çağrılmıyor**. Profil API'si (`profilePictureUrl`, `faculty`, `linkedin` ...) bağlandığında kullanılacak. Endpoint yolu henüz bilinmiyor. **Önemli:** API yanıtında rol bilgisi yok; `teams`/`teamsDisplay`/`isOrganizerFor` yalnızca JWT'deki `realmRoles`'a bağlı. Bu yüzden API nesnesi JWT'nin yerine geçemez, `mergeWith` ile üzerine uygulanır.
-- Ana sayfadaki haberler (`NewsService`) ve bildirimler mock veridir.
-- Profildeki hızlı eylemler (QR'ı Göster, Öğrenci Kartını Eşle, NFC'yi Aç) ve ayarlardaki Bildirimler / İzinler satırları no-op.
-- `lib/features/qr/presentation/pages/qr_page.dart` **tamamen yorum içinde** ve hiçbir yerden import edilmiyor.
-
-**Yakın geçmişte kaldırılanlar** — geri getirmeden önce sor: biletler (tickets) özelliği, duyuru carousel'i, ana sayfadaki kısayollar, Ekipler sayfası, ana sayfadaki karşılama metni. Hepsi git geçmişinde.
-
-**Etkinlik filtresi:** `EventModel.active` bayrağının anlamı bilinmiyor; "yaklaşan etkinlik" filtresi bilinçli olarak **tarihe** göre kuruldu (`EventProvider.upcomingEvents`, bitiş tarihi baz alınır ki çok günlü etkinlikler devam ederken düşmesin). Arayüzde `active`, "başvuru açık mı" olarak yorumlanıyor: kartta "Yakında" rozeti, detayda durum satırı ve pasif Katıl butonu buna bağlı.
+> If you use `AppBarActions` in the `leading` slot, wrap it in a `Center` and compute `leadingWidth` with `AppBarActions.widthFor(n)`. The slot imposes a tight height constraint, so without the wrapper the pill stretches vertically; without `leadingWidth` it gets clipped.
 
 ---
 
-## Etkinlik detayı — bilmen gerekenler
+## State of the world you should know
 
-Bu sayfa uygulamanın en çok parçası olan ekranı; dokunmadan önce oku.
+**Waiting to be wired up:**
 
-**Açılış tek yerden yapılır:** `EventDetailPage.open(context, event)`. Hem Etkinlikler sekmesindeki `EventCard` hem ana sayfadaki `UpcomingEventTile` bunu çağırıyor. Route kök navigator'a push ediliyor (yoksa navbar'ın altında kalır) ve sayfa `FadeTransition` ile biniyor.
+- `User.fromJson` and `mergeWith` are written but **never called**. They will be used once the profile API (`profilePictureUrl`, `faculty`, `linkedin` ...) is connected. The endpoint path is not known yet. **Important:** the API response carries no role information; `teams`/`teamsDisplay`/`isOrganizerFor` depend solely on `realmRoles` in the JWT. So the API object cannot replace the JWT, it is applied on top of it via `mergeWith`.
+- The news on the home page (`NewsService`), the notifications (`NotificationService`) and the profile activities (`ActivityService`) are mock data. `CertificateService.getCertificates()` is wired as a `Future` but returns an empty list until the endpoint exists.
+- The profile quick actions: **Sertifikalarım** goes to `/profile/certificates`, **Öğrenci Kartını Eşle** checks NFC availability and opens `NfcScanOverlay` (`NfcService`, ISO 14443-A only) — but the read UID is not sent anywhere yet. **NFC'yi Aç** is still a no-op.
+- The QR is on the back of the SkyPass card (tap flips it), not a quick action. It is drawn by `_MockQrPainter` — **a fake pattern**, not a real QR code.
+- The Notifications / Permissions rows in settings are no-ops.
 
-**Kapak görseli `Hero` ile uçuyor.** Etiket ve uçuş yolu `EventCoverHero` widget'ında; kapağı gösteren üç yer de onu kullanıyor, ayar tek yerden değişir. Uçuş yolu bilinçli olarak `RectTween` (düz) — Hero'nun varsayılan `MaterialRectArcTween`'i küçük bir satırdan tam genişlikte kapağa giderken görseli savuruyor.
+**The `/team` tab shows `CommingSoonPage`.** `team_page.dart` (with `PersonTag` and `SectionExpansionTile`) is written but not routed anywhere; the tab is deliberately parked behind the placeholder.
 
-> `OpenContainer` (container transform) burada **kullanılamaz**: kutuyu büyütür ama iki içeriği cross-fade eder, yani görsel yerinden hareket etmez. Hero ile birlikte de çalışmaz — ikisi de kaynak widget'ı gizleyip kendi katmanında çizer.
+**Recently removed** — ask before bringing any of them back: the tickets feature, the announcement carousel, the home page shortcuts, the `qr` feature (`qr_page.dart`), the welcome text on the home page. All of them are in the git history.
 
-**Zemin rengi kapaktan geliyor.** `EventPaletteService` görselin baskın renklerini çıkarıp bellekte tutuyor; sayfa bunları dağınık radial lekeler hâlinde koyu bir tabana bindiriyor. Servisin iki kritik ayrıntısı var:
-
-- Görsel `ResizeImage` ile ~120 pikselde çözülüyor. Verilmezse afiş tam çözünürlükte, üstelik kartın gösterdiği kopyadan **ayrı** olarak çözülür (farklı boyut isteyen her istek kendi önbellek anahtarını alır).
-- Hesaplar sıraya dizili ve her biri `endOfFrame` sonrası başlıyor. Hepsi birden çalışınca sekme açılışında kareler düşüyordu.
-
-Hesap, kart/satır göründüğü anda başlatılıyor (`initState`); sayfa açıldığında renk çoğu zaman hazır oluyor, değilse açılış animasyonu bittikten sonra tamamlanıyor.
-
-**Kapak sayfada sabit duruyor:** `_pinnedCover` kaydırma ilerledikçe yüksekliği büzülen bir `Positioned`; üstteki başlık çubuğunda etkinlik adı ancak kapak yukarı kaybolunca beliriyor.
+**Event filter:** the meaning of the `EventModel.active` flag is unknown; the "upcoming events" filter was deliberately built on **dates** (`EventProvider.upcomingEvents`, based on the end date so that multi-day events do not drop out while still running). In the UI, `active` is interpreted as "are applications open": the "Yakında" badge on the card, the status row on the detail page and the disabled Join button all depend on it.
 
 ---
 
-## Çalışma alışkanlıkları
+## Event detail — what you need to know
 
-- Her değişiklikten sonra `flutter analyze --no-pub` çalıştır ve temiz bırak.
-- Sabit dosyalarına değer eklerken anlamlı isim ver; `AppRadiuses.stadium` gibi hazır çözümlere bak (yükseklik değişse de tam yuvarlak kalır).
-- Bir şeyi silmeden önce commit'li olduğunu doğrula, silinenleri ve geri alma komutunu raporla.
-- Kullanıcı ekran görüntüsü gönderdiğinde sorunu tahmin etme; kaynağını koddan çöz ve nedenini açıkla. Layout sorunlarının çoğu kısıt (constraint) kaynaklıdır — `Center`/`Expanded`/`stretch` eksikliği gibi.
-- İş bitince özet ver ve dur. Commit atma.
+This page is the screen with the most moving parts in the app; read this before touching it.
+
+**It is opened from a single place:** `EventDetailPage.open(context, event)`. Both `EventCard` on the Events tab and `UpcomingEventTile` on the home page call it. The route is pushed onto the root navigator (otherwise it stays underneath the navbar) and the page enters with a `FadeTransition`.
+
+**The cover image flies with a `Hero`.** The tag and the flight path live in the `EventCoverHero` widget; all three places that show the cover use it, so the setting changes in one place. The flight path is deliberately a `RectTween` (straight) — Hero's default `MaterialRectArcTween` throws the image around while it travels from a small row to a full-width cover.
+
+> `OpenContainer` (container transform) **cannot be used** here: it grows the box but cross-fades the two contents, meaning the image does not move from its place. It does not work together with Hero either — both hide the source widget and draw it in their own layer.
+
+**The backdrop color comes from the cover.** `EventPaletteService` extracts the dominant colors of the image and keeps them in memory; the page lays them over a dark base as scattered radial blobs. The service has two critical details:
+
+- The image is decoded at ~120 pixels via `ResizeImage`. Without it the poster is decoded at full resolution, and on top of that **separately** from the copy the card shows (every request asking for a different size gets its own cache key).
+- The computations are queued and each one starts after `endOfFrame`. Running them all at once dropped frames when the tab opened.
+
+The computation is kicked off the moment the card/row becomes visible (`initState`); by the time the page opens the color is usually ready, and if it is not, it lands after the opening animation finishes.
+
+**The cover is pinned on the page:** `_pinnedCover` is a `Positioned` whose height shrinks as scrolling progresses; the event name appears in the top bar only once the cover has scrolled out of sight.
+
+---
+
+## Working habits
+
+- Run `flutter analyze --no-pub` after every change and leave it clean.
+- When adding values to the constant files, give them meaningful names; look at ready-made solutions such as `AppRadiuses.stadium` (stays fully rounded even when the height changes).
+- Before deleting anything, verify it is committed, and report what was deleted along with the command to undo it.
+- When the user sends a screenshot, do not guess the problem; trace it from the code and explain the cause. Most layout problems come from constraints — a missing `Center`/`Expanded`/`stretch` and the like.
+- When the task is done, give a summary and stop. Do not commit.

@@ -1,9 +1,9 @@
-# SKY LAB
+# SkyApp
 
 Yıldız Teknik Üniversitesi **SKY LAB** öğrenci kulübünün mobil uygulaması.
 Üyelik kartı, etkinlik takibi, kulüp haberleri ve kulübün alt servisleri tek yerde.
 
-Flutter · Material 3 · iOS, Android ve web
+Flutter · iOS, Android ve web
 
 ## Kurulum
 
@@ -12,8 +12,7 @@ flutter pub get
 flutter run
 ```
 
-Giriş Keycloak üzerinden yapılıyor; uygulamayı kullanmak için SKY LAB üyelik
-hesabı gerekiyor.
+Giriş [e-skylab](https://github.com/skylab-kulubu/e-skylab) üzerinden yapılır.
 
 ## Neler var
 
@@ -22,16 +21,21 @@ hesabı gerekiyor.
 - **Profil** — SkyPass üyelik kartı, sertifikalar, son aktiviteler
 - **Ayarlar** — hesap bilgileri, açık/koyu tema, destek
 
-Bir kısmı henüz mock veriyle çalışıyor; ayrıntısı `AGENTS.md` içinde.
+Bir kısmı henüz mock veriyle çalışıyor; ayrıntısı [AGENTS.md](AGENTS.md) içinde.
 
 ## Katkı
 
-Kod yazmadan önce **[CONTRIBUTING.md](CONTRIBUTING.md)** oku — klasör yapısı,
+Kod yazmadan önce [CONTRIBUTING.md](CONTRIBUTING.md)'yi oku. Klasör yapısı,
 Page/PageModel ayrımı, renk ve sabit kullanımı kuralları orada.
 
-Projenin mimarisi, tuzakları ve bilinmesi gereken durumlar için
-**[AGENTS.md](AGENTS.md)**.
+## Lisans
+
+Bu proje [GNU General Public License v3.0](LICENSE) ile lisanslanmıştır.
+Kaynak kodu kullanabilir, değiştirebilir ve dağıtabilirsin; türetilmiş
+çalışmaların da aynı lisansla ve kaynak koduyla birlikte dağıtılması gerekir.
+
+Copyright (C) 2026 SKY LAB — Yıldız Teknik Üniversitesi
 
 ---
 
-Developed by **MOBILAB**
+Developed by <img src="assets/images/mobilab-colored.svg" alt="MOBILAB" height="18" valign="middle" />

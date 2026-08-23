@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(flutter pub outdated:*)",
+      "Bash(flutter --version:*)",
+      "Bash(dart format:*)",
+      "Bash(dart fix --dry-run:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "mcp__plugin_dart-flutter_dart-mcp-server__analyze_files",
+      "mcp__plugin_dart-flutter_dart-mcp-server__dtd",
+      "mcp__plugin_dart-flutter_dart-mcp-server__get_runtime_errors",
+      "mcp__plugin_dart-flutter_dart-mcp-server__hot_reload",
+      "mcp__plugin_dart-flutter_dart-mcp-server__hot_restart"
+    ],
+    "deny": [
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)",
+      "Bash(flutter build ios:*)",
+      "Bash(pod install:*)",
+      "Bash(pod update:*)"
+    ]
+  }
+}
