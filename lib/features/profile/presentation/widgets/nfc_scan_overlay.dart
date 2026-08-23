@@ -149,13 +149,13 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
       // 1. NFC kart algılandığı an titreme hemen durur
       _pulseController.stop();
 
-      // 2. YTÜ Öğrenci Kartı Doğrulaması
-      if (!card.isYtuStudentCard) {
+      // 2. Kimliği çözülemeyen kart (id == "unknown") burada eleniyor.
+      if (!card.hasReadableUid) {
         HapticFeedback.heavyImpact();
-        await _nfcService.finishSession(iosErrorMessage: 'Geçersiz YTÜ Kartı!');
+        await _nfcService.finishSession(iosErrorMessage: 'Kart okunamadı.');
         if (!mounted || _isFinished) return;
         setState(() {
-          _errorMessage = 'Geçersiz YTÜ Kartı';
+          _errorMessage = 'Kart okunamadı';
         });
         _completeAndExit(null);
         return;
@@ -165,7 +165,7 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
       HapticFeedback.mediumImpact();
 
       await _nfcService.finishSession(
-        iosAlertMessage: 'YTÜ Kartı Başarıyla Okundu!',
+        iosAlertMessage: 'Kart başarıyla okundu!',
       );
 
       if (!mounted || _isFinished) return;
@@ -298,7 +298,7 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
                     },
                     behavior: HitTestBehavior.opaque,
                     child: ColoredBox(
-                      color: Colors.black.withValues(alpha: barrierOpacity),
+                      color: AppColors.scrim.withValues(alpha: barrierOpacity),
                     ),
                   ),
                 ),
@@ -320,7 +320,7 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
                   alignment: Alignment.bottomCenter,
                   child: SafeArea(
                     child: Padding(
-                      padding: const EdgeInsets.only(bottom: 56),
+                      padding: AppPaddings.nfcStatus,
                       child: Opacity(
                         opacity: widget.routeAnimation.value.clamp(0.0, 1.0),
                         child: _statusIndicator(),
@@ -393,10 +393,8 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
   }
 
   Widget _buildStatusContent() {
-    final baseStyle = context.textTheme.bodyMedium?.copyWith(
-      fontSize: 15,
+    final baseStyle = context.textTheme.bodyLarge?.copyWith(
       fontWeight: FontWeight.w600,
-      letterSpacing: 0.3,
     );
 
     if (_errorMessage != null) {
@@ -422,8 +420,7 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
       key: const ValueKey('scanning'),
       style: baseStyle?.copyWith(
         fontWeight: FontWeight.w500,
-        letterSpacing: 0.2,
-        color: AppColors.onAccent.withValues(alpha: 0.9),
+        color: AppColors.onScrim,
       ),
     );
   }

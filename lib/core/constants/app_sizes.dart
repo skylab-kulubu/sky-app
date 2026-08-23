@@ -57,6 +57,11 @@ class AppSizes {
   static const double midSpace = 8.0;
   static const double bigSpace = 12.0;
 
+  /// [bigSpace] ile [sectionSpace] arasındaki ara boşluk: bir bileşen ile
+  /// onu izleyen eylem satırı arasında kullanılır (SkyPass kartı → hızlı
+  /// eylemler).
+  static const double largeSpace = 24.0;
+
   /// İki bölüm arasındaki boşluk (detay sayfasındaki bilgi kartı ile
   /// açıklama gibi).
   static const double sectionSpace = 40.0;

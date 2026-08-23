@@ -70,6 +70,16 @@ class AppColors {
   static final onCoverDivider = onAccent.withValues(alpha: 0.15);
   static final onCoverSurface = onAccent.withValues(alpha: 0.14);
 
+  /// Tam ekran overlay'lerin (NFC okutma) arkasındaki karartma. Modal
+  /// karartma temadan bağımsız koyu kalır: açık temada beyaza gitseydi hem
+  /// öndeki kart zeminden ayrışmaz hem de "arkadaki sayfa devre dışı"
+  /// hissi kaybolurdu. Opaklığı karartmayı çizen widget veriyor.
+  static const scrim = Color(0xFF000000);
+
+  /// [scrim] üzerindeki metin. Zemin temadan bağımsız koyu olduğu için bu
+  /// renk de `context` erişimcilerinden okunmaz.
+  static final onScrim = onAccent.withValues(alpha: 0.90);
+
   // Status & Icon Colors
   static const blue = Color(0xFF1E90FF);
   static const teal = Color(0xFF1ABC9C);

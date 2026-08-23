@@ -1,24 +1,12 @@
 /// Yıldız Teknik Üniversitesi (YTÜ) Öğrenci Kartı veri modeli.
 ///
 /// YTÜ Kampüs Kartları: Mifare Classic 1K, ISO 14443-3A, 4-Byte (8 HEX
-/// karakter) UID kullanır. Turnike ve yoklama sistemiyle uyumlu normalize
-/// formatları sunar.
+/// karakter) UID kullanır.
 class NfcCard {
   final String rawUid;
-  final String cardType;
-  final String cardStandard;
-  final String? sak;
-  final String? atqa;
   final DateTime scannedAt;
 
-  const NfcCard({
-    required this.rawUid,
-    required this.cardType,
-    required this.cardStandard,
-    this.sak,
-    this.atqa,
-    required this.scannedAt,
-  });
+  const NfcCard({required this.rawUid, required this.scannedAt});
 
   /// Turnike / veritabanı temiz HEX formatı (örn: `"225FC4C9"`).
   String get normalizedHex {
@@ -43,10 +31,22 @@ class NfcCard {
   /// UID Byte uzunluğu (YTÜ kartları için 4 Byte).
   int get byteLength => normalizedHex.length ~/ 2;
 
-  /// Kartın geçerli bir YTÜ Öğrenci Kartı (Mifare Classic 1K / 4-Byte
-  /// ISO 14443-3A) olup olmadığını doğrular.
-  bool get isYtuStudentCard {
-    return byteLength == 4 &&
-        (cardStandard.contains('14443') || cardType.contains('mifare'));
-  }
+  /// Okumadan geriye kullanılabilir bir UID çıkıp çıkmadığı.
+  ///
+  /// Kartın gerçekten bir YTÜ kartı olduğu istemcide **doğrulanamaz**.
+  /// Kimlik doğrulaması yapmadan okunabilen tek anlamlı veri UID; kartın
+  /// kime ait olduğunu söylemiyor ve piyasadaki her Mifare Classic 1K
+  /// kart (otel, toplu taşıma, kargo etiketi) aynı formatta. UID'nin bir
+  /// öğrenciye ait olup olmadığı ancak sunucuda, kayıtla eşleştirilerek
+  /// anlaşılır. Ki bu da imkansız :)
+  ///
+  /// Paketin diğer alanları da elemiyor: ATQA/SAK yalnızca Android'de
+  /// doluyor, kart tipi ve standardı ise iki platformda ayrışıyor —
+  /// CoreNFC'nin `NFCMiFareFamily` enum'unda Classic olmadığı için iOS bir
+  /// YTÜ kartına `unknown` diyor.
+  ///
+  /// Geriye kalan tek gerçek kontrol UID'nin okunabilmiş olması:
+  /// `FlutterNfcKit.poll` kimliği çözemediğinde `id` alanını `"unknown"`
+  /// döndürüyor, o da [normalizedHex] süzgecinden boş geçiyor.
+  bool get hasReadableUid => normalizedHex.isNotEmpty;
 }

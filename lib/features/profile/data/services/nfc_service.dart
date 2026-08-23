@@ -4,18 +4,11 @@ import 'package:sky_app/features/profile/data/models/nfc_card.dart';
 /// NFC donanım iletişiminden sorumlu servis sınıfı.
 ///
 /// Yalnızca ISO 14443-A standardındaki öğrenci kartlarını hedefler.
-/// Tek kullanıcısı profil feature'ı olduğu için `core/services` yerine
-/// burada yaşar.
 class NfcService {
-  /// Cihazın NFC durumunu kontrol eder.
   Future<NFCAvailability> checkAvailability() async {
     return FlutterNfcKit.nfcAvailability;
   }
 
-  /// Yalnızca ISO 14443-A (Type A) kartları tarar.
-  ///
-  /// Diğer standartlar (14443B, 15693, 18092) filtrelenerek okuma
-  /// hızlandırılır.
   Future<NfcCard> pollCard({
     Duration timeout = const Duration(seconds: 15),
     String iosAlertMessage =
@@ -32,17 +25,9 @@ class NfcService {
       readIso18092: false,
     );
 
-    return NfcCard(
-      rawUid: tag.id.toUpperCase(),
-      cardType: tag.type.toString().split('.').last,
-      cardStandard: tag.standard.toString().split('.').last,
-      sak: tag.sak?.toUpperCase(),
-      atqa: tag.atqa?.toUpperCase(),
-      scannedAt: DateTime.now(),
-    );
+    return NfcCard(rawUid: tag.id.toUpperCase(), scannedAt: DateTime.now());
   }
 
-  /// NFC oturumunu başarıyla veya hata mesajıyla sonlandırır.
   Future<void> finishSession({
     String? iosAlertMessage,
     String? iosErrorMessage,

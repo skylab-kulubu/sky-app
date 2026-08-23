@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
+import 'package:sky_app/core/constants/app_radiuses.dart';
+import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/profile/data/services/activity_service.dart';
@@ -51,7 +53,7 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSizes.largeSpace),
         _quickActions(context, user, subtitle),
         const SizedBox(height: _sectionSpacing),
         _sectionTitle(context, 'Aktivitelerim'),
@@ -150,16 +152,34 @@ class ProfilePage extends StatelessWidget {
     required String title,
     required String message,
   }) {
-    showDialog(
+    showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: context.tileColor,
-        title: Text(title, style: TextStyle(color: context.textPrimary)),
-        content: Text(message, style: TextStyle(color: context.textSecondary)),
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: dialogContext.tileColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppRadiuses.cardBorderRadius,
+        ),
+        title: Text(
+          title,
+          style: dialogContext.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          message,
+          style: dialogContext.textTheme.bodyMedium?.copyWith(
+            color: dialogContext.textSecondary,
+          ),
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Tamam', style: TextStyle(color: context.accentColor)),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              'Tamam',
+              style: dialogContext.textTheme.bodyMedium?.copyWith(
+                color: dialogContext.accentColor,
+              ),
+            ),
           ),
         ],
       ),

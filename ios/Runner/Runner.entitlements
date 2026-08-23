@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- "Near Field Communication Tag Reading" capability. flutter_nfc_kit
+	     NFCTagReaderSession kullandığı için TAG formatı şart; bu anahtar
+	     olmadan iOS oturumu açılmadan uygulamayı sonlandırıyor. -->
+	<key>com.apple.developer.nfc.readersession.formats</key>
+	<array>
+		<string>TAG</string>
+	</array>
+</dict>
+</plist>

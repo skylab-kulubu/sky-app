@@ -37,6 +37,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NFCReaderUsageDescription</key>
+	<string>NFC access is required to read your student card and link it to your Sky account.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera access is required to scan event QR codes and confirm your attendance.</string>
 	<key>UIApplicationSceneManifest</key>

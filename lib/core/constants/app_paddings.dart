@@ -94,6 +94,11 @@ class AppPaddings {
   /// Ayarlar bölüm başlığının boşluğu.
   static const sectionHeader = EdgeInsets.only(left: 4, top: 24, bottom: 8);
 
+  /// NFC okutma overlay'inde ekranın altında duran durum metninin, güvenli
+  /// alanın üstünde bıraktığı pay. Merkezdeki kart yukarı çekilirken metnin
+  /// altında kalmasını sağlayacak kadar geniş.
+  static const nfcStatus = EdgeInsets.only(bottom: 56);
+
   /// Navbar hap'ının, öğelerini saran iç boşluğu.
   static const navBarContent = EdgeInsets.all(8);
 
