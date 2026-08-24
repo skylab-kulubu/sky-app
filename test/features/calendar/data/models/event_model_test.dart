@@ -76,26 +76,29 @@ void main() {
       expect(singleDayEvent.isMultiDay, isFalse);
     });
 
-    test('eventDays returns all days between start and end dates inclusive', () {
-      final event = EventModel(
-        id: '1',
-        name: 'Test Event',
-        coverImageUrl: '',
-        description: '',
-        location: '',
-        startDate: '2026-08-14T10:00:00.000',
-        endDate: '2026-08-16T18:00:00.000',
-        formUrl: '',
-        active: true,
-        typeName: 'Test',
-      );
+    test(
+      'eventDays returns all days between start and end dates inclusive',
+      () {
+        final event = EventModel(
+          id: '1',
+          name: 'Test Event',
+          coverImageUrl: '',
+          description: '',
+          location: '',
+          startDate: '2026-08-14T10:00:00.000',
+          endDate: '2026-08-16T18:00:00.000',
+          formUrl: '',
+          active: true,
+          typeName: 'Test',
+        );
 
-      final days = event.eventDays;
-      expect(days.length, 3);
-      expect(days[0].day, 14);
-      expect(days[1].day, 15);
-      expect(days[2].day, 16);
-    });
+        final days = event.eventDays;
+        expect(days.length, 3);
+        expect(days[0].day, 14);
+        expect(days[1].day, 15);
+        expect(days[2].day, 16);
+      },
+    );
 
     test('eventDays returns empty list when dates are invalid', () {
       final event = EventModel(
@@ -114,35 +117,38 @@ void main() {
       expect(event.eventDays, isEmpty);
     });
 
-    test('formattedDate returns formatted string or original if parse fails', () {
-      final validEvent = EventModel(
-        id: '1',
-        name: 'Test Event',
-        coverImageUrl: '',
-        description: '',
-        location: '',
-        startDate: '2026-08-14T10:00:00.000',
-        endDate: '',
-        formUrl: '',
-        active: true,
-        typeName: 'Test',
-      );
-      expect(validEvent.formattedDate, '14.08.2026');
+    test(
+      'formattedDate returns formatted string or original if parse fails',
+      () {
+        final validEvent = EventModel(
+          id: '1',
+          name: 'Test Event',
+          coverImageUrl: '',
+          description: '',
+          location: '',
+          startDate: '2026-08-14T10:00:00.000',
+          endDate: '',
+          formUrl: '',
+          active: true,
+          typeName: 'Test',
+        );
+        expect(validEvent.formattedDate, '14.08.2026');
 
-      final invalidEvent = EventModel(
-        id: '2',
-        name: 'Test Event',
-        coverImageUrl: '',
-        description: '',
-        location: '',
-        startDate: 'invalid',
-        endDate: '',
-        formUrl: '',
-        active: true,
-        typeName: 'Test',
-      );
-      expect(invalidEvent.formattedDate, 'invalid');
-    });
+        final invalidEvent = EventModel(
+          id: '2',
+          name: 'Test Event',
+          coverImageUrl: '',
+          description: '',
+          location: '',
+          startDate: 'invalid',
+          endDate: '',
+          formUrl: '',
+          active: true,
+          typeName: 'Test',
+        );
+        expect(invalidEvent.formattedDate, 'invalid');
+      },
+    );
 
     test('formattedTime returns HH:mm or empty if parse fails', () {
       final validEvent = EventModel(
@@ -218,48 +224,57 @@ void main() {
       expect(multiDayDiffMonth.formattedDayLabel, '30 Ağustos – 2 Eylül 2026');
     });
 
-    test('formattedTimeRange formats correctly for single/multi day and missing end', () {
-      final singleDayEvent = EventModel(
-        id: '1',
-        name: 'Test Event',
-        coverImageUrl: '',
-        description: '',
-        location: '',
-        startDate: '2026-08-14T10:30:00.000',
-        endDate: '2026-08-14T18:45:00.000',
-        formUrl: '',
-        active: true,
-        typeName: 'Test',
-      );
-      expect(singleDayEvent.formattedTimeRange, '10:30 – 18:45');
+    test(
+      'formattedTimeRange formats correctly for single/multi day and missing end',
+      () {
+        final singleDayEvent = EventModel(
+          id: '1',
+          name: 'Test Event',
+          coverImageUrl: '',
+          description: '',
+          location: '',
+          startDate: '2026-08-14T10:30:00.000',
+          endDate: '2026-08-14T18:45:00.000',
+          formUrl: '',
+          active: true,
+          typeName: 'Test',
+        );
+        expect(singleDayEvent.formattedTimeRange, '10:30 – 18:45');
 
-      final multiDayEvent = EventModel(
-        id: '2',
-        name: 'Test Event',
-        coverImageUrl: '',
-        description: '',
-        location: '',
-        startDate: '2026-08-14T10:00:00.000',
-        endDate: '2026-08-16T18:00:00.000',
-        formUrl: '',
-        active: true,
-        typeName: 'Test',
-      );
-      expect(multiDayEvent.formattedTimeRange, '10:00'); // only start time for multi-day
+        final multiDayEvent = EventModel(
+          id: '2',
+          name: 'Test Event',
+          coverImageUrl: '',
+          description: '',
+          location: '',
+          startDate: '2026-08-14T10:00:00.000',
+          endDate: '2026-08-16T18:00:00.000',
+          formUrl: '',
+          active: true,
+          typeName: 'Test',
+        );
+        expect(
+          multiDayEvent.formattedTimeRange,
+          '10:00',
+        ); // only start time for multi-day
 
-      final noEndEvent = EventModel(
-        id: '3',
-        name: 'Test Event',
-        coverImageUrl: '',
-        description: '',
-        location: '',
-        startDate: '2026-08-14T10:00:00.000',
-        endDate: '',
-        formUrl: '',
-        active: true,
-        typeName: 'Test',
-      );
-      expect(noEndEvent.formattedTimeRange, '10:00'); // only start time if no end time
-    });
+        final noEndEvent = EventModel(
+          id: '3',
+          name: 'Test Event',
+          coverImageUrl: '',
+          description: '',
+          location: '',
+          startDate: '2026-08-14T10:00:00.000',
+          endDate: '',
+          formUrl: '',
+          active: true,
+          typeName: 'Test',
+        );
+        expect(
+          noEndEvent.formattedTimeRange,
+          '10:00',
+        ); // only start time if no end time
+      },
+    );
   });
 }

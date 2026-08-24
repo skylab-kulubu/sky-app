@@ -16,8 +16,8 @@ void main() {
         'sky_number': 'SKY-001',
         'email_verified': true,
         'realm_access': {
-          'roles': ['MOBILAB', 'default-roles']
-        }
+          'roles': ['MOBILAB', 'default-roles'],
+        },
       };
 
       final user = User.fromJwt(jwtPayload);
@@ -71,7 +71,7 @@ void main() {
       expect(user.university, 'YTU');
       expect(user.department, 'CENG');
       expect(user.skyNumber, 'SKY-001');
-      
+
       expect(user.schoolEmail, 'test@std.yildiz.edu.tr');
       expect(user.faculty, 'EE');
       expect(user.profilePictureUrl, 'https://example.com/pic.jpg');

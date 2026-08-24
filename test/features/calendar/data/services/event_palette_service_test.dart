@@ -9,33 +9,43 @@ void main() {
       expect(colors, isEmpty);
     });
 
-    testWidgets('resolve handles empty url gracefully and caches the future for concurrent calls', (tester) async {
-      final eventId = 'empty-url-event';
-      
-      final future = EventPaletteService.resolve(eventId: eventId, imageUrl: '');
-      
-      // Schedule a frame so SchedulerBinding.instance.endOfFrame can complete
-      await tester.pumpWidget(const SizedBox());
-      await tester.pump();
+    testWidgets(
+      'resolve handles empty url gracefully and caches the future for concurrent calls',
+      (tester) async {
+        final eventId = 'empty-url-event';
 
-      final colors = await future;
-      
-      expect(colors, isEmpty);
-      expect(EventPaletteService.cached(eventId), isEmpty);
+        final future = EventPaletteService.resolve(
+          eventId: eventId,
+          imageUrl: '',
+        );
 
-      // Second part: concurrent calls
-      final eventId2 = 'concurrent-event';
-      final future1 = EventPaletteService.resolve(eventId: eventId2, imageUrl: '');
-      final future2 = EventPaletteService.resolve(eventId: eventId2, imageUrl: '');
-      
-      expect(identical(future1, future2), isTrue);
-      
-      // Schedule a frame so the pending future can complete cleanly
-      await tester.pumpWidget(const SizedBox());
-      await tester.pump();
-      await future1;
-    });
+        // Schedule a frame so SchedulerBinding.instance.endOfFrame can complete
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump();
+
+        final colors = await future;
+
+        expect(colors, isEmpty);
+        expect(EventPaletteService.cached(eventId), isEmpty);
+
+        // Second part: concurrent calls
+        final eventId2 = 'concurrent-event';
+        final future1 = EventPaletteService.resolve(
+          eventId: eventId2,
+          imageUrl: '',
+        );
+        final future2 = EventPaletteService.resolve(
+          eventId: eventId2,
+          imageUrl: '',
+        );
+
+        expect(identical(future1, future2), isTrue);
+
+        // Schedule a frame so the pending future can complete cleanly
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump();
+        await future1;
+      },
+    );
   });
 }
-
-
