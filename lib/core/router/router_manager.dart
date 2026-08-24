@@ -26,18 +26,7 @@ class RouterManager {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
     refreshListenable: userProvider,
-    redirect: (context, state) {
-      final bool isInitialized = userProvider.isInitialized;
-      final bool isLoggedIn = userProvider.user != null;
-      final bool isAuthRoute = state.matchedLocation == '/auth';
-      final bool isSplashRoute = state.matchedLocation == '/';
-
-      if (!isInitialized) return isSplashRoute ? null : '/';
-      if (!isLoggedIn && !isAuthRoute) return '/auth';
-      if (isLoggedIn && (isAuthRoute || isSplashRoute)) return '/home';
-
-      return null;
-    },
+    redirect: (context, state) => redirectLogic(userProvider, state),
     routes: [
       GoRoute(path: '/', builder: (context, state) => const SplashPage()),
 
@@ -104,4 +93,17 @@ class RouterManager {
       ),
     ],
   );
+
+  static String? redirectLogic(UserProvider userProvider, GoRouterState state) {
+    final bool isInitialized = userProvider.isInitialized;
+    final bool isLoggedIn = userProvider.user != null;
+    final bool isAuthRoute = state.matchedLocation == '/auth';
+    final bool isSplashRoute = state.matchedLocation == '/';
+
+    if (!isInitialized) return isSplashRoute ? null : '/';
+    if (!isLoggedIn && !isAuthRoute) return '/auth';
+    if (isLoggedIn && (isAuthRoute || isSplashRoute)) return '/home';
+
+    return null;
+  }
 }
