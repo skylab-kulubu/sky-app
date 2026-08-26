@@ -32,12 +32,7 @@ jobs:
         run: flutter pub get
 
       - name: Format kontrolü
-        run: |
-          if [ -d test ]; then
-            dart format --output=none --set-exit-if-changed lib test
-          else
-            dart format --output=none --set-exit-if-changed lib
-          fi
+        run: dart format --output=none --set-exit-if-changed lib test
 
       - name: Statik analiz
         run: flutter analyze --fatal-infos
@@ -58,12 +53,7 @@ jobs:
         run: flutter pub get
 
       - name: Testleri çalıştır
-        run: |
-          if find test -name '*_test.dart' -print -quit 2>/dev/null | grep -q .; then
-            flutter test --reporter compact
-          else
-            echo "test/ altında henüz test dosyası yok, adım atlanıyor."
-          fi
+        run: flutter test --reporter compact
 
   build-android:
     name: Android derleme

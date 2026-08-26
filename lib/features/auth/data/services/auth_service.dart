@@ -212,7 +212,32 @@ class AuthService {
     if (token == null) return null;
 
     final payload = _decodeJwt(token);
-    return User.fromJwt(payload);
+    final jwtUser = User.fromJwt(payload);
+
+    try {
+      const profileUrl = 'https://api.yildizskylab.com/api/users/me';
+      final response = await _dio.get<dynamic>(
+        profileUrl,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      dynamic rawData = response.data;
+      if (rawData is String) {
+        rawData = jsonDecode(rawData);
+      }
+
+      if (rawData is Map<String, dynamic>) {
+        final data = rawData['data'];
+        if (data is Map<String, dynamic>) {
+          final profileUser = User.fromJson(data);
+          return jwtUser.mergeWith(profileUser);
+        }
+      }
+    } catch (e) {
+      log('Profile API Hatası: $e');
+    }
+
+    return jwtUser;
   }
 
   String _generateCodeVerifier() {

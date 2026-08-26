@@ -271,6 +271,19 @@ AppIcon(AppIcons.home, filled: true, size: AppSizes.icon, color: context.accentC
 
 ---
 
+## 🧪 Test Yazımı (Testing)
+
+Projede testler `test/` dizini altında, `lib/` dizinindeki klasör yapısını **birebir kopyalayarak** yazılır.
+
+Örneğin, `lib/features/auth/data/models/user.dart` için test dosyası `test/features/auth/data/models/user_test.dart` konumunda olmalıdır.
+
+**Test Yazım Kuralları:**
+- **Sadece iş mantığını test et:** Dart kodunun yoğun olduğu modeller (`EventModel`, `User`), karmaşık servisler (`EventPaletteService`) veya core mekanizmalar (`RouterManager`) ucuza ve hızlı test edilebilir hedeflerdir.
+- **UI testlerinden (Widget testing) şimdilik kaçın:** Flutter'ın UI'ı cihazda görsel doğrulama gerektirir. Sadece mantık testlerine odaklanıyoruz.
+- CI/CD sürecinde (`.github/workflows/ci.yml`) testler ve formatlama adımları aktif olarak çalışmaktadır. Yazdığın kodların testleri geçip geçmediğini PR oluşturmadan önce `flutter test` ile doğrula.
+
+---
+
 ##  Özet Kontrol Listesi
 
 PR açmadan önce aşağıdaki maddeleri kontrol et:
