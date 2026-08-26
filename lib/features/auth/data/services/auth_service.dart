@@ -215,8 +215,9 @@ class AuthService {
     final jwtUser = User.fromJwt(payload);
 
     try {
+      const profileUrl = 'https://api.yildizskylab.com/api/users/me';
       final response = await _dio.get<dynamic>(
-        'https://api.yildizskylab.com/api/users/me',
+        profileUrl,
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
