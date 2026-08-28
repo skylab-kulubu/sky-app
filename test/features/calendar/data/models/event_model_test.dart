@@ -77,47 +77,6 @@ void main() {
     });
 
     test(
-      'eventDays returns all days between start and end dates inclusive',
-      () {
-        final event = EventModel(
-          id: '1',
-          name: 'Test Event',
-          coverImageUrl: '',
-          description: '',
-          location: '',
-          startDate: '2026-08-14T10:00:00.000',
-          endDate: '2026-08-16T18:00:00.000',
-          formUrl: '',
-          active: true,
-          typeName: 'Test',
-        );
-
-        final days = event.eventDays;
-        expect(days.length, 3);
-        expect(days[0].day, 14);
-        expect(days[1].day, 15);
-        expect(days[2].day, 16);
-      },
-    );
-
-    test('eventDays returns empty list when dates are invalid', () {
-      final event = EventModel(
-        id: '1',
-        name: 'Test Event',
-        coverImageUrl: '',
-        description: '',
-        location: '',
-        startDate: '',
-        endDate: '',
-        formUrl: '',
-        active: true,
-        typeName: 'Test',
-      );
-
-      expect(event.eventDays, isEmpty);
-    });
-
-    test(
       'formattedDate returns formatted string or original if parse fails',
       () {
         final validEvent = EventModel(

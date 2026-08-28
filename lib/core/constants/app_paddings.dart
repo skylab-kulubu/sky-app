@@ -8,16 +8,6 @@ class AppPaddings {
 
   static const all6 = EdgeInsets.all(6);
 
-  static const horizontal8 = EdgeInsets.symmetric(horizontal: 8);
-  static const horizontal16Vertical8 = EdgeInsets.symmetric(
-    horizontal: 16,
-    vertical: 8,
-  );
-  static const cardContentPaddingHorizontal = EdgeInsets.symmetric(
-    horizontal: 8,
-  );
-  static const buttonInternalPadding = EdgeInsets.symmetric(vertical: 10);
-
   /// AppBar leading'inin sol kenar boşluğu; actions'ınkiyle simetrik.
   static const appBarLeading = EdgeInsets.only(left: 16);
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 
-class CommingSoonPage extends StatelessWidget {
-  const CommingSoonPage({super.key});
+class ComingSoonPage extends StatelessWidget {
+  const ComingSoonPage({super.key});
 
   @override
   Widget build(BuildContext context) {

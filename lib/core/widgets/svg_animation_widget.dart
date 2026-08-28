@@ -164,16 +164,6 @@ class SvgPathLibrary {
   final double viewBoxWidth;
   final double viewBoxHeight;
   final List<ParsedSvgPath> paths;
-
-  /// Key ile path'e erişim (gruplama için).
-  ParsedSvgPath? findByKey(String key) {
-    for (final p in paths) {
-      if (p.key == key) {
-        return p;
-      }
-    }
-    return null;
-  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

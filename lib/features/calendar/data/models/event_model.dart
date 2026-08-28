@@ -58,26 +58,6 @@ class EventModel {
     return !reference.isBefore(DateTime.now());
   }
 
-  List<DateTime> get eventDays {
-    if (startDate.isEmpty || endDate.isEmpty) return [];
-    try {
-      final start = DateTime.parse(startDate);
-      final end = DateTime.parse(endDate);
-
-      final days = <DateTime>[];
-      var current = DateTime(start.year, start.month, start.day);
-      final last = DateTime(end.year, end.month, end.day);
-
-      while (!current.isAfter(last)) {
-        days.add(current);
-        current = current.add(const Duration(days: 1));
-      }
-      return days;
-    } catch (e) {
-      return [];
-    }
-  }
-
   String get formattedDate {
     if (startDate.isEmpty) return '';
     try {

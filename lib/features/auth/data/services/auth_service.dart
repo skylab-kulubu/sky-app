@@ -201,12 +201,6 @@ class AuthService {
     return await _storage.read(key: 'access_token');
   }
 
-  Future<bool> isLoggedIn() async {
-    final token = await _storage.read(key: 'access_token');
-
-    return token != null;
-  }
-
   Future<User?> getUser() async {
     final token = await _storage.read(key: 'access_token');
     if (token == null) return null;

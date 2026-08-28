@@ -193,7 +193,7 @@ Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **not
 - The QR is on the back of the SkyPass card (tap flips it), not a quick action. It is drawn by `_MockQrPainter` — **a fake pattern**, not a real QR code.
 - The Notifications / Permissions rows in settings are no-ops.
 
-**The `/team` tab shows `CommingSoonPage`.** `team_page.dart` (with `PersonTag` and `SectionExpansionTile`) is written but not routed anywhere; the tab is deliberately parked behind the placeholder.
+**The `/team` tab shows `ComingSoonPage`.** `team_page.dart` (with `PersonTag` and `SectionExpansionTile`) is written but not routed anywhere; the tab is deliberately parked behind the placeholder.
 
 **Recently removed** — ask before bringing any of them back: the tickets feature, the announcement carousel, the home page shortcuts, the `qr` feature (`qr_page.dart`), the welcome text on the home page. All of them are in the git history.
 
