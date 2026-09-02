@@ -15,8 +15,6 @@ class AppColors {
   static const primaryStrong = Color(0xFF8B5FA3);
 
   static const secondaryBlue = Color(0xFF00BFFF);
-  static const indicatorColor = Color(0xFFe0c8e5);
-  static const buttonBackground = Color(0xFF263238);
 
   // SkyPass Card (açık lila zemin üzerinde koyu metin)
   static const skyPassGradientStart = primaryColor;
@@ -25,7 +23,6 @@ class AppColors {
   static final skyPassForegroundMuted = const Color(
     0xFF231A2B,
   ).withValues(alpha: 0.60);
-  static final skyPassChip = const Color(0xFF231A2B).withValues(alpha: 0.18);
 
   // Yüzen navbar'ın gölgesi. Açık temada aynı opaklık beyaz zeminde sert bir
   // leke bırakıyor, o yüzden ağırlık temaya göre ayrışıyor.
@@ -88,25 +85,10 @@ class AppColors {
   static const darkPurple = Color(0xFF9B59B6);
   static const orange = Color(0xFFE67E22);
   static const pink = Color(0xFFE84393);
-  static const coral = Color(0xFFFF6467);
   static const red = Color(0xFFE74C3C);
   static const darkOrange = Color(0xFFF39C12);
-  static const brightRed = Color(0xFFFB2C36);
 
   /// Giriş sayfasındaki alt başlığın gökkuşağı geçişi. Vurgu renklerinden
   /// kuruluyor, temadan bağımsız: iki temada da aynı canlılıkta okunuyor.
   static const brandGradient = <Color>[secondaryBlue, purple, pink, darkOrange];
-
-  // Opacity Backgrounds (For icon boxes)
-  static final primaryBlue10 = const Color(0xFF1E90FF).withValues(alpha: 0.1);
-  static final secondaryBlue9 = const Color(
-    0xFF00BFFF,
-  ).withValues(alpha: 0.094);
-  static final teal9 = const Color(0xFF1ABC9C).withValues(alpha: 0.094);
-  static final green9 = const Color(0xFF2ECC71).withValues(alpha: 0.094);
-  static final purple9 = const Color(0xFF6C5CE7).withValues(alpha: 0.094);
-  static final darkPurple9 = const Color(0xFF9B59B6).withValues(alpha: 0.094);
-  static final orange9 = const Color(0xFFE67E22).withValues(alpha: 0.094);
-  static final red9 = const Color(0xFFE74C3C).withValues(alpha: 0.094);
-  static final pink9 = const Color(0xFFE84393).withValues(alpha: 0.094);
 }

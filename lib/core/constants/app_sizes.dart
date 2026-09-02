@@ -10,7 +10,6 @@ class AppSizes {
 
   /// Profildeki hızlı eylem dairesi ve appbar avatarı.
   static const quickActionCircle = 56.0;
-  static const appBarAvatar = 40.0;
 
   /// Liste tile'larındaki kare görsel (haber, etkinlik). Metin bloğundan
   /// kasıtlı olarak yüksek: tile yüksekliğini hep görsel belirlesin ve tüm

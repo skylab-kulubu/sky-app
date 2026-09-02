@@ -13,7 +13,7 @@ import 'package:sky_app/core/pages/webview_page.dart';
 import 'package:sky_app/features/settings/presentation/pages/account/account_page.dart';
 import 'package:sky_app/features/settings/presentation/pages/contact/contact_page.dart';
 import 'package:sky_app/features/settings/presentation/pages/settings_page.dart';
-import 'package:sky_app/features/team/presentation/pages/comming_soon_page.dart';
+import 'package:sky_app/features/team/presentation/pages/coming_soon_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -75,7 +75,7 @@ class RouterManager {
           GoRoute(
             path: '/team',
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: CommingSoonPage()),
+                const NoTransitionPage(child: ComingSoonPage()),
           ),
           GoRoute(
             path: '/profile',
