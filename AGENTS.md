@@ -73,11 +73,11 @@ Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `te
 
 `provider` is used. Three global providers are registered in `main.dart`:
 
-| Provider | Responsibility |
-|---|---|
+| Provider        | Responsibility                                                    |
+| --------------- | ----------------------------------------------------------------- |
 | `ThemeProvider` | `ThemeMode` (system/light/dark), persisted in `SharedPreferences` |
-| `UserProvider` | Session and `User`; through `AuthService` |
-| `EventProvider` | Event lists; filled on splash |
+| `UserProvider`  | Session and `User`; through `AuthService`                         |
+| `EventProvider` | Event lists; filled on splash                                     |
 
 ### Routing
 
@@ -99,17 +99,17 @@ Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `te
 
 ### Notable packages
 
-| Package | Where |
-|---|---|
-| `reicon_flutter` | All icons (through `AppIcon`) |
-| `animations` | Only the `OpenContainer` transition of the news tile |
+| Package                    | Where                                                                                                      |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `reicon_flutter`           | All icons (through `AppIcon`)                                                                              |
+| `animations`               | Only the `OpenContainer` transition of the news tile                                                       |
 | `palette_generator_master` | Backdrop color from the event cover (`EventPaletteService`) — the maintained fork, not `palette_generator` |
-| `share_plus` | Share button on the event detail — **native dependency**, hot reload is not enough when it is added |
-| `timeago` | Relative time in the notification list (`tr` and `tr_short` locales are registered in `main.dart`) |
-| `flutter_nfc_kit` | Student card scanning (`NfcService`) — **native dependency**, needs the iOS NFC entitlement |
-| `sensors_plus` | The tilt of the SkyPass card (`TiltBuilder`) |
-| `cached_network_image_ce` | Network images (`CoverImage`) |
-| `dio` | All REST calls |
+| `share_plus`               | Share button on the event detail — **native dependency**, hot reload is not enough when it is added        |
+| `timeago`                  | Relative time in the notification list (`tr` and `tr_short` locales are registered in `main.dart`)         |
+| `flutter_nfc_kit`          | Student card scanning (`NfcService`) — **native dependency**, needs the iOS NFC entitlement                |
+| `sensors_plus`             | The tilt of the SkyPass card (`TiltBuilder`)                                                               |
+| `cached_network_image_ce`  | Network images (`CoverImage`)                                                                              |
+| `dio`                      | All REST calls                                                                                             |
 
 ---
 
@@ -193,7 +193,7 @@ Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **not
 - The QR is on the back of the SkyPass card (tap flips it), not a quick action. It is drawn by `_MockQrPainter` — **a fake pattern**, not a real QR code.
 - The Notifications / Permissions rows in settings are no-ops.
 
-**The `/team` tab shows `ComingSoonPage`.** `team_page.dart` (with `PersonTag` and `SectionExpansionTile`) is written but not routed anywhere; the tab is deliberately parked behind the placeholder.
+**The `/team` tab shows `ComingSoonPage`.**
 
 **Recently removed** — ask before bringing any of them back: the tickets feature, the announcement carousel, the home page shortcuts, the `qr` feature (`qr_page.dart`), the welcome text on the home page. All of them are in the git history.
 

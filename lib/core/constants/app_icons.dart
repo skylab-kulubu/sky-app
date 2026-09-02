@@ -7,6 +7,7 @@ class AppIcons {
   // Navigation
   static const String home = 'home';
   static const String calendar = 'calendar';
+  static const String ticket = 'ticket';
   static const String profile = 'user';
 
   // AppBar actions
@@ -17,23 +18,37 @@ class AppIcons {
   static const String infoSquare = 'infoSquare';
 
   // Actions
+  static const String close = 'xmark';
+  static const String closeCircle = 'closeCircle';
   static const String check = 'check';
   static const String checkCircle = 'checkCircle';
+  static const String edit = 'edit';
+  static const String refresh = 'refresh';
   static const String share = 'share';
+  static const String play = 'play';
 
   // Navigation arrows
   static const String arrowBack = 'arrowLeft';
   static const String chevronRight = 'chevronRight';
 
+  // QR & Scan
+  static const String qr = 'qr';
+  static const String scan = 'scan';
+  static const String camera = 'camera';
+
   // People
   static const String users2 = 'users2';
+  static const String group = 'group';
 
   // Content
   static const String clock = 'clock';
   static const String location = 'location';
   static const String bell = 'bell';
   static const String announcement = 'bullhorn';
+  static const String task = 'task';
   static const String project = 'category';
+  static const String education = 'presentation';
+  static const String research = 'flask';
 
   // SkyPass hızlı eylemleri
   static const String studentCard = 'personalcard';
@@ -42,6 +57,8 @@ class AppIcons {
   // Profil bilgi satırları
   static const String certificate = 'awardCertificate';
   static const String medal = 'medalStar';
+  static const String university = 'buildings';
+  static const String email = 'sms';
 
   // Görünüm / tema
   static const String appearance = 'palette';
