@@ -51,6 +51,19 @@ class ApiException implements Exception {
     return ApiException(type, statusCode: statusCode, message: error.message);
   }
 
+  /// Herhangi bir hatayı [ApiException]'a indirger.
+  ///
+  /// `_ErrorInterceptor` sınıflandırmayı `DioException.error` içine koyuyor;
+  /// bu kurucu onu çıkarıyor, bulamazsa yeniden sınıflandırıyor.
+  factory ApiException.from(Object error) {
+    if (error is ApiException) return error;
+    if (error is DioException) {
+      final inner = error.error;
+      return inner is ApiException ? inner : ApiException.fromDio(error);
+    }
+    return ApiException(ApiErrorType.unknown, message: error.toString());
+  }
+
   final ApiErrorType type;
   final int? statusCode;
   final String? message;
@@ -59,6 +72,17 @@ class ApiException implements Exception {
   /// Oturumun korunup korunmayacağına bu ayrım karar veriyor.
   bool get isConnectivityIssue =>
       type == ApiErrorType.network || type == ApiErrorType.timeout;
+
+  /// Hata ekranlarında gösterilen açıklama.
+  String get userMessage => switch (type) {
+    ApiErrorType.network => 'İnternet bağlantısı kurulamadı.',
+    ApiErrorType.timeout => 'Sunucu zamanında yanıt vermedi.',
+    ApiErrorType.auth => 'Oturumun doğrulanamadı.',
+    ApiErrorType.notFound => 'Aradığın kayıt bulunamadı.',
+    ApiErrorType.server => 'Sunucuda bir sorun oluştu.',
+    ApiErrorType.cancelled => 'İstek iptal edildi.',
+    ApiErrorType.unknown => 'Beklenmeyen bir hata oluştu.',
+  };
 
   static ApiErrorType _fromStatusCode(int? statusCode) {
     if (statusCode == null) return ApiErrorType.unknown;

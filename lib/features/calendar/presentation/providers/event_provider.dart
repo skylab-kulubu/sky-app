@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/data/services/event_service.dart';
 
@@ -10,9 +11,17 @@ class EventProvider extends ChangeNotifier {
   List<EventModel> _activeEvents = [];
   bool _isInitialized = false;
   bool _isLoading = false;
+  ApiException? _error;
 
   List<EventModel> get events => _events;
   List<EventModel> get activeEvents => _activeEvents;
+
+  /// Son yüklemenin hatası; başarılıysa null.
+  ///
+  /// Boş liste artık tek başına bir şey söylemiyor: "etkinlik yok" ile
+  /// "yüklenemedi" ayrımını bu alan taşıyor.
+  ApiException? get error => _error;
+  bool get hasError => _error != null;
 
   /// Bitişi geçmemiş etkinlikler, en yakın tarihli önce.
   ///
@@ -43,62 +52,43 @@ class EventProvider extends ChangeNotifier {
   /// Etkinlikler elde yoksa bir kez yükler, varsa hiçbir şey yapmaz.
   ///
   /// Sayfalar açılışta koşulsuz çağırabilsin diye idempotent: arka arkaya
-  /// gelen çağrılar tek bir isteğe karşılık gelir. Veriyi hangi sayfanın
+  /// gelen çağrılar tek bir yüklemeye karşılık gelir. Veriyi hangi sayfanın
   /// tetiklediği önemsiz; ilk gelen yükler, sonrakiler hazır bulur.
-  ///
-  /// İki istek sırayla: `fetchEvents` ve `fetchActiveEvents` aynı
-  /// [_isLoading] bayrağını paylaşıyor ve ikisi de bayrak kalkıkken erken
-  /// dönüyor. Paralel başlatılırsa ikincisi sessizce hiç çalışmaz.
   Future<void> ensureLoaded() async {
     if (_isInitialized || _isLoading) return;
-    await fetchEvents();
-    await fetchActiveEvents();
+    await _load();
   }
 
-  Future<void> fetchEvents({bool forceRefresh = false}) async {
+  /// Elde ne olursa olsun yeniden yükler; hata ekranındaki "tekrar dene".
+  Future<void> refresh() => _load();
+
+  Future<void> _load() async {
     if (_isLoading) return;
-    if (_events.isNotEmpty && !forceRefresh) {
-      _isInitialized = true;
-      notifyListeners();
-      return;
-    }
 
     _isLoading = true;
+    _error = null;
     notifyListeners();
 
     try {
       _events = await _eventService.fetchEvents();
-    } catch (e) {
-      log('Event fetch error: $e');
+    } on ApiException catch (e) {
+      log('Etkinlikler yüklenemedi: $e');
       _events = [];
-    } finally {
-      _isLoading = false;
-      _isInitialized = true;
-      notifyListeners();
-    }
-  }
-
-  Future<void> fetchActiveEvents({bool forceRefresh = false}) async {
-    if (_isLoading) return;
-    if (_activeEvents.isNotEmpty && !forceRefresh) {
-      _isInitialized = true;
-      notifyListeners();
-      return;
+      _error = e;
     }
 
-    _isLoading = true;
-    notifyListeners();
-
+    // Ayrı ele alınıyor: bu listeyi şu an hiçbir ekran okumuyor, bu yüzden
+    // buradaki hata etkinlik listesini karartmamalı.
     try {
       _activeEvents = await _eventService.fetchActiveEvents();
-    } catch (e) {
-      log('Active event fetch error: $e');
+    } on ApiException catch (e) {
+      log('Aktif etkinlikler yüklenemedi: $e');
       _activeEvents = [];
-    } finally {
-      _isLoading = false;
-      _isInitialized = true;
-      notifyListeners();
     }
+
+    _isLoading = false;
+    _isInitialized = true;
+    notifyListeners();
   }
 
   Future<bool> joinEvent(String eventId) async {

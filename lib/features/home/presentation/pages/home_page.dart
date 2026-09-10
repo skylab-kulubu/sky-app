@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
+import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/home/presentation/widgets/upcoming_event_tile.dart';
@@ -88,9 +89,15 @@ class _HomePageState extends HomePagemodel {
     );
   }
 
-  /// Yaklaşan etkinlikler; hiç yoksa sayfa boş görünmesin diye bilgi kartı.
+  /// Yaklaşan etkinlikler; hiç yoksa sayfa boş görünmesin diye bilgi kartı,
+  /// yüklenemediyse tekrar denenebilen hata satırı.
   Widget _upcomingEvents(BuildContext context) {
-    final events = context.watch<EventProvider>().upcomingEvents;
+    final provider = context.watch<EventProvider>();
+
+    final error = provider.error;
+    if (error != null) return _eventsError(context, error);
+
+    final events = provider.upcomingEvents;
 
     if (events.isEmpty) return _emptyEvents(context);
 
@@ -142,6 +149,64 @@ class _HomePageState extends HomePagemodel {
                   style: context.textTheme.bodyMedium?.copyWith(
                     color: context.textTertiary,
                     height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Etkinlikler yüklenemedi. Boş durumla aynı satır düzeninde duruyor ki
+  /// haber başlıklarıyla hizası bozulmasın.
+  Widget _eventsError(BuildContext context, ApiException error) {
+    return Padding(
+      padding: AppPaddings.newsTile,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: AppSizes.thumbnail,
+            child: Center(
+              child: AppIcon(
+                error.isConnectivityIssue ? AppIcons.wifiOff : AppIcons.warning,
+                size: AppSizes.iconLarge,
+                color: context.textTertiary,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSizes.bigSpace),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Etkinlikler Yüklenemedi',
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: AppSizes.smallSpace),
+                Text(
+                  error.userMessage,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: context.textTertiary,
+                    height: 1.35,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => context.read<EventProvider>().refresh(),
+                  child: Padding(
+                    padding: AppPaddings.buttonInternalPadding,
+                    child: Text(
+                      'Tekrar Dene',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.accentColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],

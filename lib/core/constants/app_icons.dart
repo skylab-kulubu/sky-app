@@ -74,8 +74,9 @@ class AppIcons {
   static const String support = 'envelope';
   static const String logout = 'logout6';
 
-  // Bağlantı durumu
+  // Hata durumları
   static const String wifiOff = 'wifiOff';
+  static const String warning = 'triangleWarning';
 
   // External links
   static const String browser = 'global';

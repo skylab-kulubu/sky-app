@@ -11,4 +11,6 @@ abstract class CalendarPagemodel extends State<CalendarPage> {
     if (!provider.isInitialized && !provider.isLoading) return true;
     return provider.isLoading && provider.events.isEmpty;
   }
+
+  void onRetry() => context.read<EventProvider>().refresh();
 }

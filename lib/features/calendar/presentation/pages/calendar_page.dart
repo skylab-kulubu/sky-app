@@ -6,7 +6,9 @@ import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
+import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_card.dart';
@@ -47,10 +49,50 @@ class _CalendarPageState extends CalendarPagemodel {
           );
         }
 
+        // Hata boş durumdan ayrı: "etkinlik yok" bilgi, "yüklenemedi" ise
+        // kullanıcının tekrar deneyebileceği bir arıza.
+        final error = eventProvider.error;
+        if (error != null) return Scaffold(body: _error(context, error));
+
         final events = eventProvider.events;
 
         return Scaffold(body: events.isEmpty ? _empty(context) : _list(events));
       },
+    );
+  }
+
+  Widget _error(BuildContext context, ApiException error) {
+    return Center(
+      child: Padding(
+        padding: AppPaddings.mainPaddingAll,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppIcon(
+              error.isConnectivityIssue ? AppIcons.wifiOff : AppIcons.warning,
+              size: AppSizes.iconLarge,
+              color: context.textTertiary,
+            ),
+            const SizedBox(height: AppSizes.bigSpace),
+            Text(
+              'Etkinlikler Yüklenemedi',
+              style: context.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppSizes.smallSpace),
+            Text(
+              error.userMessage,
+              textAlign: TextAlign.center,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.textTertiary,
+              ),
+            ),
+            const SizedBox(height: AppSizes.largeSpace),
+            SkyButton(text: 'Tekrar Dene', onPressed: onRetry),
+          ],
+        ),
+      ),
     );
   }
 

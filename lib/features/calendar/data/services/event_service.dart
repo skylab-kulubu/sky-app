@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:sky_app/core/services/api_client.dart';
+import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 
 class EventService {
@@ -9,6 +11,9 @@ class EventService {
   /// header elle kurulmuyor.
   final Dio _dio = ApiClient.instance.dio;
 
+  /// Sunucuda henüz etkinlik yokken geliştirme ekranlarının boş kalmaması
+  /// için örnek veri. Yalnızca debug'da devreye giriyor: kullanıcı release
+  /// derlemesinde hiçbir koşulda sahte etkinlik görmemeli.
   static final List<EventModel> mockEvents = [
     EventModel(
       id: 'mock-event-1',
@@ -82,45 +87,68 @@ class EventService {
 
   Future<List<EventModel>> fetchEvents() async {
     final events = await _fetchEvents('/api/events');
-    return events.isEmpty ? mockEvents : events;
+    if (events.isEmpty && kDebugMode) return mockEvents;
+    return events;
   }
 
   Future<List<EventModel>> fetchActiveEvents() async {
     final events = await _fetchEvents('/api/events/active');
-    if (events.isEmpty) {
+    if (events.isEmpty && kDebugMode) {
       return mockEvents.where((e) => e.active).toList();
     }
     return events;
   }
 
+  /// Hatayı yutmuyor.
+  ///
+  /// Eskiden her hata boş listeye dönüşüyordu; çağıran "gerçekten etkinlik
+  /// yok" ile "yüklenemedi" arasında ayrım yapamıyor ve sessizce mock veriye
+  /// düşüyordu. Artık [ApiException] fırlatıyor, ayrımı çağıran yapıyor.
   Future<List<EventModel>> _fetchEvents(String path) async {
+    final Response<dynamic> response;
     try {
-      final response = await _dio.get<dynamic>(path);
-      dynamic rawData = response.data;
-      if (rawData is String) {
-        rawData = jsonDecode(rawData);
-      }
-
-      if (rawData is! Map<String, dynamic>) {
-        return [];
-      }
-
-      final data = rawData['data'];
-      if (data is! List) {
-        return [];
-      }
-
-      return data
-          .whereType<Map<String, dynamic>>()
-          .map(EventModel.fromJson)
-          .toList(growable: false);
+      response = await _dio.get<dynamic>(path);
     } catch (e) {
-      return [];
+      throw ApiException.from(e);
     }
+
+    dynamic rawData = response.data;
+    if (rawData is String) {
+      try {
+        rawData = jsonDecode(rawData);
+      } catch (_) {
+        throw const ApiException(
+          ApiErrorType.server,
+          message: 'Yanıt çözümlenemedi',
+        );
+      }
+    }
+
+    if (rawData is! Map<String, dynamic>) {
+      throw const ApiException(
+        ApiErrorType.server,
+        message: 'Beklenmeyen yanıt gövdesi',
+      );
+    }
+
+    final data = rawData['data'];
+    if (data is! List) {
+      throw const ApiException(
+        ApiErrorType.server,
+        message: 'Yanıtta etkinlik listesi yok',
+      );
+    }
+
+    return data
+        .whereType<Map<String, dynamic>>()
+        .map(EventModel.fromJson)
+        .toList(growable: false);
   }
 
   Future<bool> joinEvent(String eventId) async {
-    if (eventId.startsWith('mock-')) {
+    // Örnek etkinlikler yalnızca debug'da listelendiği için kısayol da
+    // debug'a bağlı; release'de sahte başarı dönme ihtimali kalmıyor.
+    if (kDebugMode && eventId.startsWith('mock-')) {
       await Future.delayed(const Duration(milliseconds: 600));
       return true;
     }
