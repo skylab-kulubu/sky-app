@@ -2,25 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sky_app/core/router/router_manager.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
-import 'package:sky_app/features/auth/data/models/user.dart';
 
 class FakeUserProvider extends UserProvider {
-  bool _fakeIsInitialized = false;
-  User? _fakeUser;
+  AuthStatus _fakeStatus = AuthStatus.loading;
 
   @override
-  bool get isInitialized => _fakeIsInitialized;
+  AuthStatus get status => _fakeStatus;
 
-  @override
-  User? get user => _fakeUser;
-
-  void setInitialized(bool value) {
-    _fakeIsInitialized = value;
-    notifyListeners();
-  }
-
-  void setUser(User? value) {
-    _fakeUser = value;
+  void setStatus(AuthStatus value) {
+    _fakeStatus = value;
     notifyListeners();
   }
 }
@@ -43,67 +33,73 @@ void main() {
       provider = FakeUserProvider();
     });
 
-    test('redirects to / when not initialized (except when already on /)', () {
-      provider.setInitialized(false);
-
-      // Not on splash -> redirects to splash
-      var state = MockGoRouterState('/home');
-      expect(RouterManager.redirectLogic(provider, state), '/');
-
-      // Already on splash -> no redirect
-      state = MockGoRouterState('/');
-      expect(RouterManager.redirectLogic(provider, state), isNull);
-    });
-
-    test('redirects to /auth when initialized but not logged in', () {
-      provider.setInitialized(true);
-      provider.setUser(null);
-
-      // Accessing a protected route
-      var state = MockGoRouterState('/home');
-      expect(RouterManager.redirectLogic(provider, state), '/auth');
-
-      // Accessing splash route
-      state = MockGoRouterState('/');
-      expect(RouterManager.redirectLogic(provider, state), '/auth');
-
-      // Accessing auth route -> no redirect
-      state = MockGoRouterState('/auth');
-      expect(RouterManager.redirectLogic(provider, state), isNull);
-    });
-
     test(
-      'redirects to /home when logged in and trying to access / or /auth',
+      'oturum kontrolü sürerken splash dışındaki her yol splash e döner',
       () {
-        provider.setInitialized(true);
-        provider.setUser(
-          const User(
-            id: '1',
-            name: 'User',
-            givenName: '',
-            familyName: '',
-            email: '',
-            preferredUsername: '',
-            university: '',
-            department: '',
-            skyNumber: '',
-            emailVerified: true,
-            realmRoles: [],
-          ),
+        provider.setStatus(AuthStatus.loading);
+
+        expect(
+          RouterManager.redirectLogic(provider, MockGoRouterState('/home')),
+          '/',
         );
-
-        // Accessing splash route
-        var state = MockGoRouterState('/');
-        expect(RouterManager.redirectLogic(provider, state), '/home');
-
-        // Accessing auth route
-        state = MockGoRouterState('/auth');
-        expect(RouterManager.redirectLogic(provider, state), '/home');
-
-        // Accessing a protected route -> no redirect
-        state = MockGoRouterState('/profile');
-        expect(RouterManager.redirectLogic(provider, state), isNull);
+        expect(
+          RouterManager.redirectLogic(provider, MockGoRouterState('/')),
+          isNull,
+        );
       },
     );
+
+    test('oturum yokken /auth a yönlendirir', () {
+      provider.setStatus(AuthStatus.unauthenticated);
+
+      expect(
+        RouterManager.redirectLogic(provider, MockGoRouterState('/home')),
+        '/auth',
+      );
+      expect(
+        RouterManager.redirectLogic(provider, MockGoRouterState('/')),
+        '/auth',
+      );
+      expect(
+        RouterManager.redirectLogic(provider, MockGoRouterState('/auth')),
+        isNull,
+      );
+    });
+
+    test('oturum varken / ve /auth adresleri /home a düşer', () {
+      provider.setStatus(AuthStatus.authenticated);
+
+      expect(
+        RouterManager.redirectLogic(provider, MockGoRouterState('/')),
+        '/home',
+      );
+      expect(
+        RouterManager.redirectLogic(provider, MockGoRouterState('/auth')),
+        '/home',
+      );
+      expect(
+        RouterManager.redirectLogic(provider, MockGoRouterState('/profile')),
+        isNull,
+      );
+    });
+
+    // İşin can alıcı noktası: çevrimdışıyken kullanıcı giriş ekranına
+    // atılmamalı, kayıtlı oturumu duruyor.
+    test('çevrimdışıyken /auth a atmaz, splash te tutar', () {
+      provider.setStatus(AuthStatus.offline);
+
+      expect(
+        RouterManager.redirectLogic(provider, MockGoRouterState('/')),
+        isNull,
+      );
+      expect(
+        RouterManager.redirectLogic(provider, MockGoRouterState('/home')),
+        '/',
+      );
+      expect(
+        RouterManager.redirectLogic(provider, MockGoRouterState('/auth')),
+        '/',
+      );
+    });
   });
 }

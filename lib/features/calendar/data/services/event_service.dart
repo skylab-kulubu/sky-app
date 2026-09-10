@@ -1,18 +1,13 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
-import 'package:sky_app/features/auth/data/services/auth_service.dart';
+import 'package:sky_app/core/services/api_client.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 
 class EventService {
-  late AuthService _authService;
-  static const String _apiBaseUrl = 'https://api.yildizskylab.com';
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: _apiBaseUrl,
-      headers: const {'Accept': 'application/json'},
-    ),
-  );
+  /// Token, timeout ve 401 yenilemesi [ApiClient] tarafında; burada
+  /// header elle kurulmuyor.
+  final Dio _dio = ApiClient.instance.dio;
 
   static final List<EventModel> mockEvents = [
     EventModel(
@@ -130,17 +125,12 @@ class EventService {
       return true;
     }
 
-    _authService = AuthService();
-    final token = await _authService.getAccessToken();
     try {
-      await _dio.post(
-        '/api/events/$eventId/applications/me',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
+      await _dio.post<dynamic>('/api/events/$eventId/applications/me');
       return true;
     } catch (e) {
-      log('Error joining event: $e');
-      return true;
+      log('Etkinliğe katılma hatası: $e');
+      return false;
     }
   }
 }

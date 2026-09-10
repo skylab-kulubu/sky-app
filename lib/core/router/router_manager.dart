@@ -95,15 +95,23 @@ class RouterManager {
   );
 
   static String? redirectLogic(UserProvider userProvider, GoRouterState state) {
-    final bool isInitialized = userProvider.isInitialized;
-    final bool isLoggedIn = userProvider.user != null;
     final bool isAuthRoute = state.matchedLocation == '/auth';
     final bool isSplashRoute = state.matchedLocation == '/';
 
-    if (!isInitialized) return isSplashRoute ? null : '/';
-    if (!isLoggedIn && !isAuthRoute) return '/auth';
-    if (isLoggedIn && (isAuthRoute || isSplashRoute)) return '/home';
+    switch (userProvider.status) {
+      // Oturum kontrolü sürüyor ya da sunucuya ulaşılamıyor; ikisinde de
+      // splash'te kalınıyor. Çevrimdışıyken `/auth`'a atmak, aslında geçerli
+      // olabilecek oturumu kaybettirmek olurdu — splash tekrar denemeyi
+      // sunuyor.
+      case AuthStatus.loading:
+      case AuthStatus.offline:
+        return isSplashRoute ? null : '/';
 
-    return null;
+      case AuthStatus.unauthenticated:
+        return isAuthRoute ? null : '/auth';
+
+      case AuthStatus.authenticated:
+        return isAuthRoute || isSplashRoute ? '/home' : null;
+    }
   }
 }
