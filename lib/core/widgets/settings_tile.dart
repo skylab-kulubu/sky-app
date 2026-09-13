@@ -6,7 +6,10 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/icon_circle.dart';
 
-/// Ayarlar sayfasındaki tek satır: dolu renkli ikon dairesi + başlık + sağ ikon.
+/// Liste satırı: dolu renkli ikon dairesi + başlık (+ açıklama) + sağ ikon.
+///
+/// Ayarlar, iletişim, görünüm seçimi ve kulüp menüsü aynı satırı kullanıyor;
+/// hepsi aynı dilde okunsun diye tek yerde.
 class SettingsTile extends StatelessWidget {
   const SettingsTile({
     super.key,
@@ -18,6 +21,7 @@ class SettingsTile extends StatelessWidget {
     this.trailingIconColor,
     this.titleColor,
     this.value,
+    this.subtitle,
   });
 
   /// [AppIcons] içindeki ikon adı.
@@ -37,6 +41,9 @@ class SettingsTile extends StatelessWidget {
   /// eylemlerde vurgulamak için.
   final Color? titleColor;
 
+  /// Başlığın altındaki tek satırlık soluk açıklama (kulüp menüsü).
+  final String? subtitle;
+
   /// Ayarın güncel değeri; sağ ikondan önce soluk renkte yazılır.
   final String? value;
 
@@ -52,15 +59,7 @@ class SettingsTile extends StatelessWidget {
             children: [
               IconCircle(icon: icon, color: iconColor),
               const SizedBox(width: AppSizes.bigSpace),
-              Expanded(
-                child: Text(
-                  title,
-                  style: context.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w400,
-                    color: titleColor,
-                  ),
-                ),
-              ),
+              Expanded(child: _texts(context)),
               if (value != null) ...[
                 Text(
                   value!,
@@ -80,6 +79,34 @@ class SettingsTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _texts(BuildContext context) {
+    final title = Text(
+      this.title,
+      style: context.textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.w400,
+        color: titleColor,
+      ),
+    );
+
+    final subtitle = this.subtitle;
+    if (subtitle == null) return title;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        title,
+        Text(
+          subtitle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.textTheme.bodySmall?.copyWith(
+            color: context.textSecondary,
+          ),
+        ),
+      ],
     );
   }
 }

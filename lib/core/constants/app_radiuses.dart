@@ -11,7 +11,6 @@ class AppRadiuses {
   /// oturduğu için ondan küçük; eşit olsaydı iç köşe dıştakinden daha
   /// yuvarlak görünürdü.
   static const double innerTile = 12;
-  static const double iconBox = 12;
 
   /// SkyPass kartı ve hızlı eylem dairesi.
   static const double skyPassCard = 24;

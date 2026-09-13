@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
@@ -183,7 +182,7 @@ class AccountPage extends StatelessWidget {
       LinkItem(
         name: 'LinkedIn',
         description: '',
-        iconPath: AppAssets.link,
+        icon: AppIcons.linkedin,
         color: AppColors.blue,
         // Kayıt şemasız gelebiliyor; `Uri.parse` o hâlde bunu göreli yol
         // sayar ve webview boş açılır.

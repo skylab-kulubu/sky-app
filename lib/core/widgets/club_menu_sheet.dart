@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
@@ -6,21 +7,35 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/models/link_item.dart';
 import 'package:sky_app/core/services/links_service.dart';
 import 'package:sky_app/core/services/webview_service.dart';
-import 'package:sky_app/core/widgets/icon_box.dart';
+import 'package:sky_app/core/widgets/section_header.dart';
+import 'package:sky_app/core/widgets/settings_tile.dart';
+import 'package:sky_app/core/widgets/tile_group.dart';
 
 /// Home appbar'ındaki menü butonundan açılan kulüp menüsü.
 ///
-/// [LinksService.list] içindeki bağlantılar 3 sütunluk grid'de listelenir;
-/// hepsi webview'da açılır.
+/// [LinksService.groups] başlıklar altında, ayarlar sayfasıyla aynı satır
+/// düzeninde listeleniyor: ikon dairesi, ad ve ne işe yaradığını anlatan
+/// kısa açıklama. Bağlantılar tarayıcı sheet'inde açılıyor
+/// ([WebviewService.openLink]).
 class ClubMenuSheet extends StatelessWidget {
-  const ClubMenuSheet({super.key, required this.parentContext});
+  const ClubMenuSheet({
+    super.key,
+    required this.parentContext,
+    required this.scrollController,
+  });
 
   /// Sheet kapandıktan sonra yönlendirme için kullanılan, sheet'ten bağımsız
   /// context. Sheet'in kendi context'i pop sonrası geçersiz olur.
   final BuildContext parentContext;
 
-  static const int _columns = 3;
-  static const double _maxHeightFactor = 0.75;
+  /// [DraggableScrollableSheet]'in controller'ı; liste bununla kayıyor.
+  final ScrollController scrollController;
+
+  /// Liste uzun; sheet ekranın büyük kısmını kaplayıp içeride kayıyor.
+  static const double _maxHeightFactor = 0.92;
+
+  /// Sheet bu yüksekliğe kadar sürüklenince kapanıyor.
+  static const double _closeHeightFactor = 0.40;
 
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet<void>(
@@ -30,16 +45,28 @@ class ClubMenuSheet extends StatelessWidget {
         borderRadius: AppRadiuses.sheetBorderRadius,
       ),
       isScrollControlled: true,
-      builder: (_) => ClubMenuSheet(parentContext: context),
+      // Liste kayan bir alan olduğu için aşağı sürükleme kaydırmaya gidiyor
+      // ve sheet yalnızca tutma çubuğundan kapanabiliyordu.
+      // DraggableScrollableSheet, liste en üstteyken aşağı çekilen hareketi
+      // sheet'e aktarıyor; en küçük yüksekliğe inince sheet kapanıyor
+      // (`shouldCloseOnMinExtent`).
+      builder: (_) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: _maxHeightFactor,
+        maxChildSize: _maxHeightFactor,
+        minChildSize: _closeHeightFactor,
+        snap: true,
+        builder: (_, scrollController) => ClubMenuSheet(
+          parentContext: context,
+          scrollController: scrollController,
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.sizeOf(context).height * _maxHeightFactor,
-      ),
+    return SizedBox.expand(
       child: SafeArea(
         top: false,
         child: Padding(
@@ -56,7 +83,7 @@ class ClubMenuSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSizes.bigSpace),
-              Flexible(child: _grid(context)),
+              Expanded(child: _list(context)),
             ],
           ),
         ),
@@ -78,57 +105,38 @@ class ClubMenuSheet extends StatelessWidget {
     );
   }
 
-  Widget _grid(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
+  Widget _list(BuildContext sheetContext) {
+    const groups = LinksService.groups;
+
+    return ListView(
+      controller: scrollController,
       padding: EdgeInsets.zero,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: _columns,
-        mainAxisSpacing: AppSizes.bigSpace,
-        crossAxisSpacing: AppSizes.bigSpace,
-        childAspectRatio: 0.85,
-      ),
-      itemCount: LinksService.list.length,
-      itemBuilder: (_, index) => _item(context, LinksService.list[index]),
+      children: [
+        for (var i = 0; i < groups.length; i++) ...[
+          // İlk başlık, sheet başlığının hemen altında; kendi üst boşluğu
+          // araya ikinci bir boşluk ekliyordu.
+          SectionHeader(groups[i].title, isFirst: i == 0),
+          TileGroup(
+            children: [
+              for (final link in groups[i].links) _tile(sheetContext, link),
+            ],
+          ),
+        ],
+      ],
     );
   }
 
-  Widget _item(BuildContext sheetContext, LinkItem link) {
-    return Material(
-      // Uygulamanın genel deseni: siyah zemin üzerinde tile arka planlı kart.
-      color: sheetContext.tileColor,
-      borderRadius: BorderRadius.circular(AppRadiuses.tile),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () {
-          Navigator.pop(sheetContext);
-          WebviewService.openLink(parentContext, link);
-        },
-        child: Padding(
-          padding: AppPaddings.all6,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconBox(
-                icon: link.iconPath,
-                color: link.color,
-                size: AppSizes.iconBoxLarge,
-                padding: AppSizes.iconBoxLargePadding,
-              ),
-              const SizedBox(height: AppSizes.midSpace),
-              Text(
-                link.name,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: sheetContext.textTheme.labelMedium?.copyWith(
-                  color: sheetContext.textPrimary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+  Widget _tile(BuildContext sheetContext, LinkItem link) {
+    return SettingsTile(
+      icon: link.icon,
+      iconColor: link.color,
+      title: link.name,
+      subtitle: link.description,
+      trailingIcon: AppIcons.externalLink,
+      onTap: () {
+        Navigator.pop(sheetContext);
+        WebviewService.openLink(parentContext, link);
+      },
     );
   }
 }

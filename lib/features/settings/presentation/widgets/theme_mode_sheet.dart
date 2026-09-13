@@ -8,7 +8,7 @@ import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/theme/theme_provider.dart';
 import 'package:sky_app/core/widgets/tile_group.dart';
-import 'package:sky_app/features/settings/presentation/widgets/settings_tile.dart';
+import 'package:sky_app/core/widgets/settings_tile.dart';
 
 /// Görünüm tercihini seçtiren bottom sheet: Sistem / Açık / Koyu.
 class ThemeModeSheet extends StatelessWidget {

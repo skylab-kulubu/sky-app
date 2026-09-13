@@ -16,7 +16,7 @@ import 'package:sky_app/core/widgets/tile_group.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/core/theme/theme_provider.dart';
 import 'package:sky_app/features/settings/presentation/widgets/account_tile.dart';
-import 'package:sky_app/features/settings/presentation/widgets/settings_tile.dart';
+import 'package:sky_app/core/widgets/settings_tile.dart';
 import 'package:sky_app/features/settings/presentation/widgets/theme_mode_sheet.dart';
 
 part 'settings_pagemodel.dart';

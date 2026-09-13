@@ -4,10 +4,6 @@ class AppSizes {
   static const icon = 26.0;
   static const iconLarge = 40.0;
 
-  /// Menü grid'indeki ikon kutusunun kenar uzunluğu ve iç boşluğu.
-  static const iconBoxLarge = 52.0;
-  static const iconBoxLargePadding = 13.0;
-
   /// Profildeki hızlı eylem dairesi ve appbar avatarı.
   static const quickActionCircle = 56.0;
 

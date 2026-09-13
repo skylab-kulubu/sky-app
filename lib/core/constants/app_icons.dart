@@ -87,5 +87,16 @@ class AppIcons {
 
   // External links
   static const String browser = 'global';
+
+  // Kulüp menüsü (LinksService)
+  static const String campusMap = 'map';
+  static const String game = 'gamepad';
+  static const String cloud = 'cloud';
+  static const String shortLink = 'link';
+  static const String form = 'clipboardText';
+  static const String stand = 'shop';
+  static const String server = 'server';
+  static const String room = 'arrowDoorIn';
+  static const String securityArticles = 'shieldSecurity';
   static const String externalLink = 'arrowRightUp';
 }

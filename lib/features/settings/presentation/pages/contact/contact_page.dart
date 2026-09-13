@@ -8,7 +8,7 @@ import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/section_header.dart';
 import 'package:sky_app/core/widgets/tile_group.dart';
-import 'package:sky_app/features/settings/presentation/widgets/settings_tile.dart';
+import 'package:sky_app/core/widgets/settings_tile.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 part 'contact_pagemodel.dart';

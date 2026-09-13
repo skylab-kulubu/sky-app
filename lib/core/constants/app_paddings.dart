@@ -6,8 +6,6 @@ class AppPaddings {
   static const mainPaddingVertical = EdgeInsets.symmetric(vertical: 16);
   static const newsTile = EdgeInsets.symmetric(horizontal: 16, vertical: 8);
 
-  static const all6 = EdgeInsets.all(6);
-
   static const horizontal8 = EdgeInsets.symmetric(horizontal: 8);
   static const horizontal16Vertical8 = EdgeInsets.symmetric(
     horizontal: 16,

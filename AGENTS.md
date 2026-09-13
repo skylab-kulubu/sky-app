@@ -61,7 +61,7 @@ lib/
 │   ├── services/             # links_service.dart, webview_service.dart
 │   ├── theme/                # theme.dart (light/dark), theme_provider.dart
 │   └── widgets/              # AppIcon, AppBarActions, NavItem, UserAvatar, CoverImage, BottomScrim, ColorGlow,
-│                             # SkyButton, SkyTextfield, IconBox, IconCircle, TileGroup, SectionHeader, ClubMenuSheet ...
+│                             # SkyButton, IconCircle, TileGroup, SectionHeader, SettingsTile, ClubMenuSheet ...
 └── features/<name>/
     ├── data/{models,services}
     └── presentation/{pages,widgets,providers}
