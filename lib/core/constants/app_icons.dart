@@ -60,6 +60,11 @@ class AppIcons {
   static const String medal = 'medalStar';
   static const String university = 'buildings';
   static const String email = 'sms';
+  static const String bug = 'bug';
+
+  // Marka. LinkedIn Reicon'da yok, `AppCustomIcons` içinde.
+  static const String instagram = 'instagram';
+  static const String linkedin = 'linkedin';
 
   // Görünüm / tema
   static const String appearance = 'palette';
@@ -74,6 +79,7 @@ class AppIcons {
   static const String permissions = 'shieldTick';
   static const String support = 'envelope';
   static const String logout = 'logout6';
+  static const String phoneChat = 'phoneChat';
 
   // Hata durumları
   static const String wifiOff = 'wifiOff';

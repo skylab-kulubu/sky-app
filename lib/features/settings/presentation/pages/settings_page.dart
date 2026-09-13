@@ -77,9 +77,9 @@ class _SettingsPageState extends SettingsPagemodel {
           TileGroup(
             children: [
               SettingsTile(
-                icon: AppIcons.support,
+                icon: AppIcons.phoneChat,
                 iconColor: AppColors.secondaryBlue,
-                title: 'Destek ile İletişime Geç',
+                title: 'İletişim',
                 onTap: onSupportTap,
               ),
               SettingsTile(

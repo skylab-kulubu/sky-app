@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reicon_flutter/reicon_flutter.dart';
+import 'package:sky_app/core/constants/app_custom_icons.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 
@@ -35,7 +36,9 @@ class AppIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pathData = (filled ? Reicon.filled : Reicon.outline)[name];
+    final pathData =
+        (filled ? Reicon.filled : Reicon.outline)[name] ??
+        (filled ? AppCustomIcons.filled : AppCustomIcons.outline)[name];
 
     // Ad pakette yoksa layout'u bozmamak için ikon boyutunda boşluk bırakılır.
     if (pathData == null) {

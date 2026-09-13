@@ -168,6 +168,8 @@ grep -o "^  '[a-zA-Z0-9]*':" ~/.pub-cache/hosted/pub.dev/reicon_flutter-*/lib/sr
 
 Names are camelCase: `info-square` → `infoSquare`.
 
+**An icon Reicon does not have** (brand logos such as LinkedIn) goes into `core/constants/app_custom_icons.dart` in the same format — raw SVG content for a 24×24 `viewBox`, colored with `currentColor`. `AppIcon` falls back to that map when a name is missing from Reicon, so the icon works everywhere a `String` name is accepted. Reicon leaves a 2-unit margin inside the box; logos drawn edge to edge are wrapped in `translate(2 2) scale(0.833333)` to match its visual size.
+
 ---
 
 ## The shell: AppBar and Navbar
