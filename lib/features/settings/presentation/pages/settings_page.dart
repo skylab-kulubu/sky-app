@@ -65,12 +65,12 @@ class _SettingsPageState extends SettingsPagemodel {
                 ),
                 onTap: onAppearanceTap,
               ),
-              SettingsTile(
-                icon: AppIcons.permissions,
-                iconColor: AppColors.green,
-                title: 'İzinler',
-                onTap: onPermissionsTap,
-              ),
+              // SettingsTile(
+              //   icon: AppIcons.permissions,
+              //   iconColor: AppColors.green,
+              //   title: 'İzinler',
+              //   onTap: onPermissionsTap,
+              // ),
             ],
           ),
           const SectionHeader('Kaynaklar'),

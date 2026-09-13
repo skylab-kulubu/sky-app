@@ -195,7 +195,7 @@ Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **not
 - The profile activities (`ActivityService`) are derived from `/api/tickets/me` (registration, or attendance if checked in) and `/api/competitors/me` (rank/score/winner). There is no activity-history endpoint and tickets carry no registration date, so a registration is dated by the event start.
 - The profile quick actions: **Sertifikalarım** goes to `/profile/certificates`, **Öğrenci Kartını Eşle** checks NFC availability and opens `NfcScanOverlay` (`NfcService`, ISO 14443-A only) — but the read UID is not sent anywhere yet. **QR'ı Göster** flips the SkyPass card through `SkyPassCardController` (same as tapping the card).
 - The QR is on the back of the SkyPass card (tap or **QR'ı Göster** flips it). It is drawn by `_MockQrPainter` — **a fake pattern**, not a real QR code.
-- The Notifications row in settings is hidden until push exists; the Permissions row is a no-op.
+- The Notifications and Permissions rows in settings are hidden: push does not exist yet (#45) and no runtime permission is requested anywhere, so a permissions page would be empty (#31). `permission_handler` is in `pubspec.yaml` but unused; on iOS (Swift Package Manager) it needs extra build configuration before it reports real statuses.
 
 **The `/team` tab shows `ComingSoonPage`.**
 
