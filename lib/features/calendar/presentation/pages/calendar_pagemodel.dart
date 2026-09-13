@@ -5,12 +5,12 @@ abstract class CalendarPagemodel extends State<CalendarPage> {
   /// de bu boşluk görüyor.
   static const double _cardGap = 16.0;
 
-  /// Liste henüz gösterilemiyor: ya splash'teki ilk yükleme bitmedi ya da
-  /// elde gösterilecek bir şey yokken yenileme sürüyor.
-  bool isBusy(EventProvider provider) {
-    if (!provider.isInitialized && !provider.isLoading) return true;
-    return provider.isLoading && provider.events.isEmpty;
-  }
+  /// Liste henüz gösterilemiyor: ilk yükleme bitmedi.
+  ///
+  /// Sonraki yüklemelerde ortada spinner yok; ekrandaki liste ya da mesaj
+  /// yerinde kalıyor, geri bildirimi aşağı çekme göstergesi veya "Tekrar
+  /// Dene" butonu veriyor.
+  bool isBusy(EventProvider provider) => !provider.isInitialized;
 
   void onRetry() => context.read<EventProvider>().refresh();
 }

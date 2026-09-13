@@ -8,6 +8,7 @@ import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
+import 'package:sky_app/core/widgets/events_refresh_indicator.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
@@ -43,30 +44,54 @@ class _CalendarPageState extends CalendarPagemodel {
   Widget build(BuildContext context) {
     return Consumer<EventProvider>(
       builder: (context, eventProvider, child) {
-        if (isBusy(eventProvider)) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator.adaptive()),
-          );
-        }
-
-        // Hata boş durumdan ayrı: "etkinlik yok" bilgi, "yüklenemedi" ise
-        // kullanıcının tekrar deneyebileceği bir arıza.
-        final error = eventProvider.error;
-        if (error != null) return Scaffold(body: _error(context, error));
-
-        if (eventProvider.events.isEmpty) {
-          return Scaffold(body: _empty(context));
-        }
-
-        final events = eventProvider.searchedEvents;
-        if (events.isEmpty) return Scaffold(body: _noResults(context));
-
-        return Scaffold(body: _list(events));
+        return Scaffold(
+          body: EventsRefreshIndicator(child: _body(context, eventProvider)),
+        );
       },
     );
   }
 
-  Widget _error(BuildContext context, ApiException error) {
+  /// Sayfanın durumu: ilk yükleme, hata, boş liste, aramada sonuç yok ya da
+  /// listenin kendisi.
+  ///
+  /// Hepsi tek bir [EventsRefreshIndicator]'ın altında kalıyor; yoksa
+  /// durum değiştiğinde gösterge ağaçtan kalkıp jest yarıda kesiliyor.
+  Widget _body(BuildContext context, EventProvider eventProvider) {
+    if (isBusy(eventProvider)) {
+      return _scrollable(
+        const Center(child: CircularProgressIndicator.adaptive()),
+      );
+    }
+
+    // Hata boş durumdan ayrı: "etkinlik yok" bilgi, "yüklenemedi" ise
+    // kullanıcının tekrar deneyebileceği bir arıza. Elde liste varken
+    // yenileme hatası sayfayı kaplamıyor, SnackBar'a düşüyor.
+    final error = eventProvider.error;
+    if (error != null && eventProvider.events.isEmpty) {
+      return _scrollable(_error(context, error, eventProvider.isLoading));
+    }
+
+    if (eventProvider.events.isEmpty) return _scrollable(_empty(context));
+
+    final events = eventProvider.searchedEvents;
+    if (events.isEmpty) return _scrollable(_noResults(context));
+
+    return _list(events);
+  }
+
+  /// Liste dışındaki durumları kaydırılabilir yapar.
+  ///
+  /// [RefreshIndicator] altında kaydırılabilir bir çocuk ister; `Center`
+  /// doğrudan verilirse liste boşken — aşağı çekmenin en çok gerektiği
+  /// durumda — jest hiç başlamıyor.
+  Widget _scrollable(Widget child) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [SliverFillRemaining(hasScrollBody: false, child: child)],
+    );
+  }
+
+  Widget _error(BuildContext context, ApiException error, bool isRetrying) {
     return Center(
       child: Padding(
         padding: AppPaddings.mainPaddingAll,
@@ -94,7 +119,11 @@ class _CalendarPageState extends CalendarPagemodel {
               ),
             ),
             const SizedBox(height: AppSizes.largeSpace),
-            SkyButton(text: 'Tekrar Dene', onPressed: onRetry),
+            SkyButton(
+              text: 'Tekrar Dene',
+              onPressed: onRetry,
+              isLoading: isRetrying,
+            ),
           ],
         ),
       ),
@@ -103,6 +132,8 @@ class _CalendarPageState extends CalendarPagemodel {
 
   Widget _list(List<EventModel> events) {
     return ListView.separated(
+      // Liste ekranı doldurmasa da aşağı çekilebilsin.
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: AppPaddings.mainPaddingAll,
       // Son kart yüzen navbar'ın altında kalmasın diye listeye bir öğe
       // fazla pay bırakılıyor.

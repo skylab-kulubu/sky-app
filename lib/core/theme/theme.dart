@@ -53,6 +53,12 @@ ThemeData lightTheme = ThemeData(
     backgroundColor: AppColors.lightTileHigh,
     foregroundColor: AppColors.lightTextPrimary,
   ),
+  progressIndicatorTheme: const ProgressIndicatorThemeData(
+    // Aşağı çekerek yenileme göstergesinin zemini. Varsayılanı canvasColor,
+    // yani sayfa zemininin ta kendisi; gösterge zeminde kayboluyor.
+    // Halkanın rengi ayrıca verilmiyor, varsayılan colorScheme.primary.
+    refreshBackgroundColor: AppColors.lightTileHigh,
+  ),
   textTheme: const TextTheme(
     bodyMedium: TextStyle(color: AppColors.lightTextPrimary),
   ),
@@ -106,6 +112,9 @@ ThemeData darkTheme = ThemeData(
     shape: CircleBorder(),
     backgroundColor: AppColors.darkTileHigh,
     foregroundColor: AppColors.darkTextPrimary,
+  ),
+  progressIndicatorTheme: const ProgressIndicatorThemeData(
+    refreshBackgroundColor: AppColors.darkTileHigh,
   ),
   textTheme: const TextTheme(
     bodyMedium: TextStyle(color: AppColors.darkTextSecondary),

@@ -8,4 +8,9 @@ abstract class HomePagemodel extends State<HomePage> {
   /// Ana sayfada gösterilen yaklaşan etkinlik sayısı; gerisi Etkinlikler
   /// sekmesinde.
   static const int _maxUpcomingEvents = 3;
+
+  /// Hata satırındaki "Tekrar Dene"nin yerini alan gösterge. Metin
+  /// boyutunda kalıyor ki satırın yüksekliği değişmesin.
+  static const double _retrySpinner = 16.0;
+  static const double _retrySpinnerStroke = 2.0;
 }
