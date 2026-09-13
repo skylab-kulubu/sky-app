@@ -15,6 +15,7 @@ class SettingsTile extends StatelessWidget {
     required this.title,
     required this.onTap,
     this.trailingIcon = AppIcons.chevronRight,
+    this.trailingIconColor,
     this.titleColor,
     this.value,
   });
@@ -25,8 +26,12 @@ class SettingsTile extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
 
-  /// Dışarı açılan satırlarda [AppIcons.externalLink] verilir.
-  final String trailingIcon;
+  /// Dışarı açılan satırlarda [AppIcons.externalLink] verilir. `null`
+  /// verilirse sağda ikon çizilmez (seçim listesinde seçili olmayan satır).
+  final String? trailingIcon;
+
+  /// Verilmezse soluk metin rengi; seçim işareti gibi vurgulu ikonlar için.
+  final Color? trailingIconColor;
 
   /// Verilmezse varsayılan metin rengi kullanılır; çıkış gibi yıkıcı
   /// eylemlerde vurgulamak için.
@@ -65,11 +70,12 @@ class SettingsTile extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSizes.midSpace),
               ],
-              AppIcon(
-                trailingIcon,
-                size: AppSizes.iconSmall,
-                color: context.textTertiary,
-              ),
+              if (trailingIcon case final trailingIcon?)
+                AppIcon(
+                  trailingIcon,
+                  size: AppSizes.iconSmall,
+                  color: trailingIconColor ?? context.textTertiary,
+                ),
             ],
           ),
         ),

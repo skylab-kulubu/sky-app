@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/theme/theme_provider.dart';
-import 'package:sky_app/core/widgets/app_icon.dart';
+import 'package:sky_app/core/widgets/tile_group.dart';
+import 'package:sky_app/features/settings/presentation/widgets/settings_tile.dart';
 
 /// Görünüm tercihini seçtiren bottom sheet: Sistem / Açık / Koyu.
 class ThemeModeSheet extends StatelessWidget {
@@ -37,8 +39,11 @@ class ThemeModeSheet extends StatelessWidget {
     ThemeMode.dark => AppIcons.themeDark,
   };
 
-  static String? _descriptionOf(ThemeMode mode) =>
-      mode == ThemeMode.system ? 'Cihaz ayarını izler' : null;
+  static Color _colorOf(ThemeMode mode) => switch (mode) {
+    ThemeMode.system => AppColors.secondaryBlue,
+    ThemeMode.light => AppColors.darkOrange,
+    ThemeMode.dark => AppColors.purple,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -60,76 +65,25 @@ class ThemeModeSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSizes.bigSpace),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppRadiuses.tile),
-              child: Container(
-                color: context.tileColor,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (final mode in ThemeMode.values) ...[
-                      if (mode != ThemeMode.values.first) _divider(context),
-                      _option(context, mode, mode == selected),
-                    ],
-                  ],
-                ),
-              ),
+            // Ayarlar sayfasındaki satırların aynısı; seçili olanın sağında
+            // ok yerine işaret var, diğerlerinde sağ taraf boş.
+            TileGroup(
+              children: [
+                for (final mode in ThemeMode.values)
+                  SettingsTile(
+                    icon: _iconOf(mode),
+                    iconColor: _colorOf(mode),
+                    title: labelOf(mode),
+                    trailingIcon: mode == selected ? AppIcons.check : null,
+                    trailingIconColor: context.accentColor,
+                    onTap: () {
+                      context.read<ThemeProvider>().setThemeMode(mode);
+                      Navigator.pop(context);
+                    },
+                  ),
+              ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _option(BuildContext context, ThemeMode mode, bool isSelected) {
-    final description = _descriptionOf(mode);
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          context.read<ThemeProvider>().setThemeMode(mode);
-          Navigator.pop(context);
-        },
-        child: Padding(
-          padding: AppPaddings.settingsTile,
-          child: Row(
-            children: [
-              AppIcon(
-                _iconOf(mode),
-                filled: isSelected,
-                size: AppSizes.iconMedium,
-                color: isSelected ? context.accentColor : context.textSecondary,
-              ),
-              const SizedBox(width: AppSizes.bigSpace),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      labelOf(mode),
-                      style: context.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    if (description != null)
-                      Text(
-                        description,
-                        style: context.textTheme.bodySmall?.copyWith(
-                          color: context.textSecondary,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              if (isSelected)
-                AppIcon(
-                  AppIcons.check,
-                  size: AppSizes.iconMedium,
-                  color: context.accentColor,
-                ),
-            ],
-          ),
         ),
       ),
     );
@@ -148,11 +102,4 @@ class ThemeModeSheet extends StatelessWidget {
       ),
     );
   }
-
-  Widget _divider(BuildContext context) => Divider(
-    height: 1,
-    color: context.dividerColor,
-    indent: 16,
-    endIndent: 16,
-  );
 }
