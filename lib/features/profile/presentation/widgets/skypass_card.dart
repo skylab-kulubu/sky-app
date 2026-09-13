@@ -11,17 +11,45 @@ import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/profile/presentation/widgets/tilt_builder.dart';
 
+/// [SkyPassCard]'ı karta dokunmadan çevirmek için.
+///
+/// Kart kendi animasyonunu yönettiği için dönüş durumu burada tutulmuyor;
+/// controller yalnızca "çevir" isteğini karta iletiyor.
+///
+/// Tek değil birden çok kart bağlanabiliyor: profildeki kart [Hero] içinde ve
+/// uçuş sırasında aynı widget'tan geçici bir kopya kuruluyor. Tek bağlantı
+/// olsaydı kopya asıl kartın yerini alır, uçuş bitip kopya kalkınca buton
+/// hiçbir kartı çeviremez hâle gelirdi.
+class SkyPassCardController {
+  final Set<VoidCallback> _flipCallbacks = {};
+
+  /// Kartı öbür yüzüne çevirir; dönüş sürerken çağrı yok sayılır.
+  void flip() {
+    for (final callback in _flipCallbacks.toList()) {
+      callback();
+    }
+  }
+
+  void _attach(VoidCallback onFlip) => _flipCallbacks.add(onFlip);
+
+  void _detach(VoidCallback onFlip) => _flipCallbacks.remove(onFlip);
+}
+
 /// Kulüp üyelik kartı. Banka kartı oranında (85.6 × 53.98 mm) çizilir.
 ///
 /// İki yüzü var: ön yüzde kimlik bilgileri, arkasında üyelik QR'ı. Karta
-/// dokunulunca Y ekseninde dönerek diğer yüze geçer.
+/// dokunulunca Y ekseninde dönerek diğer yüze geçer; [controller] verilirse
+/// kart dışarıdan da çevrilebilir (profildeki "QR'ı Göster").
 class SkyPassCard extends StatefulWidget {
   const SkyPassCard({
     super.key,
     required this.name,
     required this.skyNumber,
     required this.subtitle,
+    this.controller,
   });
+
+  final SkyPassCardController? controller;
 
   final String name;
   final String skyNumber;
@@ -59,7 +87,22 @@ class _SkyPassCardState extends State<SkyPassCard>
   );
 
   @override
+  void initState() {
+    super.initState();
+    widget.controller?._attach(_flip);
+  }
+
+  @override
+  void didUpdateWidget(SkyPassCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller == widget.controller) return;
+    oldWidget.controller?._detach(_flip);
+    widget.controller?._attach(_flip);
+  }
+
+  @override
   void dispose() {
+    widget.controller?._detach(_flip);
     _controller.dispose();
     super.dispose();
   }

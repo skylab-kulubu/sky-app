@@ -15,14 +15,22 @@ import 'package:sky_app/features/profile/presentation/widgets/nfc_scan_overlay.d
 import 'package:sky_app/features/profile/presentation/widgets/quick_action_button.dart';
 import 'package:sky_app/features/profile/presentation/widgets/skypass_card.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   /// Navbar'ın kartların üstüne binmemesi için liste sonuna bırakılan boşluk.
   static const double _bottomInset = 120;
 
   static const double _sectionSpacing = 32;
   static const double _titleSpacing = 12;
+
+  /// "QR'ı Göster" butonu kartı bununla çeviriyor.
+  final SkyPassCardController _cardController = SkyPassCardController();
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +57,7 @@ class ProfilePage extends StatelessWidget {
               name: user.name,
               skyNumber: user.skyNumber,
               subtitle: subtitle,
+              controller: _cardController,
             ),
           ),
         ),
@@ -63,8 +72,8 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  /// QR artık kartın arka yüzünde olduğu için "QR'ı Göster"in yeri
-  /// sertifikalara devredildi.
+  /// QR kartın arka yüzünde; "QR'ı Göster" ayrı bir sayfa açmıyor, kartı
+  /// çeviriyor. Karta dokunmakla aynı iş, keşfedilmesi kolay olsun diye.
   Widget _quickActions(BuildContext context, User user, String subtitle) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,8 +97,12 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
         ),
-        const Expanded(
-          child: QuickActionButton(icon: AppIcons.nfc, label: "NFC'yi Aç"),
+        Expanded(
+          child: QuickActionButton(
+            icon: AppIcons.qr,
+            label: "QR'ı Göster",
+            onTap: _cardController.flip,
+          ),
         ),
       ],
     );
