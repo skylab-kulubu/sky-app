@@ -57,7 +57,7 @@ class _NotificationPageState extends NotificationPagemodel {
           mainAxisSize: MainAxisSize.min,
           children: [
             AppIcon(
-              AppIcons.bell,
+              AppIcons.bellOff,
               size: AppSizes.iconLarge,
               color: context.textTertiary,
             ),

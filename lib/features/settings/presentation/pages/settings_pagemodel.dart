@@ -14,8 +14,6 @@ abstract class SettingsPagemodel extends State<SettingsPage> {
 
   void onAppearanceTap() => ThemeModeSheet.show(context);
 
-  // Sayfaları henüz yok; bağlanana kadar bir şey yapmıyorlar.
-  void onNotificationsTap() {}
-
+  // Sayfası henüz yok; bağlanana kadar bir şey yapmıyor.
   void onPermissionsTap() {}
 }

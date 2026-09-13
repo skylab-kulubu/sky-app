@@ -44,6 +44,7 @@ class AppIcons {
   static const String clock = 'clock';
   static const String location = 'location';
   static const String bell = 'bell';
+  static const String bellOff = 'bellOff';
   static const String announcement = 'bullhorn';
   static const String task = 'task';
   static const String project = 'category';

@@ -66,12 +66,6 @@ class _SettingsPageState extends SettingsPagemodel {
                 onTap: onAppearanceTap,
               ),
               SettingsTile(
-                icon: AppIcons.bell,
-                iconColor: AppColors.red,
-                title: 'Bildirimler',
-                onTap: onNotificationsTap,
-              ),
-              SettingsTile(
                 icon: AppIcons.permissions,
                 iconColor: AppColors.green,
                 title: 'İzinler',
