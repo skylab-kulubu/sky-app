@@ -25,6 +25,10 @@ class AppPaddings {
   /// `titleSpacing` (16) değeriyle simetrik olsun diye aynı.
   static const appBarActions = EdgeInsets.only(right: 16);
 
+  /// AppBar'daki arama kutusunun metin boşluğu. Dikeyde boşluk yok; metin
+  /// alanı kutunun içinde `Center` ile ortalanıyor.
+  static const appBarSearchField = EdgeInsets.symmetric(horizontal: 16);
+
   /// Yüzen navbar'ın ekran kenarlarına uzaklığı.
   static const navBar = EdgeInsets.only(
     left: 16,

@@ -46,6 +46,48 @@ class EventProvider extends ChangeNotifier {
     return null;
   }
 
+  String _searchQuery = '';
+
+  /// Etkinlikler sekmesindeki arama kutusunun metni; boşsa arama yok.
+  String get searchQuery => _searchQuery;
+
+  void setSearchQuery(String query) {
+    final trimmed = query.trim();
+    if (trimmed == _searchQuery) return;
+    _searchQuery = trimmed;
+    notifyListeners();
+  }
+
+  /// Aramaya uyan etkinlikler; arama yoksa listenin tamamı.
+  ///
+  /// Ad, konum ve tür satırında aranıyor. Açıklama dışarıda: uzun metinde
+  /// geçen tek bir kelime alakasız etkinlikleri de sonuca katıyordu.
+  List<EventModel> get searchedEvents {
+    if (_searchQuery.isEmpty) return _events;
+
+    final needle = _normalize(_searchQuery);
+    return _events
+        .where(
+          (event) => [
+            event.name,
+            event.location,
+            event.typeName,
+          ].any((field) => _normalize(field).contains(needle)),
+        )
+        .toList();
+  }
+
+  /// Büyük/küçük harf ve i/ı farkını yok sayar.
+  ///
+  /// Dart'ın `toLowerCase`'i Türkçeyi bilmiyor: "İ" noktalı bir "i̇"ye, "I"
+  /// ise "i"ye dönüşüyor. Klavyeden hangisinin yazılacağı da belli
+  /// olmadığından hepsi tek harfe indiriliyor.
+  static String _normalize(String value) => value
+      .replaceAll('İ', 'i')
+      .replaceAll('I', 'i')
+      .toLowerCase()
+      .replaceAll('ı', 'i');
+
   bool get isInitialized => _isInitialized;
   bool get isLoading => _isLoading;
 

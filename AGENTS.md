@@ -176,7 +176,9 @@ Names are camelCase: `info-square` → `infoSquare`.
 
 **The AppBar changes per tab.** `_AppBarConfig` holds the title, action icons and logo/avatar display for each tab. Actions are collected in the `AppBarActions` pill and it grows or shrinks with the icon count as the tab changes.
 
-Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **notification** (`AppIcons.bell` → `/notification`) and **settings** (`/settings`). The others — search on Events, shuffle and info on Team — are tappable but **do nothing**; their pages do not exist yet. To wire one up, add it to `_onActionTap` in `core/pages/shell_page.dart`.
+Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **notification** (`AppIcons.bell` → `/notification`), **settings** (`/settings`) and **search** on Events. The others — shuffle and info on Team — are tappable but **do nothing**; their pages do not exist yet. To wire one up, add it to `_onActionTap` in `core/pages/shell_page.dart`.
+
+**Search on Events:** a tab gets search by setting `searchHint` in its `_AppBarConfig`. The search button opens `AppBarSearchField` in the title slot (title fades out, the box grows leftward from the button, the keyboard opens when the growth ends) and the button turns into a close button. The open state, controller and focus node live in `shell_pagemodel.dart`; the text goes to `EventProvider.setSearchQuery` and `CalendarPage` lists `searchedEvents`. Closing or leaving the tab clears the query.
 
 **The navbar** is a floating pill; the selected tab reveals its label next to the icon. The expansion is animated with `Align.widthFactor` — since the label width depends on the text, no manual width math is done.
 

@@ -54,9 +54,14 @@ class _CalendarPageState extends CalendarPagemodel {
         final error = eventProvider.error;
         if (error != null) return Scaffold(body: _error(context, error));
 
-        final events = eventProvider.events;
+        if (eventProvider.events.isEmpty) {
+          return Scaffold(body: _empty(context));
+        }
 
-        return Scaffold(body: events.isEmpty ? _empty(context) : _list(events));
+        final events = eventProvider.searchedEvents;
+        if (events.isEmpty) return Scaffold(body: _noResults(context));
+
+        return Scaffold(body: _list(events));
       },
     );
   }
@@ -116,6 +121,29 @@ class _CalendarPageState extends CalendarPagemodel {
   }
 
   Widget _empty(BuildContext context) {
+    return _message(
+      context,
+      icon: AppIcons.calendar,
+      title: 'Etkinlik Yok',
+      message: 'Yeni bir etkinlik açıldığında burada görünecek.',
+    );
+  }
+
+  Widget _noResults(BuildContext context) {
+    return _message(
+      context,
+      icon: AppIcons.search,
+      title: 'Sonuç Yok',
+      message: 'Aramana uyan bir etkinlik bulunamadı.',
+    );
+  }
+
+  Widget _message(
+    BuildContext context, {
+    required String icon,
+    required String title,
+    required String message,
+  }) {
     return Center(
       child: Padding(
         padding: AppPaddings.mainPaddingAll,
@@ -123,20 +151,20 @@ class _CalendarPageState extends CalendarPagemodel {
           mainAxisSize: MainAxisSize.min,
           children: [
             AppIcon(
-              AppIcons.calendar,
+              icon,
               size: AppSizes.iconLarge,
               color: context.textTertiary,
             ),
             const SizedBox(height: AppSizes.bigSpace),
             Text(
-              'Etkinlik Yok',
+              title,
               style: context.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: AppSizes.smallSpace),
             Text(
-              'Yeni bir etkinlik açıldığında burada görünecek.',
+              message,
               textAlign: TextAlign.center,
               style: context.textTheme.bodyMedium?.copyWith(
                 color: context.textTertiary,

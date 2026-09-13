@@ -56,7 +56,9 @@ class AppBarActions extends StatelessWidget {
   /// İkon yokken 0 — aksi halde boş bir hap görünürdü.
   double get _width => widthFor(icons.length);
 
-  double get _height => _buttonSize + (_inset + _borderWidth) * 2;
+  /// Hap'ın dış yüksekliği; yanına hizalanan öğeler (arama kutusu) aynı
+  /// boyda dursun diye açık.
+  static const double height = _buttonSize + (_inset + _borderWidth) * 2;
 
   /// Kenarlık yalnızca açık temada görünür: orada hap ile beyaz zemin
   /// arasındaki fark çok az kalıyor ve sınırı belirginleştiriyor. Koyu temada
@@ -66,9 +68,18 @@ class AppBarActions extends StatelessWidget {
   /// sayfa kendi kontrastını kuruyor.
   Color _borderColor(BuildContext context) {
     if (backgroundColor != null) return Colors.transparent;
+    return themeBorderColor(context);
+  }
+
+  /// Tema zemininde duran hap'ın kenarlık rengi. Yanına konan ve hap'la
+  /// aynı dili konuşması gereken öğeler (arama kutusu) de bunu kullanıyor;
+  /// açık temada biri çizgili biri çizgisiz durunca uyumsuz görünüyorlardı.
+  static Color themeBorderColor(BuildContext context) {
     if (context.theme.brightness == Brightness.dark) return Colors.transparent;
     return context.dividerColor;
   }
+
+  static const double borderWidth = _borderWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +87,7 @@ class AppBarActions extends StatelessWidget {
       duration: _duration,
       curve: _curve,
       width: _width,
-      height: _height,
+      height: height,
       decoration: BoxDecoration(
         color: backgroundColor ?? context.tileColor,
         borderRadius: AppRadiuses.stadiumBorderRadius,

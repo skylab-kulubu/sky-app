@@ -10,25 +10,35 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
+import 'package:sky_app/core/widgets/app_bar_search_field.dart';
 import 'package:sky_app/core/widgets/bottom_scrim.dart';
 import 'package:sky_app/core/widgets/club_menu_sheet.dart';
 import 'package:sky_app/core/widgets/nav_item.dart';
 import 'package:sky_app/core/widgets/user_avatar.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 
-class ShellPage extends StatelessWidget {
+part 'shell_pagemodel.dart';
+
+class ShellPage extends StatefulWidget {
   const ShellPage({super.key, required this.child});
 
   final Widget child;
 
   @override
+  State<ShellPage> createState() => _ShellPageState();
+}
+
+class _ShellPageState extends ShellPagemodel {
+  @override
   Widget build(BuildContext context) {
     final currentLocation = GoRouterState.of(context).matchedLocation;
+    closeSearchIfLeftCalendar(currentLocation);
 
     return Scaffold(
       extendBody: true,
       appBar: appBar(context),
-      body: Stack(children: [child, const BottomScrim()]),
+      body: Stack(children: [widget.child, const BottomScrim()]),
       bottomNavigationBar: navBar(currentLocation, context),
     );
   }
@@ -107,12 +117,28 @@ class ShellPage extends StatelessWidget {
       GoRouterState.of(context).matchedLocation,
     );
 
+    final title = _appBarTitle(context, config);
+    final searchHint = config.searchHint;
+    // Sekme değiştiği karede arama henüz kapanmamış olabiliyor; kapatma bir
+    // sonraki kareye kalıyor. O karede diğer sekmede çarpı görünmesin diye.
+    final showSearch = searchHint != null && isSearchOpen;
+
     return AppBar(
       automaticallyImplyLeading: false,
-      title: _appBarTitle(context, config),
+      title: searchHint != null
+          ? AppBarSearchField(
+              title: title,
+              isOpen: isSearchOpen,
+              controller: searchController,
+              focusNode: searchFocusNode,
+              hintText: searchHint,
+            )
+          : title,
       actions: [
         AppBarActions(
-          icons: config.actions,
+          // Arama açıkken aynı yerde kapatma butonu duruyor; ikon sayısı
+          // değişmediği için hap genişlemiyor.
+          icons: showSearch ? const [AppIcons.close] : config.actions,
           onIconTap: (icon) => _onActionTap(context, icon),
         ),
       ],
@@ -124,6 +150,8 @@ class ShellPage extends StatelessWidget {
     if (icon == AppIcons.widget) ClubMenuSheet.show(context);
     if (icon == AppIcons.bell) context.push('/notification');
     if (icon == AppIcons.settings) context.push('/settings');
+    if (icon == AppIcons.search) openSearch();
+    if (icon == AppIcons.close) closeSearch();
   }
 
   Widget _appBarTitle(BuildContext context, _AppBarConfig config) {
@@ -167,6 +195,7 @@ class _AppBarConfig {
     required this.actions,
     this.showLogo = false,
     this.showAvatar = false,
+    this.searchHint,
   });
 
   final String title;
@@ -176,6 +205,10 @@ class _AppBarConfig {
   /// Başlığın soluna kullanıcı avatarı çizilir.
   final bool showAvatar;
 
+  /// Verilirse sekmede arama var: [AppIcons.search] butonu başlığın yerinde
+  /// bu ipucuyla bir arama kutusu açar.
+  final String? searchHint;
+
   static const _home = _AppBarConfig(
     title: 'Sky Lab',
     showLogo: true,
@@ -184,6 +217,7 @@ class _AppBarConfig {
   static const _calendar = _AppBarConfig(
     title: 'Etkinlikler',
     actions: [AppIcons.search],
+    searchHint: 'Etkinlik ara',
   );
 
   static const _team = _AppBarConfig(
