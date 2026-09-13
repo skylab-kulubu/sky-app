@@ -41,7 +41,7 @@ class SettingsTile extends StatelessWidget {
   /// eylemlerde vurgulamak için.
   final Color? titleColor;
 
-  /// Başlığın altındaki tek satırlık soluk açıklama (kulüp menüsü).
+  /// Başlığın altındaki en fazla iki satırlık soluk açıklama (kulüp menüsü).
   final String? subtitle;
 
   /// Ayarın güncel değeri; sağ ikondan önce soluk renkte yazılır.
@@ -100,7 +100,9 @@ class SettingsTile extends StatelessWidget {
         title,
         Text(
           subtitle,
-          maxLines: 1,
+          // İki satır: kulüp menüsündeki açıklamalar sitedeki metinlerle aynı
+          // ve bazıları tek satıra sığmıyor.
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: context.textTheme.bodySmall?.copyWith(
             color: context.textSecondary,

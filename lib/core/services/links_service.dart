@@ -73,15 +73,16 @@ class LinksService {
       links: [
         LinkItem(
           name: 'YıldızPlace',
-          description: 'YTÜ kampüs haritası ve mekan rehberi',
-          icon: AppIcons.campusMap,
+          description:
+              'SKY LAB interaktif piksel sanatı ve topluluk tuvali platformu',
+          icon: AppIcons.pixelArt,
           color: AppColors.red,
           url: 'https://place.yildizskylab.com',
         ),
         LinkItem(
           name: 'YTUGuessr',
-          description: 'YTÜ kampüsünü keşfet, konumu tahmin et',
-          icon: AppIcons.game,
+          description: 'YTÜ kampüsleri konum tahmin etme oyunu',
+          icon: AppIcons.location,
           color: AppColors.green,
           url: 'https://guessr.yildizskylab.com',
         ),

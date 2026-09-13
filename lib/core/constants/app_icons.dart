@@ -89,8 +89,7 @@ class AppIcons {
   static const String browser = 'global';
 
   // Kulüp menüsü (LinksService)
-  static const String campusMap = 'map';
-  static const String game = 'gamepad';
+  static const String pixelArt = 'brush';
   static const String cloud = 'cloud';
   static const String shortLink = 'link';
   static const String form = 'clipboardText';
