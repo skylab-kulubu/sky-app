@@ -67,7 +67,9 @@ class AppBarActions extends StatelessWidget {
   /// Zemini dışarıdan verilen hap'larda da çizgi yok; o durumda rengi veren
   /// sayfa kendi kontrastını kuruyor.
   Color _borderColor(BuildContext context) {
-    if (backgroundColor != null) return Colors.transparent;
+    // İkon yokken hap sıfır genişliğe iniyor ama kenarlık yine çiziliyor ve
+    // yerinde ince dikey bir çizgi kalıyor.
+    if (backgroundColor != null || icons.isEmpty) return Colors.transparent;
     return themeBorderColor(context);
   }
 

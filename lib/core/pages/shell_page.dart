@@ -220,10 +220,9 @@ class _AppBarConfig {
     searchHint: 'Etkinlik ara',
   );
 
-  static const _team = _AppBarConfig(
-    title: 'Ekip',
-    actions: [AppIcons.shuffle, AppIcons.infoSquare],
-  );
+  // Karıştır ve bilgi butonları, sekme hazır olana kadar gizli; yerleri
+  // AppIcons.shuffle ve AppIcons.infoSquare.
+  static const _team = _AppBarConfig(title: 'Ekip', actions: []);
   static const _profile = _AppBarConfig(
     title: 'Profil',
     showAvatar: true,
