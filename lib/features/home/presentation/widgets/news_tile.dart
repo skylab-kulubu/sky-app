@@ -5,7 +5,7 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/home/data/models/news_item.dart';
-import 'package:sky_app/features/home/presentation/pages/news_detail_page.dart';
+import 'package:sky_app/features/home/presentation/pages/news_detail/news_detail_page.dart';
 import 'package:sky_app/core/widgets/cover_image.dart';
 
 /// Haber listesindeki tek satır: solda kare görsel, sağda başlık ve iki
