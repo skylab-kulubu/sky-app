@@ -20,6 +20,9 @@ class EventProvider extends ChangeNotifier {
   ///
   /// Boş liste artık tek başına bir şey söylemiyor: "etkinlik yok" ile
   /// "yüklenemedi" ayrımını bu alan taşıyor.
+  ///
+  /// Yükleme sürerken önceki değerinde kalıyor: istek başında sıfırlansaydı
+  /// yenileme boyunca hata ekranı bir anlığına boş duruma dönüşürdü.
   ApiException? get error => _error;
   bool get hasError => _error != null;
 
@@ -91,32 +94,43 @@ class EventProvider extends ChangeNotifier {
   bool get isInitialized => _isInitialized;
   bool get isLoading => _isLoading;
 
+  /// Süren yükleme; aynı anda gelen çağrılar bunu paylaşır.
+  Future<void>? _inFlight;
+
   /// Etkinlikler elde yoksa bir kez yükler, varsa hiçbir şey yapmaz.
   ///
   /// Sayfalar açılışta koşulsuz çağırabilsin diye idempotent: arka arkaya
   /// gelen çağrılar tek bir yüklemeye karşılık gelir. Veriyi hangi sayfanın
   /// tetiklediği önemsiz; ilk gelen yükler, sonrakiler hazır bulur.
   Future<void> ensureLoaded() async {
-    if (_isInitialized || _isLoading) return;
+    if (_isInitialized) return;
     await _load();
   }
 
-  /// Elde ne olursa olsun yeniden yükler; hata ekranındaki "tekrar dene".
+  /// Elde ne olursa olsun yeniden yükler; aşağı çekerek yenileme ve hata
+  /// ekranındaki "tekrar dene".
   Future<void> refresh() => _load();
 
-  Future<void> _load() async {
-    if (_isLoading) return;
+  /// Süren bir yükleme varsa yenisini başlatmaz, onunkini döndürür.
+  ///
+  /// Erken `return` yerine future paylaşılıyor: aşağı çekerek yenilemede
+  /// çağıran isteğin bitmesini bekliyor, hemen tamamlanan boş bir future
+  /// göstergeyi veri gelmeden kapatıyordu.
+  Future<void> _load() => _inFlight ??= _run();
 
+  Future<void> _run() async {
     _isLoading = true;
-    _error = null;
     notifyListeners();
+
+    ApiException? error;
 
     try {
       _events = await _eventService.fetchEvents();
     } on ApiException catch (e) {
       log('Etkinlikler yüklenemedi: $e');
-      _events = [];
-      _error = e;
+      // Eldeki liste korunuyor: aşağı çekerek yenilemede ağ koptu diye
+      // ekrandaki etkinlikler kaybolmamalı. İlk yüklemede zaten boş.
+      error = e;
     }
 
     // Ayrı ele alınıyor: bu listeyi şu an hiçbir ekran okumuyor, bu yüzden
@@ -128,8 +142,10 @@ class EventProvider extends ChangeNotifier {
       _activeEvents = [];
     }
 
+    _error = error;
     _isLoading = false;
     _isInitialized = true;
+    _inFlight = null;
     notifyListeners();
   }
 

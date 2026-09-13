@@ -7,6 +7,7 @@ import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
+import 'package:sky_app/core/widgets/events_refresh_indicator.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/home/presentation/widgets/upcoming_event_tile.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
@@ -48,30 +49,34 @@ class _HomePageState extends HomePagemodel {
     }
 
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: AppPaddings.mainPaddingVertical,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: AppPaddings.mainPaddingHorizontal,
-              child: _sectionHeader(
-                context,
-                'Yaklaşan Etkinlikler',
-                onSeeAll: () => context.go('/calendar'),
+      body: EventsRefreshIndicator(
+        child: SingleChildScrollView(
+          // İçerik ekranı doldurmasa da aşağı çekilebilsin.
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: AppPaddings.mainPaddingVertical,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: AppPaddings.mainPaddingHorizontal,
+                child: _sectionHeader(
+                  context,
+                  'Yaklaşan Etkinlikler',
+                  onSeeAll: () => context.go('/calendar'),
+                ),
               ),
-            ),
-            const SizedBox(height: HomePagemodel._titleSpacing),
-            _upcomingEvents(context),
-            const SizedBox(height: HomePagemodel._sectionSpacing),
-            Padding(
-              padding: AppPaddings.mainPaddingHorizontal,
-              child: _sectionHeader(context, 'Haberler'),
-            ),
-            const SizedBox(height: HomePagemodel._titleSpacing),
-            _newsList(),
-            const SizedBox(height: AppSizes.navBarClearance),
-          ],
+              const SizedBox(height: HomePagemodel._titleSpacing),
+              _upcomingEvents(context),
+              const SizedBox(height: HomePagemodel._sectionSpacing),
+              Padding(
+                padding: AppPaddings.mainPaddingHorizontal,
+                child: _sectionHeader(context, 'Haberler'),
+              ),
+              const SizedBox(height: HomePagemodel._titleSpacing),
+              _newsList(),
+              const SizedBox(height: AppSizes.navBarClearance),
+            ],
+          ),
         ),
       ),
     );
@@ -94,8 +99,12 @@ class _HomePageState extends HomePagemodel {
   Widget _upcomingEvents(BuildContext context) {
     final provider = context.watch<EventProvider>();
 
+    // Hata yalnızca elde hiç etkinlik yokken gösteriliyor; liste doluyken
+    // yenileme hatası SnackBar'a düşüyor (bkz. EventsRefreshIndicator).
     final error = provider.error;
-    if (error != null) return _eventsError(context, error);
+    if (error != null && provider.events.isEmpty) {
+      return _eventsError(context, error, provider.isLoading);
+    }
 
     final events = provider.upcomingEvents;
 
@@ -161,7 +170,11 @@ class _HomePageState extends HomePagemodel {
 
   /// Etkinlikler yüklenemedi. Boş durumla aynı satır düzeninde duruyor ki
   /// haber başlıklarıyla hizası bozulmasın.
-  Widget _eventsError(BuildContext context, ApiException error) {
+  Widget _eventsError(
+    BuildContext context,
+    ApiException error,
+    bool isRetrying,
+  ) {
     return Padding(
       padding: AppPaddings.newsTile,
       child: Row(
@@ -196,19 +209,33 @@ class _HomePageState extends HomePagemodel {
                     height: 1.35,
                   ),
                 ),
-                GestureDetector(
-                  onTap: () => context.read<EventProvider>().refresh(),
-                  child: Padding(
+                // İstek sürerken metnin yerini gösterge alıyor; satır
+                // yerinde kaldığı için dokunmanın başka bir karşılığı yok.
+                if (isRetrying)
+                  const Padding(
                     padding: AppPaddings.buttonInternalPadding,
-                    child: Text(
-                      'Tekrar Dene',
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: context.accentColor,
-                        fontWeight: FontWeight.w600,
+                    child: SizedBox(
+                      width: HomePagemodel._retrySpinner,
+                      height: HomePagemodel._retrySpinner,
+                      child: CircularProgressIndicator.adaptive(
+                        strokeWidth: HomePagemodel._retrySpinnerStroke,
+                      ),
+                    ),
+                  )
+                else
+                  GestureDetector(
+                    onTap: () => context.read<EventProvider>().refresh(),
+                    child: Padding(
+                      padding: AppPaddings.buttonInternalPadding,
+                      child: Text(
+                        'Tekrar Dene',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: context.accentColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
