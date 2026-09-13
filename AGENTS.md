@@ -56,7 +56,7 @@ lib/
 │   ├── constants/            # AppColors, AppPaddings, AppRadiuses, AppSizes, AppAssets, AppIcons
 │   ├── extensions/           # context_extensions.dart — theme colors are read from here
 │   ├── models/               # link_item.dart
-│   ├── pages/                # shell_page.dart (appbar + navbar shell), webview_page.dart
+│   ├── pages/                # shell_page.dart (appbar + navbar shell), webview_page.dart (fallback only)
 │   ├── router/               # router_manager.dart (GoRouter)
 │   ├── services/             # links_service.dart, webview_service.dart
 │   ├── theme/                # theme.dart (light/dark), theme_provider.dart
@@ -96,6 +96,8 @@ Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `te
 - REST: `https://api.yildizskylab.com` — responses come wrapped in a `{success, message, data, ...}` envelope, `data` is unwrapped before use (see `EventService`).
 - Authentication: Keycloak, `https://e.yildizskylab.com/realms/e-skylab`, OAuth/PKCE via `flutter_appauth`. Tokens live in `flutter_secure_storage`.
 
+> **Club sites log in automatically through the shared browser cookie — keep both halves in sync.** Login and logout run in `SFSafariViewController` on iOS (`AuthService._externalUserAgent`; Android always uses the default browser's Custom Tabs), and `WebviewService.openLink` opens club sites in the same browser as a sheet (`flutter_custom_tabs`). The Keycloak cookie written at login is therefore visible to the sites. Do not move links back to `webview_flutter` (separate cookie jar, no SSO), and do not change the login agent on its own: on iOS `ASWebAuthenticationSession` writes to Safari, which `SFSafariViewController` cannot read, and a logout in a different store leaves the user logged in on the sites. `WebviewPage` (`/webview`) is only the fallback when no browser can be opened.
+
 > On logout `UserProvider.user` drops to null and pages rebuild in the same frame; the redirect to `/auth` only happens on the next frame. Pages that read the user must survive that single frame — writing `user!` blows up there (see `profile_page.dart`).
 
 ### Notable packages
@@ -111,6 +113,7 @@ Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `te
 | `sensors_plus`             | The tilt of the SkyPass card (`TiltBuilder`)                                                               |
 | `cached_network_image_ce`  | Network images (`CoverImage`)                                                                              |
 | `dio`                      | All REST calls                                                                                             |
+| `flutter_custom_tabs`      | Club sites open in a browser sheet (`WebviewService`): Partial Custom Tabs / `SFSafariViewController` page sheet. They share the Keycloak cookie with the login, so e-skylab sites log the user in automatically — **native dependency** |
 
 ---
 

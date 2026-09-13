@@ -80,6 +80,18 @@ class AuthService implements TokenProvider {
     return await launchUrl(authUri, webOnlyWindowName: '_self');
   }
 
+  /// Giriş ve çıkışın açıldığı tarayıcı. Yalnızca iOS'u etkiliyor; Android
+  /// her durumda varsayılan tarayıcının Custom Tabs'ını kullanıyor.
+  ///
+  /// iOS'ta varsayılan `ASWebAuthenticationSession` Keycloak çerezini
+  /// Safari'ye yazıyor. Kulüp siteleri ise uygulama içinde
+  /// `SFSafariViewController` ile açılıyor ve onun uygulamaya özel ayrı bir
+  /// deposu var; çerezi göremiyor, otomatik giriş olmuyordu. Giriş de aynı
+  /// yerde yapılınca siteler oturumu buluyor. Çıkış da aynı yerden yapılmalı,
+  /// yoksa çerez kalır ve siteler çıkış yapmış kullanıcıyı içeri alır.
+  static const ExternalUserAgent _externalUserAgent =
+      ExternalUserAgent.sfSafariViewController;
+
   Future<bool> _loginMobile() async {
     try {
       final AuthorizationTokenResponse result = await _appAuth
@@ -89,6 +101,7 @@ class AuthService implements TokenProvider {
               _redirectUrl,
               issuer: _issuer,
               scopes: _scopes,
+              externalUserAgent: _externalUserAgent,
             ),
           );
 
@@ -269,6 +282,7 @@ class AuthService implements TokenProvider {
             idTokenHint: idToken,
             postLogoutRedirectUrl: _redirectUrl,
             issuer: _issuer,
+            externalUserAgent: _externalUserAgent,
           ),
         );
       }
