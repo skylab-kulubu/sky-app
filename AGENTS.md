@@ -71,13 +71,14 @@ Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `te
 
 ### State management
 
-`provider` is used. Three global providers are registered in `main.dart`:
+`provider` is used. Four global providers are registered in `main.dart`:
 
 | Provider        | Responsibility                                                    |
 | --------------- | ----------------------------------------------------------------- |
 | `ThemeProvider` | `ThemeMode` (system/light/dark), persisted in `SharedPreferences` |
 | `UserProvider`  | Session and `User`; through `AuthService`                         |
 | `EventProvider` | Event lists; filled on splash                                     |
+| `ActivityProvider` | Profile activities; keyed by user id so a new login never sees the previous user's list |
 
 ### Routing
 
@@ -188,10 +189,11 @@ Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **not
 **Waiting to be wired up:**
 
 - `User.fromJson` and `mergeWith` are written but **never called**. They will be used once the profile API (`profilePictureUrl`, `faculty`, `linkedin` ...) is connected. The endpoint path is not known yet. **Important:** the API response carries no role information; `teams`/`teamsDisplay`/`isOrganizerFor` depend solely on `realmRoles` in the JWT. So the API object cannot replace the JWT, it is applied on top of it via `mergeWith`.
-- The news on the home page (`NewsService`), the notifications (`NotificationService`) and the profile activities (`ActivityService`) are mock data. `CertificateService.getCertificates()` is wired as a `Future` but returns an empty list until the endpoint exists.
+- The news on the home page (`NewsService`) is a static list of real club posts; there is no news endpoint. The notifications (`NotificationService`) list is empty until the backend adds notifications (issue #45). `CertificateService.getCertificates()` is wired as a `Future` but returns an empty list until the endpoint exists.
+- The profile activities (`ActivityService`) are derived from `/api/tickets/me` (registration, or attendance if checked in) and `/api/competitors/me` (rank/score/winner). There is no activity-history endpoint and tickets carry no registration date, so a registration is dated by the event start.
 - The profile quick actions: **Sertifikalarım** goes to `/profile/certificates`, **Öğrenci Kartını Eşle** checks NFC availability and opens `NfcScanOverlay` (`NfcService`, ISO 14443-A only) — but the read UID is not sent anywhere yet. **NFC'yi Aç** is still a no-op.
 - The QR is on the back of the SkyPass card (tap flips it), not a quick action. It is drawn by `_MockQrPainter` — **a fake pattern**, not a real QR code.
-- The Notifications / Permissions rows in settings are no-ops.
+- The Notifications row in settings is hidden until push exists; the Permissions row is a no-op.
 
 **The `/team` tab shows `ComingSoonPage`.**
 

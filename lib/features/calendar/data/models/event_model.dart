@@ -34,7 +34,13 @@ class EventModel {
       endDate: json['endDate'] as String? ?? '',
       formUrl: json['formUrl'] as String? ?? '',
       active: json['active'] as bool? ?? false,
-      typeName: json['type']['name'] as String? ?? '',
+      // Backend etkinlik türünü kaldırıp yerine sahip ekibi (`ownerTeam`)
+      // koydu. `json['type']['name']` artık null üzerinde çağrılıp listeyi
+      // tamamen düşürüyordu; eski yanıt biçimi de okunmaya devam ediyor.
+      typeName:
+          (json['type'] as Map<String, dynamic>?)?['name'] as String? ??
+          json['ownerTeam'] as String? ??
+          '',
     );
   }
 

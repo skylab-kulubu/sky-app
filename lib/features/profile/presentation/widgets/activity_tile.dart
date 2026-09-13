@@ -79,7 +79,11 @@ class ActivityTile extends StatelessWidget {
         const SizedBox(width: AppSizes.midSpace),
         Text(
           // Kısa biçim ("3g", "2ay"): uzun biçim başlığın yerini yiyor.
-          timeago.format(item.dateTime, locale: 'tr_short'),
+          // Kısa Türkçe biçimde gelecek ile geçmiş aynı yazılıyor ("3g");
+          // henüz başlamamış bir etkinliğe kayıt bu yüzden ayrı etiketleniyor.
+          item.dateTime.isAfter(DateTime.now())
+              ? 'yakında'
+              : timeago.format(item.dateTime, locale: 'tr_short'),
           style: context.textTheme.labelSmall?.copyWith(
             color: context.textTertiary,
           ),

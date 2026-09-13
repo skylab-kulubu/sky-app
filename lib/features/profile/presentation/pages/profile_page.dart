@@ -9,9 +9,8 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
-import 'package:sky_app/features/profile/data/services/activity_service.dart';
 import 'package:sky_app/features/profile/data/services/nfc_service.dart';
-import 'package:sky_app/features/profile/presentation/widgets/activity_tile.dart';
+import 'package:sky_app/features/profile/presentation/widgets/activity_list.dart';
 import 'package:sky_app/features/profile/presentation/widgets/nfc_scan_overlay.dart';
 import 'package:sky_app/features/profile/presentation/widgets/quick_action_button.dart';
 import 'package:sky_app/features/profile/presentation/widgets/skypass_card.dart';
@@ -58,7 +57,7 @@ class ProfilePage extends StatelessWidget {
         const SizedBox(height: _sectionSpacing),
         _sectionTitle(context, 'Aktivitelerim'),
         const SizedBox(height: _titleSpacing),
-        _activities(),
+        ActivityList(userId: user.id),
         const SizedBox(height: _bottomInset),
       ],
     );
@@ -183,16 +182,6 @@ class ProfilePage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _activities() {
-    final activities = ActivityService.list;
-
-    return Column(
-      children: [
-        for (final activity in activities) ActivityTile(item: activity),
-      ],
     );
   }
 
