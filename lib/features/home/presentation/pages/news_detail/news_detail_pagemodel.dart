@@ -3,7 +3,19 @@ part of 'news_detail_page.dart';
 abstract class NewsDetailPagemodel extends State<NewsDetailPage> {
   final ScrollController scrollController = ScrollController();
 
-  NewsItem get item => widget.item;
+  /// Provider'daki güncel hâl; düzenleme kaydedilince sayfa kendiliğinden
+  /// yenileniyor. Yalnızca `build` içinde okunmalı (`watch`).
+  NewsItem get item =>
+      context.watch<NewsProvider>().itemBySlug(widget.item.slug) ?? widget.item;
+
+  /// Olay işleyicilerinde okunacak güncel hâl (`watch` build dışında
+  /// kullanılamıyor).
+  NewsItem get _latest =>
+      context.read<NewsProvider>().itemBySlug(widget.item.slug) ?? widget.item;
+
+  /// Düzenleme yalnızca `cms:access` rolü olana.
+  bool get canEdit =>
+      context.watch<UserProvider>().user?.canManageNews ?? false;
 
   @override
   void dispose() {
@@ -11,10 +23,13 @@ abstract class NewsDetailPagemodel extends State<NewsDetailPage> {
     super.dispose();
   }
 
-  /// Haberi sistem paylaşım sayfasıyla paylaşır: başlık ve tam metin.
+  void onEditPressed() => NewsEditPage.open(context, item: _latest);
+
+  /// Haberi sistem paylaşım sayfasıyla paylaşır: başlık ve kısa metin.
   Future<void> onSharePressed() async {
+    final item = _latest;
     await SharePlus.instance.share(
-      ShareParams(text: '${item.title}\n\n${item.description}'),
+      ShareParams(text: '${item.title}\n\n${item.preview}'),
     );
   }
 }

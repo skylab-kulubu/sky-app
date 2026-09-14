@@ -16,6 +16,13 @@ class User {
   /// aynı kaynaktan okuyor ki gösterdiği ile backend'in izin verdiği aynı olsun.
   final List<String> groups;
 
+  /// SkyCMS client rolleri (`resource_access.skycms.roles`).
+  final List<String> cmsRoles;
+
+  /// Haber oluşturup düzenleyebilir mi. CMS bütün haber yazma işlerini
+  /// `cms:access` rolüne bağlıyor; kimin yazdığına bakmıyor.
+  bool get canManageNews => cmsRoles.contains('cms:access');
+
   // Yalnızca profil API'sinden gelen alanlar; JWT'de karşılıkları yok.
   final String schoolEmail;
   final String faculty;
@@ -41,6 +48,7 @@ class User {
     this.linkedin = '',
     this.ldapUser = false,
     this.groups = const [],
+    this.cmsRoles = const [],
   });
 
   factory User.fromJwt(Map<String, dynamic> payload) {
@@ -57,6 +65,9 @@ class User {
       emailVerified: payload['email_verified'] ?? false,
       realmRoles: List<String>.from(payload['realm_access']?['roles'] ?? []),
       groups: List<String>.from(payload['groups'] ?? []),
+      cmsRoles: List<String>.from(
+        payload['resource_access']?['skycms']?['roles'] ?? [],
+      ),
     );
   }
 
@@ -111,6 +122,7 @@ class User {
       emailVerified: emailVerified,
       realmRoles: realmRoles,
       groups: groups,
+      cmsRoles: cmsRoles,
       schoolEmail: pick(profile.schoolEmail, schoolEmail),
       faculty: pick(profile.faculty, faculty),
       profilePictureUrl: pick(profile.profilePictureUrl, profilePictureUrl),

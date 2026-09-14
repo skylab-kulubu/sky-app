@@ -6,6 +6,7 @@ import 'package:sky_app/features/auth/data/models/user.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/home/presentation/pages/home_page.dart';
+import 'package:sky_app/features/home/presentation/providers/news_provider.dart';
 import 'package:sky_app/features/home/presentation/widgets/upcoming_event_tile.dart';
 
 import '../../../../helpers/fake_event_provider.dart';
@@ -18,6 +19,15 @@ class _FakeUserProvider extends UserProvider {
   User get user => User.fromJwt(const {});
 }
 
+/// Haberler bu testlerin konusu değil; ağa gitmeden boş ve yüklenmiş.
+class _FakeNewsProvider extends NewsProvider {
+  @override
+  bool get isInitialized => true;
+
+  @override
+  Future<void> ensureLoaded() async {}
+}
+
 Future<void> _pumpPage(WidgetTester tester, FakeEventProvider fake) async {
   await tester.pumpWidget(
     MultiProvider(
@@ -25,6 +35,9 @@ Future<void> _pumpPage(WidgetTester tester, FakeEventProvider fake) async {
         ChangeNotifierProvider<EventProvider>.value(value: fake),
         ChangeNotifierProvider<UserProvider>(
           create: (_) => _FakeUserProvider(),
+        ),
+        ChangeNotifierProvider<NewsProvider>(
+          create: (_) => _FakeNewsProvider(),
         ),
       ],
       child: const MaterialApp(home: HomePage()),

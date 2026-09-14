@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
@@ -7,7 +8,10 @@ import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
 import 'package:sky_app/core/widgets/cover_image.dart';
+import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/home/data/models/news_item.dart';
+import 'package:sky_app/features/home/presentation/pages/news_edit/news_edit_page.dart';
+import 'package:sky_app/features/home/presentation/providers/news_provider.dart';
 
 part 'news_detail_pagemodel.dart';
 
@@ -108,8 +112,11 @@ class _NewsDetailPageState extends NewsDetailPagemodel {
               padding: AppPaddings.appBarActions,
               child: Center(
                 child: AppBarActions(
-                  icons: const [AppIcons.share],
-                  onIconTap: (_) => onSharePressed(),
+                  // Yetkisi olana paylaşın solunda düzenleme.
+                  icons: [if (canEdit) AppIcons.edit, AppIcons.share],
+                  onIconTap: (icon) => icon == AppIcons.edit
+                      ? onEditPressed()
+                      : onSharePressed(),
                 ),
               ),
             ),
@@ -119,14 +126,18 @@ class _NewsDetailPageState extends NewsDetailPagemodel {
     );
   }
 
-  double _coverSize(BuildContext context) =>
-      MediaQuery.sizeOf(context).width -
-      (AppPaddings.mainPaddingHorizontal.left * 2);
+  /// Kapak yalnızca haberin görseli varsa; yoksa yeri de ayrılmıyor, başlık
+  /// en üstten başlıyor.
+  double _coverSize(BuildContext context) => item.heroImage.isEmpty
+      ? 0
+      : MediaQuery.sizeOf(context).width -
+            (AppPaddings.mainPaddingHorizontal.left * 2);
 
   /// Kapak görseli kaydırıldıkça üst iki köşesi ve yeri sabit kalır, yüksekliği
   /// büzülerek küçülür.
   Widget _pinnedCover(BuildContext context) {
     final coverSize = _coverSize(context);
+    if (coverSize == 0) return const SizedBox.shrink();
 
     return Positioned(
       top: AppSizes.bigSpace,
@@ -138,7 +149,7 @@ class _NewsDetailPageState extends NewsDetailPagemodel {
         // verilmezse her karede baştan kuruluyor.
         child: ClipRRect(
           borderRadius: AppRadiuses.cardBorderRadius,
-          child: CoverImage(imageUrl: item.imageUrl),
+          child: CoverImage(imageUrl: item.heroImage),
         ),
         builder: (context, child) {
           final currentHeight = (coverSize - _scrollOffset).clamp(
@@ -162,7 +173,10 @@ class _NewsDetailPageState extends NewsDetailPagemodel {
     return ListView(
       controller: scrollController,
       padding: AppPaddings.mainPaddingHorizontal.copyWith(
-        top: AppSizes.bigSpace + _coverSize(context) + AppSizes.sectionSpace,
+        top: item.heroImage.isEmpty
+            ? AppSizes.bigSpace
+            // Kapağın altındaki boşluk üstündekiyle aynı (ekip detayı gibi).
+            : AppSizes.bigSpace + _coverSize(context) + AppSizes.bigSpace,
         // Altta buton yok; yalnızca sistem çubuğunun payı kadar boşluk.
         bottom: AppSizes.sectionSpace + MediaQuery.paddingOf(context).bottom,
       ),
@@ -186,7 +200,7 @@ class _NewsDetailPageState extends NewsDetailPagemodel {
 
   Widget _description(BuildContext context) {
     return Text(
-      item.description,
+      item.bodyText,
       style: context.textTheme.bodyLarge?.copyWith(
         color: context.textSecondary,
         height: _descriptionLineHeight,

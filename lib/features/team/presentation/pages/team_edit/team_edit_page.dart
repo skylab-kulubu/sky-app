@@ -18,7 +18,7 @@ import 'package:sky_app/core/widgets/tile_group.dart';
 import 'package:sky_app/features/team/data/models/team.dart';
 import 'package:sky_app/features/team/data/services/team_service.dart';
 import 'package:sky_app/features/team/presentation/providers/team_provider.dart';
-import 'package:sky_app/features/team/presentation/widgets/team_tag_editor.dart';
+import 'package:sky_app/core/widgets/sky_tag_editor.dart';
 import 'package:sky_app/core/widgets/sky_text_field.dart';
 import 'package:sky_app/features/team/presentation/widgets/team_work_sheet.dart';
 
@@ -98,7 +98,7 @@ class _TeamEditPageState extends TeamEditPagemodel {
         const SectionHeader('Alım'),
         _recruiting(context),
         const SectionHeader('Konular'),
-        TeamTagEditor(
+        SkyTagEditor(
           tags: topics,
           controller: topicInputController,
           hintText: 'Konu ekle (ör. Yapay Zeka)',
@@ -106,7 +106,7 @@ class _TeamEditPageState extends TeamEditPagemodel {
           onInputChanged: onFormChanged,
         ),
         const SectionHeader('Teknolojiler'),
-        TeamTagEditor(
+        SkyTagEditor(
           tags: stack,
           controller: stackInputController,
           hintText: 'Teknoloji ekle (ör. Flutter)',

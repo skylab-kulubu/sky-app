@@ -34,13 +34,14 @@ Flutter 3.47.1 (stable), Dart SDK `>=3.12.0`, Material 3. The font is set once i
 
 ```bash
 flutter analyze --no-pub     # after every change; must stay clean
+flutter test                 # after every change; must stay green
 dart format lib/             # before committing
 flutter pub get
 ```
 
 > Do not run `flutter build ios`. The iOS project is on Swift Package Manager; the build triggers CocoaPods and breaks that setup.
 
-The project has **no tests** (there is no `test/` folder). The user has stated before that they do not want tests; do not write tests unless asked.
+**Tests:** `test/` contains widget and unit tests (event provider, calendar/home pages, models, router, API errors) and CI runs format, analyze and `flutter test` on every PR. Run `flutter test` after changes and keep it green; when a page starts reading a new provider, add a fake of it to that page's test setup (see `test/helpers/`). Do not write new tests unless asked.
 
 ---
 
@@ -61,7 +62,7 @@ lib/
 │   ├── services/             # links_service.dart, webview_service.dart
 │   ├── theme/                # theme.dart (light/dark), theme_provider.dart
 │   └── widgets/              # AppIcon, AppBarActions, NavItem, UserAvatar, CoverImage, BottomScrim, ColorGlow,
-│                             # SkyButton, SkyTextField, IconCircle, TileGroup, SectionHeader, SettingsTile, ClubMenuSheet ...
+│                             # SkyButton, SkyTextField, SkyTagEditor, IconCircle, TileGroup, SectionHeader, SettingsTile, ClubMenuSheet ...
 └── features/<name>/
     ├── data/{models,services}
     └── presentation/{pages,widgets,providers}
@@ -199,7 +200,7 @@ Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **not
 **Waiting to be wired up:**
 
 - `User.fromJson` and `mergeWith` are written but **never called**. They will be used once the profile API (`profilePictureUrl`, `faculty`, `linkedin` ...) is connected. The endpoint path is not known yet. **Important:** the API response carries no role information; `teams`/`teamsDisplay`/`isOrganizerFor` depend solely on `realmRoles` in the JWT. So the API object cannot replace the JWT, it is applied on top of it via `mergeWith`.
-- The news on the home page (`NewsService`) is a static list of real club posts; there is no news endpoint. The notifications (`NotificationService`) list is empty until the backend adds notifications (issue #45). `CertificateService.getCertificates()` is wired as a `Future` but returns an empty list until the endpoint exists.
+- The news on the home page come from SkyCMS `News` (`NewsService`/`NewsProvider`, public read, not enveloped; slug is generated from the title and will be used for deep links #44). Users with the `skycms` client role `cms:access` (`User.canManageNews`) get a FAB on the home page and an edit button on the news detail; `NewsEditPage` posts/puts to CMS. No delete (CMS has no endpoint) and no image upload — only an image URL, because Super Skylab deletes media not attached to a record after 24h. The notifications (`NotificationService`) list is empty until the backend adds notifications (issue #45). `CertificateService.getCertificates()` is wired as a `Future` but returns an empty list until the endpoint exists.
 - The profile activities (`ActivityService`) are derived from `/api/tickets/me` (registration, or attendance if checked in) and `/api/competitors/me` (rank/score/winner). There is no activity-history endpoint and tickets carry no registration date, so a registration is dated by the event start.
 - The profile quick actions: **Sertifikalarım** goes to `/profile/certificates`, **Öğrenci Kartını Eşle** checks NFC availability and opens `NfcScanOverlay` (`NfcService`, ISO 14443-A only) — but the read UID is not sent anywhere yet. **QR'ı Göster** flips the SkyPass card through `SkyPassCardController` (same as tapping the card).
 - The QR is on the back of the SkyPass card (tap or **QR'ı Göster** flips it). It is drawn by `_MockQrPainter` — **a fake pattern**, not a real QR code.

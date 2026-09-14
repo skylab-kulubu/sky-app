@@ -70,8 +70,8 @@ abstract class TeamEditPagemodel extends State<TeamEditPage> {
     longDescription: longDescriptionController.text.trim(),
     // Alanda yazılı kalan metin de etiket sayılıyor; kullanıcı onaya
     // basmadan "Kaydet"e basarsa kaybolmasın.
-    topics: TeamTagEditor.withPending(topics, topicInputController.text),
-    stack: TeamTagEditor.withPending(stack, stackInputController.text),
+    topics: SkyTagEditor.withPending(topics, topicInputController.text),
+    stack: SkyTagEditor.withPending(stack, stackInputController.text),
     works: works,
     isRecruiting: isRecruiting,
   );

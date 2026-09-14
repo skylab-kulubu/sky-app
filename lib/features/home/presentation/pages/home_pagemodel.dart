@@ -9,6 +9,11 @@ abstract class HomePagemodel extends State<HomePage> {
   /// sekmesinde.
   static const int _maxUpcomingEvents = 3;
 
+  static const double _messageLineHeight = 1.35;
+
+  /// Haber oluşturma sayfasını açar; liste provider üzerinden güncelleniyor.
+  Future<void> onCreateNews() => NewsEditPage.open(context);
+
   /// Hata satırındaki "Tekrar Dene"nin yerini alan gösterge. Metin
   /// boyutunda kalıyor ki satırın yüksekliği değişmesin.
   static const double _retrySpinner = 16.0;

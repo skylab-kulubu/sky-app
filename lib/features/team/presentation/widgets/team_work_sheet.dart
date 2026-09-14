@@ -5,7 +5,7 @@ import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/features/team/data/models/team.dart';
-import 'package:sky_app/features/team/presentation/widgets/team_tag_editor.dart';
+import 'package:sky_app/core/widgets/sky_tag_editor.dart';
 import 'package:sky_app/core/widgets/sky_text_field.dart';
 
 /// Tek bir çalışmayı ekleyen ya da düzenleyen sheet. Kaydedince çalışmanın
@@ -64,7 +64,7 @@ class _TeamWorkSheetState extends State<TeamWorkSheet> {
         title: _title.text.trim(),
         description: _description.text.trim(),
         image: _image.text.trim(),
-        tags: TeamTagEditor.withPending(_tags, _tagInput.text),
+        tags: SkyTagEditor.withPending(_tags, _tagInput.text),
       ),
     );
   }
@@ -108,7 +108,7 @@ class _TeamWorkSheetState extends State<TeamWorkSheet> {
                 keyboardType: TextInputType.url,
               ),
               const SizedBox(height: AppSizes.bigSpace),
-              TeamTagEditor(
+              SkyTagEditor(
                 tags: _tags,
                 controller: _tagInput,
                 hintText: 'Etiket ekle',

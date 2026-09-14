@@ -17,7 +17,7 @@ Both files are the single source of truth; do not duplicate their content here.
 - **Write in Turkish.** Answers, in-code comments and user-facing strings are Turkish; identifiers stay English.
 - **Run `flutter analyze --no-pub` after every change** and leave it clean. A clean analyze means "it compiles", not "it looks right".
 - **The user does the visual verification.** If you changed anything visual, say explicitly that you did not verify it on screen and point out what to look at.
-- **No tests unless asked.** The project has no `test/` folder on purpose.
+- **Keep the existing tests green.** `test/` has widget and unit tests and CI runs them (`flutter test`). Run them after changes and update them when you change the code they cover (e.g. a page that starts reading a new provider needs it in the test setup). Do not add new tests unless asked.
 - **Do not add new dependencies or invent new patterns** — reuse what is in `core/constants` and `core/widgets` first.
 
 ## Permissions
@@ -28,7 +28,8 @@ Both files are the single source of truth; do not duplicate their content here.
 
 ```bash
 flutter analyze --no-pub
-dart format lib/
+dart format lib/ test/
+flutter test
 flutter pub get
 ```
 

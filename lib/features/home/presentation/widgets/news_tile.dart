@@ -68,7 +68,7 @@ class NewsTile extends StatelessWidget {
       child: SizedBox(
         width: AppSizes.thumbnail,
         height: AppSizes.thumbnail,
-        child: CoverImage(imageUrl: item.imageUrl),
+        child: CoverImage(imageUrl: item.heroImage),
       ),
     );
   }
@@ -89,7 +89,7 @@ class NewsTile extends StatelessWidget {
         ),
         const SizedBox(height: _titleSpacing),
         Text(
-          item.description,
+          item.preview,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: context.textTheme.bodyMedium?.copyWith(

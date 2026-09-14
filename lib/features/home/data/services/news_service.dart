@@ -1,36 +1,97 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:sky_app/core/services/api_client.dart';
+import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/features/home/data/models/news_item.dart';
 
+/// SkyCMS `News` koleksiyonu.
+///
+/// Okuma girişsiz. Yazma için token'da `skycms` client'ının `cms:access`
+/// rolü ve `skycms` audience'ı gerekiyor; bu rolü olan herkes bütün
+/// haberleri oluşturup düzenleyebiliyor. Silme endpoint'i yok.
+///
+/// Koleksiyon adı büyük harfle (`News`); yanıtlar `{data: ...}` zarfında
+/// değil.
 class NewsService {
-  static const List<NewsItem> list = [
-    NewsItem(
-      imageUrl: 'assets/images/yildizJam.jpeg',
-      title: 'YILDIZ JAM: Oyun Geliştirme Zirvesi',
-      description:
-          '''Yıldız Teknik Üniversitesi SKY LAB tarafından düzenlenen YILDIZ JAM, bu yıl da oyun geliştirme tutkunlarını bir araya getiriyor!
+  final Dio _dio = ApiClient.instance.dio;
 
-📍 YTÜ Davutpaşa Kampüsü
-📅 8-9-10 Mayıs
+  static const String _path = '/api/cms/collections/News';
+  static const int _pageLimit = 100;
 
-Etkinliğin ilk gününde, oyun geliştirme sektöründen uzman isimlerle bir araya gelerek ilham verici oturumlara katılma fırsatı yakalayacak; fuaye alanında yer alan stantlar, deneyim alanları ve Indie Oyun Alanı ile dolu dolu bir gün geçireceksiniz.
+  Future<List<NewsItem>> fetchNews() async {
+    final body = await _request(
+      () => _dio.get<dynamic>(_path, queryParameters: {'limit': _pageLimit}),
+    );
+    final items = body['items'];
+    if (items is! List) {
+      throw const ApiException(
+        ApiErrorType.server,
+        message: 'Yanıtta haber listesi yok',
+      );
+    }
+    return items
+        .whereType<Map<String, dynamic>>()
+        .map(NewsItem.fromJson)
+        .where((item) => item.slug.isNotEmpty && item.title.isNotEmpty)
+        .toList(growable: false);
+  }
 
-Zirvenin ardından başlayacak olan game jam süresince katılımcılar, etkinlik anında açıklanacak tema doğrultusunda ekipler halinde kendi oyunlarını geliştireceklerdir.
+  /// Tek haber, düzenleme için taze (sürüm numarası); token'lı istek CMS'te
+  /// önbelleğe alınmıyor.
+  Future<NewsItem> fetchNewsItem(String slug) async {
+    return NewsItem.fromJson(
+      await _request(() => _dio.get<dynamic>('$_path/$slug')),
+    );
+  }
 
-🎯 Ödüller ve yarışmaya dair detaylı bilgiler ilerleyen günlerde açıklanacaktır.''',
-    ),
-    NewsItem(
-      imageUrl: 'assets/images/algolab.jpeg',
-      title: 'ALGOLAB Ekip Alımları Açıldı',
-      description:
-          '''Algolab, algoritma ve rekabetçi programlama alanında kendini geliştirmek isteyenler için aktif bir çalışma topluluğudur.
+  /// Yeni haber; slug'ı CMS başlıktan üretiyor.
+  Future<NewsItem> createNews(NewsItem draft) async {
+    return NewsItem.fromJson(
+      await _request(
+        () => _dio.post<dynamic>(_path, data: {'data': draft.toCmsData()}),
+      ),
+    );
+  }
 
-Ekibimizde:
-* Algoritma bilgisini derinleştirmeye yönelik düzenli çalışmalar yapılır.
-* Problem çözme becerilerini geliştiren içerikler paylaşılır.
-* Haftalık düzenlenen AGC yarışmaları ile rekabetçi ortamda pratik kazanılır.
+  Future<NewsItem> updateNews(NewsItem item) async {
+    return NewsItem.fromJson(
+      await _request(
+        () => _dio.put<dynamic>(
+          '$_path/${item.slug}',
+          data: {'data': item.toCmsData(), 'version': item.version},
+        ),
+      ),
+    );
+  }
 
-Birlikte öğrenmeye, takım içinde gelişmeye ve algoritma konusunda kendini sürekli ileri taşımaya odaklanıyoruz.
+  Future<Map<String, dynamic>> _request(
+    Future<Response<dynamic>> Function() send,
+  ) async {
+    final Response<dynamic> response;
+    try {
+      response = await send();
+    } catch (e) {
+      throw ApiException.from(e);
+    }
 
-Merak eden, araştıran ve düzenli şekilde kendini geliştirmek isteyen ekip arkadaşları arıyoruz.''',
-    ),
-  ];
+    dynamic body = response.data;
+    if (body is String) {
+      try {
+        body = jsonDecode(body);
+      } catch (_) {
+        throw const ApiException(
+          ApiErrorType.server,
+          message: 'Yanıt çözümlenemedi',
+        );
+      }
+    }
+    if (body is! Map<String, dynamic>) {
+      throw const ApiException(
+        ApiErrorType.server,
+        message: 'Beklenmeyen yanıt gövdesi',
+      );
+    }
+    return body;
+  }
 }

@@ -14,8 +14,8 @@ import 'package:sky_app/core/widgets/sky_text_field.dart';
 /// henüz eklenmemiş metin, form kaydedilirken [withPending] ile listeye
 /// katılıyor. Yalnızca onay tuşuyla eklendiğinde yazılıp doğrudan
 /// "Kaydet"e basılan etiketler sessizce kayboluyordu.
-class TeamTagEditor extends StatelessWidget {
-  const TeamTagEditor({
+class SkyTagEditor extends StatelessWidget {
+  const SkyTagEditor({
     super.key,
     required this.tags,
     required this.controller,
