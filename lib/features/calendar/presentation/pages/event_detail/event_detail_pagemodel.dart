@@ -10,7 +10,32 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
   /// türetiliyor. Palet çözülene kadar boş, o sürede zemin düz taban rengi.
   List<Color> backdropTints = const [];
 
-  EventModel get event => widget.event;
+  /// Gösterilen etkinlik; düzenlenince yerinde güncelleniyor.
+  late EventModel event = widget.event;
+
+  /// Düzenleme butonu yalnızca yetkisi olana (etkinliğin ekibinde lider,
+  /// GECEKODU üyesi ya da YK/DK/ADMIN).
+  bool get canEdit =>
+      context.watch<UserProvider>().user?.canEditEvent(event.typeName) ?? false;
+
+  /// Düzenleme sayfasını açar; kaydedildiyse sayfayı yeni hâliyle yeniler,
+  /// silindiyse detaydan çıkar.
+  Future<void> onEditPressed() async {
+    final result = await EventCreatePage.edit(context, event);
+    if (result == null || !mounted) return;
+
+    if (result.deleted) {
+      final messenger = ScaffoldMessenger.of(context);
+      Navigator.of(context).pop();
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Etkinlik silindi.')),
+      );
+      return;
+    }
+
+    final updated = result.event;
+    if (updated != null) setState(() => event = updated);
+  }
 
   @override
   void initState() {

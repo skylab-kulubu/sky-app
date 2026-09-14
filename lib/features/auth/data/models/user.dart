@@ -11,6 +11,11 @@ class User {
   final bool emailVerified;
   final List<String> realmRoles;
 
+  /// Keycloak grup yolları (`/UYELER/ARGE/MOBILAB/LIDERLER`). Yalnızca
+  /// JWT'de var. Etkinlik yetkilerini OPA bunlardan hesaplıyor; uygulama da
+  /// aynı kaynaktan okuyor ki gösterdiği ile backend'in izin verdiği aynı olsun.
+  final List<String> groups;
+
   // Yalnızca profil API'sinden gelen alanlar; JWT'de karşılıkları yok.
   final String schoolEmail;
   final String faculty;
@@ -35,6 +40,7 @@ class User {
     this.profilePictureUrl = '',
     this.linkedin = '',
     this.ldapUser = false,
+    this.groups = const [],
   });
 
   factory User.fromJwt(Map<String, dynamic> payload) {
@@ -50,6 +56,7 @@ class User {
       skyNumber: payload['sky_number'] ?? '',
       emailVerified: payload['email_verified'] ?? false,
       realmRoles: List<String>.from(payload['realm_access']?['roles'] ?? []),
+      groups: List<String>.from(payload['groups'] ?? []),
     );
   }
 
@@ -103,6 +110,7 @@ class User {
       skyNumber: pick(profile.skyNumber, skyNumber),
       emailVerified: emailVerified,
       realmRoles: realmRoles,
+      groups: groups,
       schoolEmail: pick(profile.schoolEmail, schoolEmail),
       faculty: pick(profile.faculty, faculty),
       profilePictureUrl: pick(profile.profilePictureUrl, profilePictureUrl),
@@ -148,6 +156,67 @@ class User {
   }
 
   String get teamsDisplay => teams.isEmpty ? '' : teams.join(' • ');
+
+  /// Grup yollarının parçaları; `/UYELER/ARGE/MOBILAB/LIDERLER` →
+  /// `[UYELER, ARGE, MOBILAB, LIDERLER]`.
+  Iterable<List<String>> get _groupPaths => groups.map(
+    (path) => path.split('/').where((part) => part.isNotEmpty).toList(),
+  );
+
+  static const Set<String> _privilegedGroups = {'ADMIN', 'YK', 'DK'};
+  static const Set<String> _leaderSubgroups = {'LIDERLER', 'KOORDINATORLER'};
+
+  /// YK, DK ya da ADMIN grubunda (ya da alt gruplarında) mı. OPA'da bu
+  /// kullanıcılar her ekip adına etkinlik oluşturabiliyor.
+  bool get isPrivileged =>
+      _groupPaths.any((parts) => parts.any(_privilegedGroups.contains));
+
+  /// Lideri ya da koordinatörü olduğu ekipler; grup yolunda lider alt
+  /// grubunun hemen üstündeki parça.
+  Set<String> get leaderTeams => {
+    for (final parts in _groupPaths)
+      for (var i = 1; i < parts.length; i++)
+        if (_leaderSubgroups.contains(parts[i])) parts[i - 1],
+  };
+
+  /// Verilen grubun (ya da alt gruplarından birinin) üyesi mi.
+  bool isInGroup(String name) =>
+      _groupPaths.any((parts) => parts.contains(name));
+
+  /// Etkinlik oluştururken seçilebilecek sahip ekipler; OPA kurallarının
+  /// uygulamadaki karşılığı (`e-skylab/opa/policies/events.rego`):
+  ///
+  /// - YK/DK/ADMIN: bütün ekipler.
+  /// - Lider/koordinatör: lideri olduğu ekipler.
+  /// - GECEKODU'da düz üyeler de oluşturabiliyor.
+  ///
+  /// Boşsa kullanıcı etkinlik oluşturamaz. Asıl kontrol backend'de; bu liste
+  /// yalnızca butonu ve seçenekleri belirliyor.
+  List<String> get eventOwnerOptions {
+    if (isPrivileged) return List.of(_teamRoles);
+
+    return {
+      ...leaderTeams,
+      if (isInGroup(_everyMemberCanCreateTeam)) _everyMemberCanCreateTeam,
+    }.toList();
+  }
+
+  static const String _everyMemberCanCreateTeam = 'GECEKODU';
+
+  bool get canCreateEvent => eventOwnerOptions.isNotEmpty;
+
+  /// Verilen ekibin etkinliğini düzenleyebilir mi. OPA'da güncelleme,
+  /// oluşturmayla aynı kurala bağlı (GECEKODU'da üyeler dahil).
+  bool canEditEvent(String ownerTeam) =>
+      ownerTeam.isNotEmpty &&
+      (isPrivileged ||
+          leaderTeams.contains(ownerTeam) ||
+          (ownerTeam == _everyMemberCanCreateTeam && isInGroup(ownerTeam)));
+
+  /// Silme her ekipte yalnızca liderlere ve YK/DK/ADMIN'e açık; GECEKODU
+  /// üyeleri düzenleyebiliyor ama silemiyor.
+  bool canDeleteEvent(String ownerTeam) =>
+      ownerTeam.isNotEmpty && (isPrivileged || leaderTeams.contains(ownerTeam));
 
   /// Verilen ekibin lideri mi. Keycloak'ta ekibin `LIDERLER` alt grubuna
   /// `<EKİP>_LEADER` realm rolü bağlı; gruba eklenen kişi rolü token'da

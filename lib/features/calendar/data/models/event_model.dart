@@ -21,10 +21,21 @@ class EventModel {
     required this.formUrl,
     required this.active,
     required this.typeName,
+    this.linkedin = '',
+    this.seasonId = '',
   });
+
+  /// Etkinliğin LinkedIn gönderisi; düzenleme formu için.
+  final String linkedin;
+
+  /// Bağlı olduğu sezonun id'si; düzenleme formunda seçili sezon.
+  final String seasonId;
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
     return EventModel(
+      linkedin: json['linkedin'] as String? ?? '',
+      seasonId:
+          (json['season'] as Map<String, dynamic>?)?['id'] as String? ?? '',
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
       coverImageUrl: json['coverImageUrl'] as String? ?? '',

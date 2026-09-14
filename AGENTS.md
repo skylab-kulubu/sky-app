@@ -61,7 +61,7 @@ lib/
 │   ├── services/             # links_service.dart, webview_service.dart
 │   ├── theme/                # theme.dart (light/dark), theme_provider.dart
 │   └── widgets/              # AppIcon, AppBarActions, NavItem, UserAvatar, CoverImage, BottomScrim, ColorGlow,
-│                             # SkyButton, IconCircle, TileGroup, SectionHeader, SettingsTile, ClubMenuSheet ...
+│                             # SkyButton, SkyTextField, IconCircle, TileGroup, SectionHeader, SettingsTile, ClubMenuSheet ...
 └── features/<name>/
     ├── data/{models,services}
     └── presentation/{pages,widgets,providers}
@@ -114,6 +114,8 @@ Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `te
 | `sensors_plus`             | The tilt of the SkyPass card (`TiltBuilder`)                                                               |
 | `cached_network_image_ce`  | Network images (`CoverImage`)                                                                              |
 | `dio`                      | All REST calls                                                                                             |
+| `image_picker`             | Cover image for event creation — **native dependency**, iOS needs `NSPhotoLibraryUsageDescription` |
+| `flutter_localizations`    | App locale is Turkish (`main_app.dart`); date/time pickers and system menus are Turkish |
 | `flutter_custom_tabs`      | Club sites open in a browser sheet (`WebviewService`): Partial Custom Tabs / `SFSafariViewController` page sheet. They share the Keycloak cookie with the login, so e-skylab sites log the user in automatically — **native dependency** |
 
 ---
@@ -206,6 +208,8 @@ Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **not
 **The `/team` tab** is a carousel of AR-GE teams (`TeamPage`). Teams come from SkyCMS (`GET /api/cms/collections/Teams` — the collection name must be capitalized, the response is not wrapped in `{data: ...}`); members come from Super Skylab (`GET /api/teams/{SLUG}/members`, 404 unless the team is public in Keycloak — treated as "no members", not an error). CMS has no logo field: logos are bundled in `assets/images/teams/` (from `skylab-kulubu/skylab-assets`) and mapped by slug in `Team`. ALGOLAB and GAMELAB logos contain white parts, so the light theme uses their monochrome versions tinted with the text color. Of the recruiting fields only `recruiting` is used: when true the detail page's "Ekibe Katıl" opens the club short link `skyl.app/<slug>` (which redirects to the team's form), otherwise the button is disabled and reads "Başvurular Kapalı". CMS `applyUrl` is not used. Team leaders (realm role `<TEAM>_LEADER`, mapped in Keycloak to the team's `LIDERLER` subgroup; `User.isTeamLeader`) see an edit button on the team detail page that opens `TeamEditPage`: recruiting on/off, description, long description, topics, stack and works are saved with `PUT /api/cms/collections/Teams/{slug}` (`{data, version}`; 409 on a version conflict). CMS rejects unknown fields and requires `recruiting`, so `Team.toCmsData` sends only schema fields and carries `recruitingFor`/`applyUrl` through unchanged. Saving also needs `cms:access` and the `skycms` audience in the token — without them CMS answers 401 and the page says the user has no permission. A per-user team panel (announcements, projects, tasks) was discussed but has no backend yet.
 
 **Recently removed** — ask before bringing any of them back: the tickets feature, the announcement carousel, the home page shortcuts, the `qr` feature (`qr_page.dart`), the welcome text on the home page. All of them are in the git history.
+
+**Event creation:** the Events tab shows a `+` FAB to users who may create events (`User.eventOwnerOptions`, read from the JWT `groups` claim to mirror `e-skylab/opa/policies/events.rego`: YK/DK/ADMIN → any team, `<TEAM>/LIDERLER|KOORDINATORLER` → that team, GECEKODU members → GECEKODU). `EventCreatePage` uploads the cover to `POST /api/media` (`file` part), then sends `POST /api/events` as **multipart** with the JSON in a `data` part; dates are zone-less `LocalDateTime`. Season is required (`GET /api/seasons`). After creation the list refreshes and the new event's detail page opens. The same page edits an event (`EventCreatePage.edit`): users allowed by `User.canEditEvent` see a settings button left of share on the detail page; edit sends `PATCH /api/events/{id}` as plain JSON (cover and capacity cannot be changed — the backend only takes them on create), and users allowed by `User.canDeleteEvent` get a trash action (`DELETE`, rejected with 400 when the event has tickets or event days).
 
 **Event filter:** the meaning of the `EventModel.active` flag is unknown; the "upcoming events" filter was deliberately built on **dates** (`EventProvider.upcomingEvents`, based on the end date so that multi-day events do not drop out while still running). In the UI, `active` is interpreted as "are applications open": the "Yakında" badge on the card, the status row on the detail page and the disabled Join button all depend on it.
 

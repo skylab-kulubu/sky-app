@@ -5,7 +5,7 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
-import 'package:sky_app/features/team/presentation/widgets/team_text_field.dart';
+import 'package:sky_app/core/widgets/sky_text_field.dart';
 
 /// Etiket listesi düzenleyici: yazıp "+"ya ya da klavyedeki onaya basınca
 /// etiket eklenir, hapın çarpısıyla silinir. Aynı etiket iki kez eklenmez.
@@ -61,7 +61,7 @@ class TeamTagEditor extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TeamTextField(
+        SkyTextField(
           controller: controller,
           hintText: hintText,
           textInputAction: TextInputAction.done,

@@ -19,7 +19,7 @@ import 'package:sky_app/features/team/data/models/team.dart';
 import 'package:sky_app/features/team/data/services/team_service.dart';
 import 'package:sky_app/features/team/presentation/providers/team_provider.dart';
 import 'package:sky_app/features/team/presentation/widgets/team_tag_editor.dart';
-import 'package:sky_app/features/team/presentation/widgets/team_text_field.dart';
+import 'package:sky_app/core/widgets/sky_text_field.dart';
 import 'package:sky_app/features/team/presentation/widgets/team_work_sheet.dart';
 
 part 'team_edit_pagemodel.dart';
@@ -80,7 +80,7 @@ class _TeamEditPageState extends TeamEditPagemodel {
       padding: AppPaddings.mainPaddingAll,
       children: [
         const SectionHeader('Kısa Açıklama', isFirst: true),
-        TeamTextField(
+        SkyTextField(
           controller: descriptionController,
           hintText: 'Ekibi bir iki cümleyle anlat',
           minLines: 2,
@@ -88,7 +88,7 @@ class _TeamEditPageState extends TeamEditPagemodel {
           onChanged: (_) => onFormChanged(),
         ),
         const SectionHeader('Uzun Açıklama'),
-        TeamTextField(
+        SkyTextField(
           controller: longDescriptionController,
           hintText: 'İsteğe bağlı; doluysa detay sayfasında bu gösterilir',
           minLines: 4,

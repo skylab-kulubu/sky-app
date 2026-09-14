@@ -10,7 +10,10 @@ import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/events_refresh_indicator.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
+import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
+import 'package:sky_app/features/calendar/presentation/pages/event_create/event_create_page.dart';
+import 'package:sky_app/features/calendar/presentation/pages/event_detail/event_detail_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_card.dart';
 
@@ -46,8 +49,27 @@ class _CalendarPageState extends CalendarPagemodel {
       builder: (context, eventProvider, child) {
         return Scaffold(
           body: EventsRefreshIndicator(child: _body(context, eventProvider)),
+          floatingActionButton: _createButton(context),
         );
       },
+    );
+  }
+
+  /// Etkinlik oluşturma butonu; yalnızca yetkisi olana (lider, GECEKODU
+  /// üyesi, YK/DK/ADMIN). Yüzen navbar'ın üstünde duruyor.
+  Widget? _createButton(BuildContext context) {
+    // Nullable okuma: sayfa kullanıcı sağlayıcısı olmadan da kurulabiliyor
+    // (widget testleri); o durumda buton yok.
+    final canCreate =
+        context.watch<UserProvider?>()?.user?.canCreateEvent ?? false;
+    if (!canCreate) return null;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSizes.navBarClearance),
+      child: FloatingActionButton(
+        onPressed: onCreateEvent,
+        child: AppIcon(AppIcons.add, color: context.textPrimary),
+      ),
     );
   }
 

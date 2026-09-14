@@ -13,4 +13,11 @@ abstract class CalendarPagemodel extends State<CalendarPage> {
   bool isBusy(EventProvider provider) => !provider.isInitialized;
 
   void onRetry() => context.read<EventProvider>().refresh();
+
+  /// Oluşturma sayfasını açar; etkinlik oluşturulduysa detayına geçer.
+  Future<void> onCreateEvent() async {
+    final event = (await EventCreatePage.open(context))?.event;
+    if (event == null || !mounted) return;
+    await EventDetailPage.open(context, event);
+  }
 }

@@ -24,6 +24,11 @@ class AppIcons {
   static const String checkCircle = 'checkCircle';
   static const String edit = 'edit';
   static const String add = 'plus';
+
+  // Etkinlik oluşturma formu
+  static const String galleryAdd = 'galleryAdd';
+  static const String delete = 'trash';
+  static const String capacity = 'people';
   static const String refresh = 'refresh';
   static const String share = 'share';
   static const String play = 'play';

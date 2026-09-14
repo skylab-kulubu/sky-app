@@ -39,6 +39,8 @@
 	<true/>
 	<key>NFCReaderUsageDescription</key>
 	<string>NFC access is required to read your student card and link it to your Sky account.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library access is required to choose a cover image for the events you create.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera access is required to scan event QR codes and confirm your attendance.</string>
 	<key>UIApplicationSceneManifest</key>

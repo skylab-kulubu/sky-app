@@ -14,7 +14,9 @@ import 'package:sky_app/core/widgets/color_glow.dart';
 import 'package:sky_app/core/widgets/cover_image.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
+import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/data/services/event_palette_service.dart';
+import 'package:sky_app/features/calendar/presentation/pages/event_create/event_create_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_cover_hero.dart';
 
@@ -214,8 +216,11 @@ class _EventDetailPageState extends EventDetailPagemodel {
               padding: AppPaddings.appBarActions,
               child: Center(
                 child: AppBarActions(
-                  icons: const [AppIcons.share],
-                  onIconTap: (_) => onSharePressed(),
+                  // Yetkisi olana paylaşın solunda düzenleme.
+                  icons: [if (canEdit) AppIcons.settings, AppIcons.share],
+                  onIconTap: (icon) => icon == AppIcons.settings
+                      ? onEditPressed()
+                      : onSharePressed(),
                   backgroundColor: AppColors.onCoverSurface,
                   iconColor: AppColors.onCover,
                 ),

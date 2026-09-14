@@ -6,7 +6,7 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/features/team/data/models/team.dart';
 import 'package:sky_app/features/team/presentation/widgets/team_tag_editor.dart';
-import 'package:sky_app/features/team/presentation/widgets/team_text_field.dart';
+import 'package:sky_app/core/widgets/sky_text_field.dart';
 
 /// Tek bir çalışmayı ekleyen ya da düzenleyen sheet. Kaydedince çalışmanın
 /// yeni hâlini döner; vazgeçilirse `null`.
@@ -89,20 +89,20 @@ class _TeamWorkSheetState extends State<TeamWorkSheet> {
                 ),
               ),
               const SizedBox(height: AppSizes.largeSpace),
-              TeamTextField(
+              SkyTextField(
                 controller: _title,
                 hintText: 'Başlık',
                 onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: AppSizes.bigSpace),
-              TeamTextField(
+              SkyTextField(
                 controller: _description,
                 hintText: 'Açıklama',
                 minLines: 3,
                 maxLines: 6,
               ),
               const SizedBox(height: AppSizes.bigSpace),
-              TeamTextField(
+              SkyTextField(
                 controller: _image,
                 hintText: 'Görsel bağlantısı (isteğe bağlı)',
                 keyboardType: TextInputType.url,

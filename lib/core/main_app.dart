@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/router/router_manager.dart';
 import 'package:sky_app/core/theme/theme.dart';
@@ -25,6 +26,10 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      // Sistem bileşenleri (tarih/saat seçici, metin seçim menüsü) Türkçe.
+      locale: const Locale('tr'),
+      supportedLocales: const [Locale('tr')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       debugShowCheckedModeBanner: false,
       title: 'SkyApp',
       theme: lightTheme,
