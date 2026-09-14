@@ -54,6 +54,11 @@ class EventPaletteService {
   }
 
   static Future<List<Color>> _extract(String eventId, String imageUrl) async {
+    // Bir mikrotask atlanır: senkron ardışık `resolve()` çağrılarının
+    // (ör. aynı karede iki widget aynı eventId'yi isterse) aynı Future'ı
+    // paylaşabilmesi için `_pending` kaydı en az bir adım canlı kalmalı.
+    await Future<void>.value();
+
     final provider = CoverImage.providerFor(imageUrl);
     if (provider == null) return _store(eventId, const []);
 
