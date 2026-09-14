@@ -13,19 +13,27 @@ class LinksService {
     url: 'https://yildizskylab.com',
   );
 
+  /// AR-GE ekiplerinin sitesi. Ekiplere alım yalnızca buradan yapılıyor;
+  /// ekip detayındaki "Ekibe Katıl" da bunu açıyor.
+  static const LinkItem arge = LinkItem(
+    name: 'Ekipler',
+    description: 'Kulüp ekiplerini keşfet',
+    icon: AppIcons.users2,
+    color: AppColors.blue,
+    url: 'https://arge.yildizskylab.com/',
+  );
+
+  /// Kulübün link kısaltma servisi (SKYLAPP). Ekiplerin başvuru formları
+  /// `skyl.app/<ekip>` adresinden yönleniyor.
+  static const String shortLinkBase = 'https://skyl.app';
+
   /// Kulüp menüsündeki bağlantılar, menüde görünecekleri sırayla.
   static const List<LinkGroup> groups = [
     LinkGroup(
       title: 'Genel',
       links: [
         website,
-        LinkItem(
-          name: 'Ekipler',
-          description: 'Kulüp ekiplerini keşfet',
-          icon: AppIcons.users2,
-          color: AppColors.blue,
-          url: 'https://arge.yildizskylab.com/',
-        ),
+        arge,
         LinkItem(
           name: 'SKYSEC Articles',
           description: 'Siber güvenlik makaleleri ve yazılar',

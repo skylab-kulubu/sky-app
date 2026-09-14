@@ -149,6 +149,12 @@ class User {
 
   String get teamsDisplay => teams.isEmpty ? '' : teams.join(' • ');
 
+  /// Verilen ekibin lideri mi. Keycloak'ta ekibin `LIDERLER` alt grubuna
+  /// `<EKİP>_LEADER` realm rolü bağlı; gruba eklenen kişi rolü token'da
+  /// taşıyor. SkyCMS de ekip düzenleme yetkisini aynı rolden okuyor.
+  bool isTeamLeader(String teamKey) =>
+      teamKey.isNotEmpty && realmRoles.contains('${teamKey}_LEADER');
+
   /// Kullanıcı adının gösterim hâli; arayüzde hep `@` ile yazılıyor.
   String get usernameDisplay =>
       preferredUsername.isEmpty ? '' : '@$preferredUsername';

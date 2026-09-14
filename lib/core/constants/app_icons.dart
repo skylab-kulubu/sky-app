@@ -23,6 +23,7 @@ class AppIcons {
   static const String check = 'check';
   static const String checkCircle = 'checkCircle';
   static const String edit = 'edit';
+  static const String add = 'plus';
   static const String refresh = 'refresh';
   static const String share = 'share';
   static const String play = 'play';
@@ -38,6 +39,7 @@ class AppIcons {
 
   // People
   static const String users2 = 'users2';
+  static const String myTeam = 'userTick';
   static const String group = 'group';
 
   // Content

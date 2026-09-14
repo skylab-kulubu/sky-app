@@ -17,6 +17,7 @@ import 'package:sky_app/core/widgets/nav_item.dart';
 import 'package:sky_app/core/widgets/user_avatar.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
+import 'package:sky_app/features/team/presentation/providers/team_provider.dart';
 
 part 'shell_pagemodel.dart';
 
@@ -93,7 +94,7 @@ class _ShellPageState extends ShellPagemodel {
                   icon: AppIcons.calendar,
                 ),
                 NavItem(
-                  label: 'Ekip',
+                  label: 'Ekipler',
                   isSelected: currentLocation == '/team',
                   onTap: () => context.go('/team'),
                   icon: AppIcons.users2,
@@ -138,11 +139,22 @@ class _ShellPageState extends ShellPagemodel {
         AppBarActions(
           // Arama açıkken aynı yerde kapatma butonu duruyor; ikon sayısı
           // değişmediği için hap genişlemiyor.
-          icons: showSearch ? const [AppIcons.close] : config.actions,
+          icons: showSearch ? const [AppIcons.close] : _actionsFor(config),
           onIconTap: (icon) => _onActionTap(context, icon),
         ),
       ],
     );
+  }
+
+  /// Sekmenin sabit butonlarına duruma bağlı olanlar ekleniyor: Ekipler
+  /// sekmesinde "ekibime git", yalnızca kullanıcı carousel'deki bir ekipte
+  /// ise.
+  List<String> _actionsFor(_AppBarConfig config) {
+    if (!identical(config, _AppBarConfig._team)) return config.actions;
+
+    final roles = context.watch<UserProvider>().user?.realmRoles ?? const [];
+    final hasTeam = context.watch<TeamProvider>().teamsOf(roles).isNotEmpty;
+    return hasTeam ? const [AppIcons.myTeam] : config.actions;
   }
 
   /// Diğer ikonların sayfaları henüz yok; bağlanana kadar sessizce yok sayılır.
@@ -152,6 +164,7 @@ class _ShellPageState extends ShellPagemodel {
     if (icon == AppIcons.settings) context.push('/settings');
     if (icon == AppIcons.search) openSearch();
     if (icon == AppIcons.close) closeSearch();
+    if (icon == AppIcons.myTeam) context.read<TeamProvider>().requestMyTeam();
   }
 
   Widget _appBarTitle(BuildContext context, _AppBarConfig config) {
@@ -222,7 +235,7 @@ class _AppBarConfig {
 
   // Karıştır ve bilgi butonları, sekme hazır olana kadar gizli; yerleri
   // AppIcons.shuffle ve AppIcons.infoSquare.
-  static const _team = _AppBarConfig(title: 'Ekip', actions: []);
+  static const _team = _AppBarConfig(title: 'Ekipler', actions: []);
   static const _profile = _AppBarConfig(
     title: 'Profil',
     showAvatar: true,

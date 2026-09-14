@@ -71,7 +71,7 @@ Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `te
 
 ### State management
 
-`provider` is used. Four global providers are registered in `main.dart`:
+`provider` is used. Five global providers are registered in `main.dart`:
 
 | Provider        | Responsibility                                                    |
 | --------------- | ----------------------------------------------------------------- |
@@ -79,6 +79,7 @@ Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `te
 | `UserProvider`  | Session and `User`; through `AuthService`                         |
 | `EventProvider` | Event lists; filled on splash                                     |
 | `ActivityProvider` | Profile activities; keyed by user id so a new login never sees the previous user's list |
+| `TeamProvider` | AR-GE teams from SkyCMS for the Team tab |
 
 ### Routing
 
@@ -181,7 +182,7 @@ Names are camelCase: `info-square` → `infoSquare`.
 
 **The AppBar changes per tab.** `_AppBarConfig` holds the title, action icons and logo/avatar display for each tab. Actions are collected in the `AppBarActions` pill and it grows or shrinks with the icon count as the tab changes.
 
-Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **notification** (`AppIcons.bell` → `/notification`), **settings** (`/settings`) and **search** on Events. The Team tab has no actions: its shuffle and info buttons are hidden until the tab exists (the icons are noted in `_AppBarConfig._team`). To wire one up, add it to `_onActionTap` in `core/pages/shell_page.dart`.
+Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **notification** (`AppIcons.bell` → `/notification`), **settings** (`/settings`) and **search** on Events. On the Teams tab the only action is "ekibime git" (`AppIcons.myTeam`), shown only when the user's realm roles match a team in the carousel; the shell calls `TeamProvider.requestMyTeam()` and `TeamPage` scrolls to the user's next team. To wire one up, add it to `_onActionTap` in `core/pages/shell_page.dart`.
 
 **Search on Events:** a tab gets search by setting `searchHint` in its `_AppBarConfig`. The search button opens `AppBarSearchField` in the title slot (title fades out, the box grows leftward from the button, the keyboard opens when the growth ends) and the button turns into a close button. The open state, controller and focus node live in `shell_pagemodel.dart`; the text goes to `EventProvider.setSearchQuery` and `CalendarPage` lists `searchedEvents`. Closing or leaving the tab clears the query.
 
@@ -202,7 +203,7 @@ Currently wired actions: **menu** (`AppIcons.widget` → `ClubMenuSheet`), **not
 - The QR is on the back of the SkyPass card (tap or **QR'ı Göster** flips it). It is drawn by `_MockQrPainter` — **a fake pattern**, not a real QR code.
 - The Notifications and Permissions rows in settings are hidden: push does not exist yet (#45) and no runtime permission is requested anywhere, so a permissions page would be empty (#31). `permission_handler` is in `pubspec.yaml` but unused; on iOS (Swift Package Manager) it needs extra build configuration before it reports real statuses.
 
-**The `/team` tab shows `ComingSoonPage`.**
+**The `/team` tab** is a carousel of AR-GE teams (`TeamPage`). Teams come from SkyCMS (`GET /api/cms/collections/Teams` — the collection name must be capitalized, the response is not wrapped in `{data: ...}`); members come from Super Skylab (`GET /api/teams/{SLUG}/members`, 404 unless the team is public in Keycloak — treated as "no members", not an error). CMS has no logo field: logos are bundled in `assets/images/teams/` (from `skylab-kulubu/skylab-assets`) and mapped by slug in `Team`. ALGOLAB and GAMELAB logos contain white parts, so the light theme uses their monochrome versions tinted with the text color. Of the recruiting fields only `recruiting` is used: when true the detail page's "Ekibe Katıl" opens the club short link `skyl.app/<slug>` (which redirects to the team's form), otherwise the button is disabled and reads "Başvurular Kapalı". CMS `applyUrl` is not used. Team leaders (realm role `<TEAM>_LEADER`, mapped in Keycloak to the team's `LIDERLER` subgroup; `User.isTeamLeader`) see an edit button on the team detail page that opens `TeamEditPage`: recruiting on/off, description, long description, topics, stack and works are saved with `PUT /api/cms/collections/Teams/{slug}` (`{data, version}`; 409 on a version conflict). CMS rejects unknown fields and requires `recruiting`, so `Team.toCmsData` sends only schema fields and carries `recruitingFor`/`applyUrl` through unchanged. Saving also needs `cms:access` and the `skycms` audience in the token — without them CMS answers 401 and the page says the user has no permission. A per-user team panel (announcements, projects, tasks) was discussed but has no backend yet.
 
 **Recently removed** — ask before bringing any of them back: the tickets feature, the announcement carousel, the home page shortcuts, the `qr` feature (`qr_page.dart`), the welcome text on the home page. All of them are in the git history.
 

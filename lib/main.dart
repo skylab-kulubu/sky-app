@@ -7,6 +7,7 @@ import 'package:sky_app/features/auth/data/services/auth_service.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/profile/presentation/providers/activity_provider.dart';
+import 'package:sky_app/features/team/presentation/providers/team_provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter_web_plugins/url_strategy.dart';
 
@@ -29,6 +30,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => EventProvider()),
         ChangeNotifierProvider(create: (_) => ActivityProvider()),
+        ChangeNotifierProvider(create: (_) => TeamProvider()),
       ],
       child: MainApp(),
     ),
