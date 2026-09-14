@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.yildizskylab.app",
+      "sha256_cert_fingerprints": [
+        "89:2B:B3:D8:F9:6E:5F:C3:BB:03:58:91:57:47:81:E2:13:E2:79:BD:89:13:8C:B3:75:09:6F:06:B8:C9:CC:CA"
+      ]
+    }
+  }
+]

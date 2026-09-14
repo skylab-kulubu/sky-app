@@ -23,6 +23,15 @@ class LinksService {
     url: 'https://arge.yildizskylab.com/',
   );
 
+  /// Paylaşılan içerik bağlantılarının kökü. Android App Links ve iOS
+  /// Universal Links bu domaini doğruluyor (`web/.well-known/`); uygulama
+  /// yüklüyse link uygulamada, değilse web sürümünde açılıyor.
+  static const String appBaseUrl = 'https://app.yildizskylab.com';
+
+  static String newsLink(String slug) => '$appBaseUrl/news/$slug';
+
+  static String eventLink(String id) => '$appBaseUrl/events/$id';
+
   /// Kulübün link kısaltma servisi (SKYLAPP). Ekiplerin başvuru formları
   /// `skyl.app/<ekip>` adresinden yönleniyor.
   static const String shortLinkBase = 'https://skyl.app';

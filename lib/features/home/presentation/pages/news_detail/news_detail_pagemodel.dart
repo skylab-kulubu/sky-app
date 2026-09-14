@@ -25,11 +25,11 @@ abstract class NewsDetailPagemodel extends State<NewsDetailPage> {
 
   void onEditPressed() => NewsEditPage.open(context, item: _latest);
 
-  /// Haberi sistem paylaşım sayfasıyla paylaşır: başlık ve kısa metin.
+  /// Haberi paylaşır: başlık ve uygulamada haberi açan bağlantı.
   Future<void> onSharePressed() async {
     final item = _latest;
     await SharePlus.instance.share(
-      ShareParams(text: '${item.title}\n\n${item.preview}'),
+      ShareParams(text: '${item.title}\n${LinksService.newsLink(item.slug)}'),
     );
   }
 }

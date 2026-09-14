@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["TEAM_ID.com.yildizskylab.app"],
+        "components": [
+          { "/": "/news/*", "comment": "Paylaşılan haberler" },
+          { "/": "/events/*", "comment": "Paylaşılan etkinlikler" }
+        ]
+      }
+    ]
+  }
+}

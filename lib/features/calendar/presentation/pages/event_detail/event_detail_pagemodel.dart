@@ -102,8 +102,7 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
 
   /// Etkinliği sistem paylaşım sayfasıyla paylaşır.
   ///
-  /// Metin, etkinliğin kendi sayfası olmadığı için elle kuruluyor: ad, tarih,
-  /// konum ve varsa başvuru bağlantısı.
+  /// Ad, tarih, konum ve uygulamada etkinliği açan bağlantı.
   Future<void> onSharePressed() async {
     final lines = <String>[
       event.name,
@@ -112,7 +111,8 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
         event.formattedTimeRange,
       ].where((part) => part.isNotEmpty).join(' · '),
       event.location,
-      event.formUrl,
+      // Uygulamada detayı açan bağlantı (App Links / Universal Links).
+      LinksService.eventLink(event.id),
     ].where((line) => line.isNotEmpty);
 
     await SharePlus.instance.share(ShareParams(text: lines.join('\n')));

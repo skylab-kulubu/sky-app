@@ -91,6 +91,8 @@ Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `te
 
 `redirect` routes between `/`, `/auth` and `/home` depending on session state.
 
+**Deep links:** shared links are `https://app.yildizskylab.com/news/<slug>` and `/events/<id>` (`LinksService.newsLink/eventLink`). `RouterManager._redirect` rewrites them to nested routes `/home/news/:slug` and `/calendar/events/:id` (root navigator, so back returns to the tab) and stores the target while splash/auth runs, then goes there instead of `/home`. `ContentLinkPage` loads the single item (`NewsService.fetchNewsItem`, `EventService.fetchEvent`) with loading / not-found states. Verification files live in `web/.well-known/` (copied into `build/web` by `flutter build web`) with content types in `web/_headers` (Cloudflare Pages). `assetlinks.json` currently holds only the **debug** keystore SHA-256 — add the release/Play signing fingerprint before release; `apple-app-site-association` has a `TEAM_ID` placeholder. iOS entitlement `applinks:app.yildizskylab.com` requires Associated Domains on the Apple account that signs the app.
+
 > ⚠️ **If you open something full screen while inside the shell**, put the route at top level or pass `parentNavigatorKey: _rootNavigatorKey`. Otherwise the page stays underneath the navbar. The same pitfall applies to `OpenContainer`: without `useRootNavigator: true` the detail page opens inside the shell.
 
 ### Backend

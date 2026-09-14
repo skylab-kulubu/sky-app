@@ -85,6 +85,27 @@ class EventService {
     ),
   ];
 
+  /// Tek etkinlik (girişsiz); bağlantıyla açılan detay sayfası için.
+  /// Bulunamazsa `notFound` tipinde [ApiException].
+  Future<EventModel> fetchEvent(String id) async {
+    final Response<dynamic> response;
+    try {
+      response = await _dio.get<dynamic>('/api/events/$id');
+    } catch (e) {
+      throw ApiException.from(e);
+    }
+
+    final body = response.data;
+    final data = body is Map<String, dynamic> ? body['data'] : null;
+    if (data is! Map<String, dynamic>) {
+      throw const ApiException(
+        ApiErrorType.server,
+        message: 'Yanıtta etkinlik yok',
+      );
+    }
+    return EventModel.fromJson(data);
+  }
+
   Future<List<EventModel>> fetchEvents() async {
     final events = await _fetchEvents('/api/events');
     if (events.isEmpty && kDebugMode) return mockEvents;
