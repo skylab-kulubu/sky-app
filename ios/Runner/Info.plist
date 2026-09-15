@@ -38,11 +38,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>
-	<string>NFC access is required to read your student card and link it to your Sky account.</string>
+	<string>Öğrenci kartını okuyup SKY LAB hesabına bağlayabilmek için NFC erişimi gerekiyor.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Photo library access is required to choose a cover image for the events you create.</string>
+	<string>Oluşturduğun etkinliğe kapak görseli seçebilmen için fotoğraflarına erişim gerekiyor.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera access is required to scan event QR codes and confirm your attendance.</string>
+	<string>Etkinlik kapağı için fotoğraf çekmek istediğinde kamera erişimi gerekiyor.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -10,7 +10,6 @@ import 'package:sky_app/features/calendar/data/services/event_service.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 
 const String _eventsPath = '/api/events';
-const String _activePath = '/api/events/active';
 
 /// Dio'nun ağ katmanının yerine geçen taşıyıcı.
 ///
@@ -78,7 +77,6 @@ void main() {
     ApiClient.instance.dio.httpClientAdapter = adapter;
     adapter.handlers[_eventsPath] = () async =>
         _okBody([_eventJson('e1'), _eventJson('e2')]);
-    adapter.handlers[_activePath] = () async => _okBody([_eventJson('e1')]);
     provider = EventProvider();
   });
 
@@ -240,19 +238,6 @@ void main() {
       gate.complete();
       await loading;
       expect(provider.isLoading, isFalse);
-    });
-  });
-
-  group('aktif etkinlikler', () {
-    test('aktif etkinlik hatası etkinlik listesini karartmaz', () async {
-      adapter.handlers[_activePath] = () async =>
-          throw _networkError(_activePath);
-
-      await provider.ensureLoaded();
-
-      expect(provider.events.length, 2);
-      expect(provider.error, isNull);
-      expect(provider.activeEvents, isEmpty);
     });
   });
 

@@ -45,7 +45,6 @@ dependencies:
 
   #Other
   sensors_plus: 7.1.0
-  permission_handler: 13.0.1
   flutter_nfc_kit: 3.6.2
   image_picker: 1.2.3
 

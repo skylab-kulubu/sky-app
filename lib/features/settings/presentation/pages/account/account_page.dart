@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
@@ -11,20 +12,30 @@ import 'package:sky_app/core/models/link_item.dart';
 import 'package:sky_app/core/services/webview_service.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/section_header.dart';
+import 'package:sky_app/core/widgets/settings_tile.dart';
 import 'package:sky_app/core/widgets/tile_group.dart';
 import 'package:sky_app/core/widgets/user_avatar.dart';
 import 'package:sky_app/features/auth/data/models/user.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/settings/presentation/widgets/account_info_tile.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+part 'account_pagemodel.dart';
 
 /// Hesap sayfası: üstte profil kimliği (avatar, ad, kullanıcı adı, ekipler),
 /// altında hesabın kayıtlı bilgileri.
 ///
 /// Bilgiler üyelik kaydından geliyor ve uygulama içinden düzenlenmiyor; bu
 /// yüzden satırlar salt okunur, yalnızca dışarı açılanlar dokunulabilir.
-class AccountPage extends StatelessWidget {
+/// En altta hesap silme talebi var (App Store kuralı 5.1.1(v)).
+class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
+  @override
+  State<AccountPage> createState() => _AccountPageState();
+}
+
+class _AccountPageState extends AccountPagemodel {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
@@ -51,8 +62,22 @@ class AccountPage extends StatelessWidget {
         _header(context, user),
         ..._section(context, 'Temel Bilgiler', _basicRows(user)),
         ..._section(context, 'Eğitim', _educationRows(user)),
-        ..._section(context, 'Bağlantılar', _linkRows(context, user)),
+        ..._section(context, 'Bağlantılar', _linkRows(user)),
         _note(context),
+        const SectionHeader('Hesap'),
+        TileGroup(
+          children: [
+            SettingsTile(
+              icon: AppIcons.delete,
+              iconColor: AppColors.red,
+              title: 'Hesabımı Sil',
+              titleColor: AppColors.red,
+              trailingIcon: AppIcons.externalLink,
+              onTap: () => onDeleteAccountTap(user),
+            ),
+          ],
+        ),
+        _deleteNote(context),
       ],
     );
   }
@@ -154,14 +179,14 @@ class AccountPage extends StatelessWidget {
     ];
   }
 
-  List<Widget> _linkRows(BuildContext context, User user) {
+  List<Widget> _linkRows(User user) {
     return [
       if (user.linkedin.isNotEmpty)
         AccountInfoTile(
           label: 'LinkedIn',
           value: _handleOf(user.linkedin),
           trailingIcon: AppIcons.externalLink,
-          onTap: () => _onLinkedinTap(context, user.linkedin),
+          onTap: () => onLinkedinTap(user.linkedin),
         ),
     ];
   }
@@ -176,21 +201,6 @@ class AccountPage extends StatelessWidget {
     return segments.isEmpty ? uri.host : segments.last;
   }
 
-  void _onLinkedinTap(BuildContext context, String url) {
-    WebviewService.openLink(
-      context,
-      LinkItem(
-        name: 'LinkedIn',
-        description: '',
-        icon: AppIcons.linkedin,
-        color: AppColors.blue,
-        // Kayıt şemasız gelebiliyor; `Uri.parse` o hâlde bunu göreli yol
-        // sayar ve webview boş açılır.
-        url: url.startsWith('http') ? url : 'https://$url',
-      ),
-    );
-  }
-
   Widget _note(BuildContext context) {
     return Padding(
       padding: AppPaddings.accountNote,
@@ -198,6 +208,20 @@ class AccountPage extends StatelessWidget {
         'Hesap bilgilerin SKY LAB üyelik kaydından geliyor ve uygulama '
         'içinden değiştirilemiyor. Bir bilgi eksik ya da yanlışsa Ayarlar → '
         'Destek ile İletişime Geç üzerinden bize yaz.',
+        style: context.textTheme.bodySmall?.copyWith(
+          color: context.textTertiary,
+        ),
+      ),
+    );
+  }
+
+  Widget _deleteNote(BuildContext context) {
+    return Padding(
+      padding: AppPaddings.accountNote,
+      child: Text(
+        'Silme talebin e-postayla SKY LAB\'e iletilir. Hesabın ve üyelik '
+        'bilgilerin talebin ulaştıktan sonra en geç 30 gün içinde kalıcı '
+        'olarak silinir; bu işlem geri alınamaz.',
         style: context.textTheme.bodySmall?.copyWith(
           color: context.textTertiary,
         ),

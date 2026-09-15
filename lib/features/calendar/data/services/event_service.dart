@@ -112,14 +112,6 @@ class EventService {
     return events;
   }
 
-  Future<List<EventModel>> fetchActiveEvents() async {
-    final events = await _fetchEvents('/api/events/active');
-    if (events.isEmpty && kDebugMode) {
-      return mockEvents.where((e) => e.active).toList();
-    }
-    return events;
-  }
-
   /// Hatayı yutmuyor.
   ///
   /// Eskiden her hata boş listeye dönüşüyordu; çağıran "gerçekten etkinlik

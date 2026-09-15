@@ -8,13 +8,11 @@ import 'package:sky_app/features/calendar/data/services/event_service.dart';
 class EventProvider extends ChangeNotifier {
   final EventService _eventService = EventService();
   List<EventModel> _events = [];
-  List<EventModel> _activeEvents = [];
   bool _isInitialized = false;
   bool _isLoading = false;
   ApiException? _error;
 
   List<EventModel> get events => _events;
-  List<EventModel> get activeEvents => _activeEvents;
 
   /// Son yüklemenin hatası; başarılıysa null.
   ///
@@ -40,13 +38,6 @@ class EventProvider extends ChangeNotifier {
       return aStart.compareTo(bStart);
     });
     return upcoming;
-  }
-
-  EventModel? get activeEvent {
-    for (final event in _activeEvents) {
-      if (event.active) return event;
-    }
-    return null;
   }
 
   String _searchQuery = '';
@@ -131,22 +122,21 @@ class EventProvider extends ChangeNotifier {
       // Eldeki liste korunuyor: aşağı çekerek yenilemede ağ koptu diye
       // ekrandaki etkinlikler kaybolmamalı. İlk yüklemede zaten boş.
       error = e;
+    } catch (e) {
+      // Beklenmeyen hata (ör. yanıt modele uymadı) de sayfayı yükleniyor
+      // durumunda bırakmamalı; kullanıcı "Tekrar Dene" görebilsin.
+      log('Etkinlikler işlenemedi: $e');
+      error = const ApiException(
+        ApiErrorType.server,
+        message: 'Etkinlikler işlenemedi',
+      );
+    } finally {
+      _error = error;
+      _isLoading = false;
+      _isInitialized = true;
+      _inFlight = null;
+      notifyListeners();
     }
-
-    // Ayrı ele alınıyor: bu listeyi şu an hiçbir ekran okumuyor, bu yüzden
-    // buradaki hata etkinlik listesini karartmamalı.
-    try {
-      _activeEvents = await _eventService.fetchActiveEvents();
-    } on ApiException catch (e) {
-      log('Aktif etkinlikler yüklenemedi: $e');
-      _activeEvents = [];
-    }
-
-    _error = error;
-    _isLoading = false;
-    _isInitialized = true;
-    _inFlight = null;
-    notifyListeners();
   }
 
   Future<bool> joinEvent(String eventId) async {
