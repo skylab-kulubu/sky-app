@@ -90,22 +90,43 @@ class EventPaletteService {
     }
   }
 
+  /// Görsel akışı bu süre içinde sonuçlanmazsa [_decodeImage] hata ile
+  /// tamamlanır. Eski [PaletteGeneratorMaster.fromImageProvider] da aynı
+  /// süreyi kullanıyordu; onsuz akış hiç tamamlanmazsa [_pending] kaydı
+  /// sonsuza dek asılı kalır.
+  static const Duration _decodeTimeout = Duration(seconds: 15);
+
   /// Bir [ImageProvider]'ı çözüp [ui.Image]'e ulaşır.
   static Future<ui.Image> _decodeImage(ImageProvider provider) {
     final stream = provider.resolve(ImageConfiguration.empty);
     final completer = Completer<ui.Image>();
     late ImageStreamListener listener;
+    late Timer timer;
+
+    void finish() {
+      timer.cancel();
+      stream.removeListener(listener);
+    }
 
     listener = ImageStreamListener(
       (info, _) {
-        stream.removeListener(listener);
+        finish();
         if (!completer.isCompleted) completer.complete(info.image);
       },
       onError: (error, stackTrace) {
-        stream.removeListener(listener);
+        finish();
         if (!completer.isCompleted) completer.completeError(error, stackTrace);
       },
     );
+
+    timer = Timer(_decodeTimeout, () {
+      stream.removeListener(listener);
+      if (!completer.isCompleted) {
+        completer.completeError(
+          TimeoutException('Kapak çözülemedi', _decodeTimeout),
+        );
+      }
+    });
 
     stream.addListener(listener);
     return completer.future;
