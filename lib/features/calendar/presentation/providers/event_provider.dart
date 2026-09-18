@@ -65,7 +65,7 @@ class EventProvider extends ChangeNotifier {
           (event) => [
             event.name,
             event.location,
-            event.typeName,
+            event.ownerTeam,
           ].any((field) => _normalize(field).contains(needle)),
         )
         .toList();

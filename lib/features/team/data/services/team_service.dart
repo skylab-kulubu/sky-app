@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:sky_app/core/services/api_client.dart';
 import 'package:sky_app/core/services/api_exception.dart';
+import 'package:sky_app/core/services/core_api.dart';
 import 'package:sky_app/features/team/data/models/team.dart';
 import 'package:sky_app/features/team/data/models/team_member.dart';
 
@@ -17,8 +18,7 @@ class TeamService {
   /// SkyCMS'teki ekipler. Giriş gerektirmiyor.
   ///
   /// Koleksiyon adı büyük harfle başlamalı (`Teams`); küçük harfle CMS 400
-  /// dönüyor. Yanıt Super Skylab'ın `{data: ...}` zarfında değil, doğrudan
-  /// `{items, total, offset, limit}`.
+  /// dönüyor. Yanıt zarfsız: `{items, total, offset, limit}`.
   Future<List<Team>> fetchTeams() async {
     final body = await _getJson(
       '/api/cms/collections/Teams',
@@ -52,8 +52,8 @@ class TeamService {
 
   /// Ekibi CMS'e kaydeder ve kaydedilmiş hâlini (yeni sürümüyle) döner.
   ///
-  /// Yetki CMS'te: token'da `<EKİP>_LEADER` ve `cms:access` rolleri ile
-  /// `skycms` audience'ı olmalı. Hatalar [ApiException] olarak fırlıyor;
+  /// Yetki CMS'te: token'ın `skyapp` client'ında `cms:access` rolü olmalı ve
+  /// kullanıcı ekibin `LIDERLER` grubunda bulunmalı. Hatalar [ApiException] olarak fırlıyor;
   /// `statusCode` 409 ise kayıt arada başkası tarafından değiştirilmiş.
   Future<Team> updateTeam(Team team) async {
     final Response<dynamic> response;
@@ -76,16 +76,20 @@ class TeamService {
     return Team.fromJson(body);
   }
 
-  /// Ekibin herkese açık üyeleri, liderler önce.
+  /// Ekibin herkese açık üyeleri, liderler önce (core
+  /// `/v1/teams/{team}/members`).
   ///
   /// Hata fırlatmıyor, boş liste dönüyor: üyeler detay sayfasında isteğe
-  /// bağlı bir bölüm. Ekip Keycloak'ta herkese açık değilse Super Skylab 404
-  /// dönüyor (şu an çoğu ekip böyle); bu bir arıza değil, bölüm görünmüyor.
+  /// bağlı bir bölüm. Ekip Keycloak'ta herkese açık değilse
+  /// (`public_listing`) core 404 dönüyor; bu bir arıza değil, bölüm
+  /// görünmüyor.
   Future<List<TeamMember>> fetchMembers(String teamKey) async {
     try {
-      final body = await _getJson('/api/teams/$teamKey/members');
-      final data = body['data'];
-      final members = data is Map<String, dynamic> ? data['members'] : null;
+      final body = CoreApi.object(
+        await CoreApi.get('/teams/$teamKey/members'),
+        what: 'ekip üyeleri',
+      );
+      final members = body['members'];
       if (members is! List) return const [];
 
       return members

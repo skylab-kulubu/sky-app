@@ -1,37 +1,39 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
-import 'package:sky_app/core/services/api_client.dart';
+import 'package:sky_app/core/extensions/date_time_extensions.dart';
 import 'package:sky_app/core/services/api_exception.dart';
+import 'package:sky_app/core/services/core_api.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/profile/data/models/activity.dart';
 
 /// Kullanıcının son aktiviteleri.
 ///
 /// Backend'de ayrı bir aktivite geçmişi yok; liste kullanıcının kendi
-/// biletlerinden (`/api/tickets/me`) ve yarışmacı kayıtlarından
-/// (`/api/competitors/me`) türetiliyor:
+/// biletlerinden (`/v1/tickets/me`) ve yarışmacı kayıtlarından
+/// (`/v1/competitors/me`) türetiliyor:
 ///
 /// - Bilet → etkinliğe kayıt. Girişte okutulduysa kayıt yerine katılım.
 /// - Yarışmacı kaydı → sıra, puan ya da kazanma bilgisi.
 class ActivityService {
-  final Dio _dio = ApiClient.instance.dio;
-
   /// Yeniden eskiye sıralı aktiviteler.
   ///
   /// İki istekten biri düşerse [ApiException] fırlatıyor; yarım bir liste
   /// "aktiviten bu kadar" gibi okunurdu.
   Future<List<Activity>> fetchMyActivities() async {
     final results = await Future.wait([
-      _fetchList('/api/tickets/me'),
-      _fetchList('/api/competitors/me'),
+      CoreApi.get('/tickets/me'),
+      CoreApi.get('/competitors/me'),
     ]);
 
     final activities = <Activity>[
-      ...results[0].map(_fromTicket).nonNulls,
-      ...results[1].map(_fromCompetitor).nonNulls,
+      ...CoreApi.list(
+        results[0],
+        what: 'bilet listesi',
+      ).map(_fromTicket).nonNulls,
+      ...CoreApi.list(
+        results[1],
+        what: 'yarışma listesi',
+      ).map(_fromCompetitor).nonNulls,
     ]..sort((a, b) => b.dateTime.compareTo(a.dateTime));
 
     return activities;
@@ -46,18 +48,18 @@ class ActivityService {
     final checkInTimes =
         (json['checkIns'] as List<dynamic>? ?? const [])
             .whereType<Map<String, dynamic>>()
-            .map((checkIn) => DateTime.tryParse('${checkIn['createdAt']}'))
+            .map((checkIn) => ApiDateTime.parse('${checkIn['createdAt']}'))
             .nonNulls
             .toList()
           ..sort();
 
     if (checkInTimes.isNotEmpty) {
-      // Çok günlü etkinlikte her gün ayrı okutuluyor; hepsi tek satır.
-      final days = checkInTimes.length;
+      // Yoklama oturum (konuşma) başına alınıyor; hepsi tek satır.
+      final sessions = checkInTimes.length;
       return Activity(
         title: event.name,
-        description: days > 1
-            ? 'Etkinliğe $days gün katıldın.'
+        description: sessions > 1
+            ? 'Etkinlikte $sessions oturuma katıldın.'
             : 'Etkinliğe katıldın.',
         icon: AppIcons.checkCircle,
         color: AppColors.green,
@@ -100,13 +102,7 @@ class ActivityService {
   }) {
     if (!finished) return 'Yarışmacı olarak kaydoldun.';
 
-    // Backend alanı `isWinner`, ama Lombok'un `isWinner()` getter'ı yüzünden
-    // Jackson onu `winner` diye yazıyor; ikisi de okunuyor.
-    final isWinner = json['isWinner'] == true || json['winner'] == true;
-    if (isWinner) return 'Yarışmayı kazandın!';
-
-    final rank = json['rank'];
-    if (rank is int) return 'Yarışmayı $rank. sırada tamamladın.';
+    if (json['isWinner'] == true) return 'Yarışmayı kazandın!';
 
     final score = json['score'];
     if (score is num) {
@@ -123,37 +119,5 @@ class ActivityService {
     if (json is! Map<String, dynamic>) return null;
     final event = EventModel.fromJson(json);
     return event.name.isEmpty ? null : event;
-  }
-
-  /// `DataResult` sarmalayıcısındaki `data` listesini döner.
-  Future<List<Map<String, dynamic>>> _fetchList(String path) async {
-    final Response<dynamic> response;
-    try {
-      response = await _dio.get<dynamic>(path);
-    } catch (e) {
-      throw ApiException.from(e);
-    }
-
-    dynamic rawData = response.data;
-    if (rawData is String) {
-      try {
-        rawData = jsonDecode(rawData);
-      } catch (_) {
-        throw const ApiException(
-          ApiErrorType.server,
-          message: 'Yanıt çözümlenemedi',
-        );
-      }
-    }
-
-    final data = rawData is Map<String, dynamic> ? rawData['data'] : null;
-    if (data is! List) {
-      throw const ApiException(
-        ApiErrorType.server,
-        message: 'Beklenmeyen yanıt gövdesi',
-      );
-    }
-
-    return data.whereType<Map<String, dynamic>>().toList(growable: false);
   }
 }

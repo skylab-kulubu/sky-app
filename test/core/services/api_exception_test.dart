@@ -7,7 +7,7 @@ DioException _dioError(
   int? statusCode,
   Object? error,
 }) {
-  final options = RequestOptions(path: '/api/events');
+  final options = RequestOptions(path: '/v1/events');
   return DioException(
     requestOptions: options,
     type: type,

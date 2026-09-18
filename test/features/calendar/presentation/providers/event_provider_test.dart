@@ -9,7 +9,7 @@ import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/features/calendar/data/services/event_service.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 
-const String _eventsPath = '/api/events';
+const String _eventsPath = '/v1/events';
 
 /// Dio'nun ağ katmanının yerine geçen taşıyıcı.
 ///
@@ -56,12 +56,12 @@ Map<String, dynamic> _eventJson(String id) => {
   'endDate': '2030-01-01T12:00:00Z',
   'formUrl': '',
   'active': true,
-  'type': {'name': 'Atölye'},
+  'ownerTeam': 'MOBILAB',
 };
 
 ResponseBody _okBody(List<Map<String, dynamic>> events) =>
     ResponseBody.fromString(
-      jsonEncode({'success': true, 'message': 'ok', 'data': events}),
+      jsonEncode(events),
       200,
       headers: {
         Headers.contentTypeHeader: [Headers.jsonContentType],

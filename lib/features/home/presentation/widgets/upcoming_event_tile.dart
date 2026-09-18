@@ -83,9 +83,9 @@ class _UpcomingEventTileState extends State<UpcomingEventTile> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (event.typeName.isNotEmpty) ...[
+        if (event.ownerTeam.isNotEmpty) ...[
           Text(
-            event.typeName,
+            event.ownerTeam,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: context.textTheme.labelMedium?.copyWith(

@@ -16,7 +16,8 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
   /// Düzenleme butonu yalnızca yetkisi olana (etkinliğin ekibinde lider,
   /// GECEKODU üyesi ya da YK/DK/ADMIN).
   bool get canEdit =>
-      context.watch<UserProvider>().user?.canEditEvent(event.typeName) ?? false;
+      context.watch<UserProvider>().user?.canEditEvent(event.ownerTeam) ??
+      false;
 
   /// Düzenleme sayfasını açar; kaydedildiyse sayfayı yeni hâliyle yeniler,
   /// silindiyse detaydan çıkar.

@@ -81,6 +81,6 @@ EventModel fakeEvent({String id = 'e1', String name = 'Etkinlik'}) {
     endDate: '2030-01-01T12:00:00Z',
     formUrl: '',
     active: true,
-    typeName: 'Atölye',
+    ownerTeam: 'Atölye',
   );
 }

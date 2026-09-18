@@ -8,6 +8,7 @@ import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sky_app/core/services/api_client.dart';
 import 'package:sky_app/core/services/api_exception.dart';
+import 'package:sky_app/core/services/core_api.dart';
 import 'package:sky_app/features/auth/data/models/user.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -324,21 +325,10 @@ class AuthService implements TokenProvider {
     }
 
     try {
-      final response = await ApiClient.instance.dio.get<dynamic>(
-        '/api/users/me',
+      final body = await CoreApi.get('/users/me');
+      return jwtUser.mergeWith(
+        User.fromJson(CoreApi.object(body, what: 'profil')),
       );
-
-      dynamic rawData = response.data;
-      if (rawData is String) {
-        rawData = jsonDecode(rawData);
-      }
-
-      if (rawData is Map<String, dynamic>) {
-        final data = rawData['data'];
-        if (data is Map<String, dynamic>) {
-          return jwtUser.mergeWith(User.fromJson(data));
-        }
-      }
     } catch (e) {
       log('Profil API hatası: $e');
     }

@@ -1,3 +1,5 @@
+import 'package:sky_app/core/extensions/date_time_extensions.dart';
+
 class EventModel {
   final String id;
   final String name;
@@ -8,7 +10,10 @@ class EventModel {
   final String endDate;
   final String formUrl;
   final bool active;
-  final String typeName;
+
+  /// Etkinliği düzenleyen ekip: Keycloak grup adı (`MOBILAB`, `GECEKODU`).
+  /// Yetkiler bu ekibe göre veriliyor.
+  final String ownerTeam;
 
   EventModel({
     required this.id,
@@ -20,7 +25,7 @@ class EventModel {
     required this.endDate,
     required this.formUrl,
     required this.active,
-    required this.typeName,
+    required this.ownerTeam,
     this.linkedin = '',
     this.seasonId = '',
   });
@@ -28,37 +33,39 @@ class EventModel {
   /// Etkinliğin LinkedIn gönderisi; düzenleme formu için.
   final String linkedin;
 
-  /// Bağlı olduğu sezonun id'si; düzenleme formunda seçili sezon.
+  /// Bağlı olduğu sezonun id'si; sezona bağlanmamışsa boş.
   final String seasonId;
 
+  /// Core `EventResponse`'u (`/v1/events`).
   factory EventModel.fromJson(Map<String, dynamic> json) {
     return EventModel(
       linkedin: json['linkedin'] as String? ?? '',
-      seasonId:
-          (json['season'] as Map<String, dynamic>?)?['id'] as String? ?? '',
+      seasonId: json['seasonId'] as String? ?? '',
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
-      coverImageUrl: json['coverImageUrl'] as String? ?? '',
+      coverImageUrl: _absoluteImageUrl(json['coverImageUrl'] as String?),
       description: json['description'] as String? ?? '',
       location: json['location'] as String? ?? '',
       startDate: json['startDate'] as String? ?? '',
       endDate: json['endDate'] as String? ?? '',
       formUrl: json['formUrl'] as String? ?? '',
       active: json['active'] as bool? ?? false,
-      // Backend etkinlik türünü kaldırıp yerine sahip ekibi (`ownerTeam`)
-      // koydu. `json['type']['name']` artık null üzerinde çağrılıp listeyi
-      // tamamen düşürüyordu; eski yanıt biçimi de okunmaya devam ediyor.
-      typeName:
-          (json['type'] as Map<String, dynamic>?)?['name'] as String? ??
-          json['ownerTeam'] as String? ??
-          '',
+      ownerTeam: json['ownerTeam'] as String? ?? '',
     );
   }
 
-  static DateTime? _parse(String value) {
-    if (value.isEmpty) return null;
-    return DateTime.tryParse(value);
+  static const String _cdnBase = 'https://cdn.yildizskylab.com/';
+
+  /// Core kapak adresini tam CDN URL'si olarak veriyor; eski kayıtlarda
+  /// kalmış göreli bir depolama anahtarı (`images/<uuid>`) gelirse CDN'e
+  /// bağlanıyor.
+  static String _absoluteImageUrl(String? value) {
+    if (value == null || value.isEmpty) return '';
+    if (value.startsWith('http')) return value;
+    return '$_cdnBase${value.startsWith('/') ? value.substring(1) : value}';
   }
+
+  static DateTime? _parse(String value) => ApiDateTime.parse(value);
 
   DateTime? get startDateTime => _parse(startDate);
 
@@ -76,23 +83,15 @@ class EventModel {
   }
 
   String get formattedDate {
-    if (startDate.isEmpty) return '';
-    try {
-      final date = DateTime.parse(startDate);
-      return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
-    } catch (e) {
-      return startDate;
-    }
+    final date = startDateTime;
+    if (date == null) return startDate;
+    return '${date.day.toString().padLeft(2, '0')}.'
+        '${date.month.toString().padLeft(2, '0')}.${date.year}';
   }
 
   String get formattedTime {
-    if (startDate.isEmpty) return '';
-    try {
-      final date = DateTime.parse(startDate);
-      return _clock(date);
-    } catch (e) {
-      return '';
-    }
+    final date = startDateTime;
+    return date == null ? '' : _clock(date);
   }
 
   static const List<String> _months = [

@@ -40,7 +40,7 @@ void main() {
       expect(user.faculty, isEmpty);
       expect(user.profilePictureUrl, isEmpty);
       expect(user.linkedin, isEmpty);
-      expect(user.ldapUser, isFalse);
+      expect(user.studentCardUid, isEmpty);
     });
 
     test('fromJson parses profile API data correctly', () {
@@ -57,7 +57,7 @@ void main() {
         'faculty': 'EE',
         'profilePictureUrl': 'https://example.com/pic.jpg',
         'linkedin': 'https://linkedin.com/in/testuser',
-        'ldapUser': true,
+        'studentCardUid': '04A1B2C3',
       };
 
       final user = User.fromJson(apiData);
@@ -76,7 +76,7 @@ void main() {
       expect(user.faculty, 'EE');
       expect(user.profilePictureUrl, 'https://example.com/pic.jpg');
       expect(user.linkedin, 'https://linkedin.com/in/testuser');
-      expect(user.ldapUser, isTrue);
+      expect(user.studentCardUid, '04A1B2C3');
 
       // Roles and emailVerified are not provided by API
       expect(user.emailVerified, isFalse);
@@ -114,7 +114,7 @@ void main() {
         faculty: 'Faculty',
         profilePictureUrl: 'url',
         linkedin: 'linkedin_url',
-        ldapUser: true,
+        studentCardUid: '04A1B2C3',
       );
 
       final merged = jwtUser.mergeWith(profileUser);
@@ -135,7 +135,7 @@ void main() {
       expect(merged.faculty, 'Faculty');
       expect(merged.profilePictureUrl, 'url');
       expect(merged.linkedin, 'linkedin_url');
-      expect(merged.ldapUser, isTrue);
+      expect(merged.studentCardUid, '04A1B2C3');
 
       // JWT retains its specific fields
       expect(merged.emailVerified, isTrue);

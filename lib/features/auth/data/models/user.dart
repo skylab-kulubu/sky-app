@@ -28,7 +28,9 @@ class User {
   final String faculty;
   final String profilePictureUrl;
   final String linkedin;
-  final bool ldapUser;
+
+  /// Eşlenmiş öğrenci kartının UID'si (NFC); eşlenmemişse boş.
+  final String studentCardUid;
 
   const User({
     required this.id,
@@ -46,7 +48,7 @@ class User {
     this.faculty = '',
     this.profilePictureUrl = '',
     this.linkedin = '',
-    this.ldapUser = false,
+    this.studentCardUid = '',
     this.groups = const [],
     this.cmsRoles = const [],
   });
@@ -71,7 +73,7 @@ class User {
     );
   }
 
-  /// Profil API'sinin `data` objesinden kurar.
+  /// Core `GET /v1/users/me` yanıtından kurar.
   ///
   /// Yanıtta rol bilgisi bulunmadığı için [realmRoles] boş kalır; roller
   /// yalnızca JWT'de olduğundan bu nesne tek başına değil, [mergeWith] ile
@@ -96,7 +98,7 @@ class User {
       faculty: data['faculty'] ?? '',
       profilePictureUrl: data['profilePictureUrl'] ?? '',
       linkedin: data['linkedin'] ?? '',
-      ldapUser: data['ldapUser'] ?? false,
+      studentCardUid: data['studentCardUid'] ?? '',
     );
   }
 
@@ -127,7 +129,7 @@ class User {
       faculty: pick(profile.faculty, faculty),
       profilePictureUrl: pick(profile.profilePictureUrl, profilePictureUrl),
       linkedin: pick(profile.linkedin, linkedin),
-      ldapUser: profile.ldapUser || ldapUser,
+      studentCardUid: pick(profile.studentCardUid, studentCardUid),
     );
   }
 

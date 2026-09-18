@@ -286,7 +286,7 @@ class _EventDetailPageState extends EventDetailPagemodel {
       ),
       children: [
         _title(context),
-        if (event.typeName.isNotEmpty) ...[
+        if (event.ownerTeam.isNotEmpty) ...[
           const SizedBox(height: AppSizes.midSpace),
           _typeRow(context),
         ],
@@ -331,7 +331,7 @@ class _EventDetailPageState extends EventDetailPagemodel {
         const SizedBox(width: AppSizes.midSpace),
         Flexible(
           child: Text(
-            event.typeName,
+            event.ownerTeam,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: context.textTheme.bodyMedium?.copyWith(

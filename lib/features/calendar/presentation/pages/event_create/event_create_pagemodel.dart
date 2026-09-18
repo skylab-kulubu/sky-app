@@ -32,18 +32,18 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
   /// yoksa (ör. GECEKODU üyesi) başa ekleniyor ki alan boş kalmasın.
   late final List<String> ownerOptions = () {
     final options = _user?.eventOwnerOptions ?? const <String>[];
-    final current = _editing?.typeName ?? '';
+    final current = _editing?.ownerTeam ?? '';
     if (current.isEmpty || options.contains(current)) return options;
     return [current, ...options];
   }();
 
   late String? ownerTeam = isEditing
-      ? _editing!.typeName
+      ? _editing!.ownerTeam
       : (ownerOptions.isEmpty ? null : ownerOptions.first);
 
   /// Silme yalnızca liderlere ve YK/DK/ADMIN'e; GECEKODU üyeleri silemiyor.
   bool get canDelete =>
-      isEditing && (_user?.canDeleteEvent(_editing!.typeName) ?? false);
+      isEditing && (_user?.canDeleteEvent(_editing!.ownerTeam) ?? false);
 
   List<Season> seasons = const [];
   Season? season;

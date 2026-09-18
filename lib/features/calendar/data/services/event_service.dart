@@ -1,16 +1,12 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'package:dio/dio.dart';
+
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:sky_app/core/services/api_client.dart';
 import 'package:sky_app/core/services/api_exception.dart';
+import 'package:sky_app/core/services/core_api.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 
+/// Etkinlik okuma ve katılma (core `/v1/events`).
 class EventService {
-  /// Token, timeout ve 401 yenilemesi [ApiClient] tarafında; burada
-  /// header elle kurulmuyor.
-  final Dio _dio = ApiClient.instance.dio;
-
   /// Sunucuda henüz etkinlik yokken geliştirme ekranlarının boş kalmaması
   /// için örnek veri. Yalnızca debug'da devreye giriyor: kullanıcı release
   /// derlemesinde hiçbir koşulda sahte etkinlik görmemeli.
@@ -26,7 +22,7 @@ class EventService {
       endDate: '2026-08-16T18:00:00Z',
       formUrl: 'https://yildizjam.com',
       active: true,
-      typeName: 'Game Jam & Zirve',
+      ownerTeam: 'GAMELAB',
     ),
     EventModel(
       id: 'mock-event-2',
@@ -39,7 +35,7 @@ class EventService {
       endDate: '2026-08-20T17:00:00Z',
       formUrl: 'https://yildizskylab.com/algolab',
       active: true,
-      typeName: 'Eğitim & Çalıştay',
+      ownerTeam: 'ALGOLAB',
     ),
     EventModel(
       id: 'mock-event-3',
@@ -53,7 +49,7 @@ class EventService {
       endDate: '2026-08-29T21:00:00Z',
       formUrl: 'https://hackytu.com',
       active: true,
-      typeName: 'Hackathon',
+      ownerTeam: 'WEBLAB',
     ),
     EventModel(
       id: 'mock-event-4',
@@ -67,7 +63,7 @@ class EventService {
       endDate: '2026-09-05T17:00:00Z',
       formUrl: 'https://yildizskylab.com/ai-summit',
       active: false,
-      typeName: 'Zirve',
+      ownerTeam: 'AIRLAB',
     ),
     EventModel(
       id: 'mock-event-5',
@@ -81,83 +77,37 @@ class EventService {
       endDate: '2026-09-12T18:00:00Z',
       formUrl: 'https://yildizskylab.com/flutter-workshop',
       active: false,
-      typeName: 'Atölye',
+      ownerTeam: 'MOBILAB',
     ),
   ];
 
   /// Tek etkinlik (girişsiz); bağlantıyla açılan detay sayfası için.
   /// Bulunamazsa `notFound` tipinde [ApiException].
   Future<EventModel> fetchEvent(String id) async {
-    final Response<dynamic> response;
-    try {
-      response = await _dio.get<dynamic>('/api/events/$id');
-    } catch (e) {
-      throw ApiException.from(e);
-    }
-
-    final body = response.data;
-    final data = body is Map<String, dynamic> ? body['data'] : null;
-    if (data is! Map<String, dynamic>) {
-      throw const ApiException(
-        ApiErrorType.server,
-        message: 'Yanıtta etkinlik yok',
-      );
-    }
-    return EventModel.fromJson(data);
+    final body = await CoreApi.get('/events/$id');
+    return EventModel.fromJson(CoreApi.object(body, what: 'etkinlik'));
   }
 
+  /// Bütün etkinlikler. Girişsiz istekte core yalnızca aktifleri dönüyor;
+  /// oturum açıkken hepsi geliyor.
+  ///
+  /// Hatayı yutmuyor: "etkinlik yok" ile "yüklenemedi" ayrımını çağıran
+  /// [ApiException] üzerinden yapıyor.
   Future<List<EventModel>> fetchEvents() async {
-    final events = await _fetchEvents('/api/events');
+    final body = await CoreApi.get('/events');
+    final events = CoreApi.list(
+      body,
+      what: 'etkinlik listesi',
+    ).map(EventModel.fromJson).toList(growable: false);
+
     if (events.isEmpty && kDebugMode) return mockEvents;
     return events;
   }
 
-  /// Hatayı yutmuyor.
+  /// Üye başvurusu: giriş yapmış kullanıcıya bilet oluşturur (201).
   ///
-  /// Eskiden her hata boş listeye dönüşüyordu; çağıran "gerçekten etkinlik
-  /// yok" ile "yüklenemedi" arasında ayrım yapamıyor ve sessizce mock veriye
-  /// düşüyordu. Artık [ApiException] fırlatıyor, ayrımı çağıran yapıyor.
-  Future<List<EventModel>> _fetchEvents(String path) async {
-    final Response<dynamic> response;
-    try {
-      response = await _dio.get<dynamic>(path);
-    } catch (e) {
-      throw ApiException.from(e);
-    }
-
-    dynamic rawData = response.data;
-    if (rawData is String) {
-      try {
-        rawData = jsonDecode(rawData);
-      } catch (_) {
-        throw const ApiException(
-          ApiErrorType.server,
-          message: 'Yanıt çözümlenemedi',
-        );
-      }
-    }
-
-    if (rawData is! Map<String, dynamic>) {
-      throw const ApiException(
-        ApiErrorType.server,
-        message: 'Beklenmeyen yanıt gövdesi',
-      );
-    }
-
-    final data = rawData['data'];
-    if (data is! List) {
-      throw const ApiException(
-        ApiErrorType.server,
-        message: 'Yanıtta etkinlik listesi yok',
-      );
-    }
-
-    return data
-        .whereType<Map<String, dynamic>>()
-        .map(EventModel.fromJson)
-        .toList(growable: false);
-  }
-
+  /// Kullanıcının o etkinlikte zaten bileti varsa core 409 dönüyor; kayıt
+  /// mevcut olduğu için bu da başarı sayılıyor.
   Future<bool> joinEvent(String eventId) async {
     // Örnek etkinlikler yalnızca debug'da listelendiği için kısayol da
     // debug'a bağlı; release'de sahte başarı dönme ihtimali kalmıyor.
@@ -167,9 +117,10 @@ class EventService {
     }
 
     try {
-      await _dio.post<dynamic>('/api/events/$eventId/applications/me');
+      await CoreApi.post('/events/$eventId/applications/me');
       return true;
-    } catch (e) {
+    } on ApiException catch (e) {
+      if (e.statusCode == 409) return true;
       log('Etkinliğe katılma hatası: $e');
       return false;
     }

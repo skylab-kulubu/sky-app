@@ -14,7 +14,7 @@ void main() {
         endDate: '2026-08-16T18:00:00Z',
         formUrl: '',
         active: true,
-        typeName: 'Test',
+        ownerTeam: 'Test',
       );
 
       expect(event.startDateTime, isNotNull);
@@ -39,7 +39,7 @@ void main() {
         endDate: 'invalid-date',
         formUrl: '',
         active: true,
-        typeName: 'Test',
+        ownerTeam: 'Test',
       );
 
       expect(event.startDateTime, isNull);
@@ -57,7 +57,7 @@ void main() {
         endDate: '2026-08-16T18:00:00.000',
         formUrl: '',
         active: true,
-        typeName: 'Test',
+        ownerTeam: 'Test',
       );
       expect(multiDayEvent.isMultiDay, isTrue);
 
@@ -71,7 +71,7 @@ void main() {
         endDate: '2026-08-14T18:00:00.000',
         formUrl: '',
         active: true,
-        typeName: 'Test',
+        ownerTeam: 'Test',
       );
       expect(singleDayEvent.isMultiDay, isFalse);
     });
@@ -89,7 +89,7 @@ void main() {
           endDate: '',
           formUrl: '',
           active: true,
-          typeName: 'Test',
+          ownerTeam: 'Test',
         );
         expect(validEvent.formattedDate, '14.08.2026');
 
@@ -103,7 +103,7 @@ void main() {
           endDate: '',
           formUrl: '',
           active: true,
-          typeName: 'Test',
+          ownerTeam: 'Test',
         );
         expect(invalidEvent.formattedDate, 'invalid');
       },
@@ -120,7 +120,7 @@ void main() {
         endDate: '',
         formUrl: '',
         active: true,
-        typeName: 'Test',
+        ownerTeam: 'Test',
       );
       expect(validEvent.formattedTime, '09:05');
 
@@ -134,7 +134,7 @@ void main() {
         endDate: '',
         formUrl: '',
         active: true,
-        typeName: 'Test',
+        ownerTeam: 'Test',
       );
       expect(invalidEvent.formattedTime, isEmpty);
     });
@@ -150,7 +150,7 @@ void main() {
         endDate: '2026-08-14T18:00:00.000',
         formUrl: '',
         active: true,
-        typeName: 'Test',
+        ownerTeam: 'Test',
       );
       expect(singleDayEvent.formattedDayLabel, '14 Ağustos Cuma');
 
@@ -164,7 +164,7 @@ void main() {
         endDate: '2026-08-16T18:00:00.000',
         formUrl: '',
         active: true,
-        typeName: 'Test',
+        ownerTeam: 'Test',
       );
       expect(multiDaySameMonth.formattedDayLabel, '14 – 16 Ağustos 2026');
 
@@ -178,7 +178,7 @@ void main() {
         endDate: '2026-09-02T18:00:00.000',
         formUrl: '',
         active: true,
-        typeName: 'Test',
+        ownerTeam: 'Test',
       );
       expect(multiDayDiffMonth.formattedDayLabel, '30 Ağustos – 2 Eylül 2026');
     });
@@ -196,7 +196,7 @@ void main() {
           endDate: '2026-08-14T18:45:00.000',
           formUrl: '',
           active: true,
-          typeName: 'Test',
+          ownerTeam: 'Test',
         );
         expect(singleDayEvent.formattedTimeRange, '10:30 – 18:45');
 
@@ -210,7 +210,7 @@ void main() {
           endDate: '2026-08-16T18:00:00.000',
           formUrl: '',
           active: true,
-          typeName: 'Test',
+          ownerTeam: 'Test',
         );
         expect(
           multiDayEvent.formattedTimeRange,
@@ -227,7 +227,7 @@ void main() {
           endDate: '',
           formUrl: '',
           active: true,
-          typeName: 'Test',
+          ownerTeam: 'Test',
         );
         expect(
           noEndEvent.formattedTimeRange,
