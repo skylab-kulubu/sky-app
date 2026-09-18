@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 /// Ağ katmanından dönen hataların uygulama içindeki karşılığı.
@@ -31,7 +33,12 @@ enum ApiErrorType {
 /// "yetkilendirme reddedildi" ile "internet yok" ayrımı, oturumun silinip
 /// silinmeyeceğine karar veriyor.
 class ApiException implements Exception {
-  const ApiException(this.type, {this.statusCode, this.message});
+  const ApiException(
+    this.type, {
+    this.statusCode,
+    this.message,
+    this.serverMessage,
+  });
 
   factory ApiException.fromDio(DioException error) {
     final int? statusCode = error.response?.statusCode;
@@ -48,7 +55,12 @@ class ApiException implements Exception {
       DioExceptionType.unknown => ApiErrorType.unknown,
     };
 
-    return ApiException(type, statusCode: statusCode, message: error.message);
+    return ApiException(
+      type,
+      statusCode: statusCode,
+      message: error.message,
+      serverMessage: _problemText(error.response?.data),
+    );
   }
 
   /// Herhangi bir hatayı [ApiException]'a indirger.
@@ -67,6 +79,11 @@ class ApiException implements Exception {
   final ApiErrorType type;
   final int? statusCode;
   final String? message;
+
+  /// Sunucunun kendi açıklaması: core'un `application/problem+json`
+  /// gövdesindeki `detail` (yoksa `title`). İngilizce ve teknik; kullanıcıya
+  /// değil loglara. Kullanıcı metni [userMessage].
+  final String? serverMessage;
 
   /// Hata kullanıcının oturumundan değil bağlantıdan kaynaklanıyorsa true.
   /// Oturumun korunup korunmayacağına bu ayrım karar veriyor.
@@ -92,7 +109,27 @@ class ApiException implements Exception {
     return ApiErrorType.unknown;
   }
 
+  /// problem+json gövdesinden açıklamayı çıkarır; başka biçimde `null`.
+  static String? _problemText(Object? data) {
+    Object? body = data;
+    if (body is String && body.isNotEmpty) {
+      try {
+        body = jsonDecode(body);
+      } catch (_) {
+        return null;
+      }
+    }
+    if (body is! Map) return null;
+
+    final detail = body['detail'];
+    if (detail is String && detail.isNotEmpty) return detail;
+    final title = body['title'];
+    return title is String && title.isNotEmpty ? title : null;
+  }
+
   @override
   String toString() =>
-      'ApiException($type${statusCode == null ? '' : ', $statusCode'})';
+      'ApiException($type'
+      '${statusCode == null ? '' : ', $statusCode'}'
+      '${serverMessage == null ? '' : ', $serverMessage'})';
 }
