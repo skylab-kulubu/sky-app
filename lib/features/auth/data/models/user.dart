@@ -9,19 +9,31 @@ class User {
   final String department;
   final String skyNumber;
   final bool emailVerified;
+
+  /// Keycloak realm rolleri. Yetki için **kullanılmıyor**: core ve CMS
+  /// yalnızca [groups]'a bakıyor. Bilgi amaçlı duruyor.
   final List<String> realmRoles;
 
   /// Keycloak grup yolları (`/UYELER/ARGE/MOBILAB/LIDERLER`). Yalnızca
-  /// JWT'de var. Etkinlik yetkilerini OPA bunlardan hesaplıyor; uygulama da
-  /// aynı kaynaktan okuyor ki gösterdiği ile backend'in izin verdiği aynı olsun.
+  /// JWT'de var. Ekip üyeliği ve bütün yetkiler bunlardan hesaplanıyor;
+  /// core (`internal/authz`) ve CMS de aynı kaynağa bakıyor, böylece
+  /// uygulamanın gösterdiği ile backend'in izin verdiği aynı kalıyor.
   final List<String> groups;
 
-  /// SkyCMS client rolleri (`resource_access.skycms.roles`).
+  /// Token'ı alan client'ın (`azp`, uygulamada `skyapp`) rolleri. CMS
+  /// `cms:access`'i buradan okuyor; başka client'lardaki roller sayılmıyor.
   final List<String> cmsRoles;
 
-  /// Haber oluşturup düzenleyebilir mi. CMS bütün haber yazma işlerini
-  /// `cms:access` rolüne bağlıyor; kimin yazdığına bakmıyor.
-  bool get canManageNews => cmsRoles.contains('cms:access');
+  bool get _hasCmsAccess => cmsRoles.contains('cms:access');
+
+  /// Haber oluşturup düzenleyebilir mi: CMS `cms:access` rolüyle birlikte
+  /// YK/DK/ADMIN grubunu istiyor.
+  bool get canManageNews => _hasCmsAccess && isPrivileged;
+
+  /// Ekibin CMS sayfasını düzenleyebilir mi: `cms:access` ve o ekibin lider
+  /// ya da koordinatör alt grubu. [teamKey] büyük harfli grup adı (`MOBILAB`).
+  bool canEditTeam(String teamKey) =>
+      _hasCmsAccess && leaderTeams.contains(teamKey);
 
   // Yalnızca profil API'sinden gelen alanlar; JWT'de karşılıkları yok.
   final String schoolEmail;
@@ -68,7 +80,7 @@ class User {
       realmRoles: List<String>.from(payload['realm_access']?['roles'] ?? []),
       groups: List<String>.from(payload['groups'] ?? []),
       cmsRoles: List<String>.from(
-        payload['resource_access']?['skycms']?['roles'] ?? [],
+        payload['resource_access']?[payload['azp']]?['roles'] ?? [],
       ),
     );
   }
@@ -133,41 +145,40 @@ class User {
     );
   }
 
-  static const List<String> _teamRoles = [
-    'AGC',
-    'MOBILAB',
+  /// Etkinlik sahibi olarak seçilebilen ekipler (YK/DK/ADMIN için).
+  /// `ownerTeam` Keycloak grup adıyla eşleşmeli; core yetkiyi o gruba göre
+  /// veriyor.
+  static const List<String> _eventOwnerTeams = [
     'AIRLAB',
     'ALGOLAB',
-    'GAMELAB',
     'CHAINLAB',
+    'GAMELAB',
+    'MOBILAB',
     'SKYSEC',
     'SKYSIS',
     'WEBLAB',
     'GECEKODU',
-    'SKYMEDYA',
-    'BIZBIZE',
-    'DK',
     'YK',
-    'SKYDEVOPS',
-    'YILDIZJAM',
+    'DK',
   ];
 
-  List<String> get teams =>
-      realmRoles.where((role) => _teamRoles.contains(role)).toList();
+  /// Kullanıcının grupları, arayüzde gösterilecek adlarıyla: her grup
+  /// yolunun en derin anlamlı parçası. Kapsayıcılar (`UYELER`, `ARGE`,
+  /// `ORGANIZASYON`), rol alt grupları (`LIDERLER`) ve teknik `ADMIN`
+  /// gösterilmiyor. `/UYELER/ARGE/MOBILAB/LIDERLER` → `MOBILAB`.
+  List<String> get teams => {
+    for (final parts in _groupPaths)
+      if (parts.where((part) => !_leaderSubgroups.contains(part)).lastOrNull
+          case final team?)
+        if (!_hiddenGroups.contains(team)) team,
+  }.toList();
 
-  bool isOrganizerFor(String activeEventTypeName) {
-    if (activeEventTypeName.isEmpty) return false;
-    return realmRoles.contains(activeEventTypeName);
-  }
-
-  bool isOrganizerForAny(Iterable<String> activeEventTypeNames) {
-    for (final activeEventTypeName in activeEventTypeNames) {
-      if (isOrganizerFor(activeEventTypeName)) {
-        return true;
-      }
-    }
-    return false;
-  }
+  static const Set<String> _hiddenGroups = {
+    'UYELER',
+    'ARGE',
+    'ORGANIZASYON',
+    'ADMIN',
+  };
 
   String get teamsDisplay => teams.isEmpty ? '' : teams.join(' • ');
 
@@ -180,8 +191,8 @@ class User {
   static const Set<String> _privilegedGroups = {'ADMIN', 'YK', 'DK'};
   static const Set<String> _leaderSubgroups = {'LIDERLER', 'KOORDINATORLER'};
 
-  /// YK, DK ya da ADMIN grubunda (ya da alt gruplarında) mı. OPA'da bu
-  /// kullanıcılar her ekip adına etkinlik oluşturabiliyor.
+  /// YK, DK ya da ADMIN grubunda (ya da alt gruplarında) mı. Core ve CMS'te
+  /// bu kullanıcılar her şeye yetkili.
   bool get isPrivileged =>
       _groupPaths.any((parts) => parts.any(_privilegedGroups.contains));
 
@@ -197,8 +208,8 @@ class User {
   bool isInGroup(String name) =>
       _groupPaths.any((parts) => parts.contains(name));
 
-  /// Etkinlik oluştururken seçilebilecek sahip ekipler; OPA kurallarının
-  /// uygulamadaki karşılığı (`e-skylab/opa/policies/events.rego`):
+  /// Etkinlik oluştururken seçilebilecek sahip ekipler; core kurallarının
+  /// uygulamadaki karşılığı (`core-backend/internal/authz/policy.go`):
   ///
   /// - YK/DK/ADMIN: bütün ekipler.
   /// - Lider/koordinatör: lideri olduğu ekipler.
@@ -207,7 +218,7 @@ class User {
   /// Boşsa kullanıcı etkinlik oluşturamaz. Asıl kontrol backend'de; bu liste
   /// yalnızca butonu ve seçenekleri belirliyor.
   List<String> get eventOwnerOptions {
-    if (isPrivileged) return List.of(_teamRoles);
+    if (isPrivileged) return List.of(_eventOwnerTeams);
 
     return {
       ...leaderTeams,
@@ -219,7 +230,7 @@ class User {
 
   bool get canCreateEvent => eventOwnerOptions.isNotEmpty;
 
-  /// Verilen ekibin etkinliğini düzenleyebilir mi. OPA'da güncelleme,
+  /// Verilen ekibin etkinliğini düzenleyebilir mi. Core'da güncelleme,
   /// oluşturmayla aynı kurala bağlı (GECEKODU'da üyeler dahil).
   bool canEditEvent(String ownerTeam) =>
       ownerTeam.isNotEmpty &&
@@ -231,12 +242,6 @@ class User {
   /// üyeleri düzenleyebiliyor ama silemiyor.
   bool canDeleteEvent(String ownerTeam) =>
       ownerTeam.isNotEmpty && (isPrivileged || leaderTeams.contains(ownerTeam));
-
-  /// Verilen ekibin lideri mi. Keycloak'ta ekibin `LIDERLER` alt grubuna
-  /// `<EKİP>_LEADER` realm rolü bağlı; gruba eklenen kişi rolü token'da
-  /// taşıyor. SkyCMS de ekip düzenleme yetkisini aynı rolden okuyor.
-  bool isTeamLeader(String teamKey) =>
-      teamKey.isNotEmpty && realmRoles.contains('${teamKey}_LEADER');
 
   /// Kullanıcı adının gösterim hâli; arayüzde hep `@` ile yazılıyor.
   String get usernameDisplay =>

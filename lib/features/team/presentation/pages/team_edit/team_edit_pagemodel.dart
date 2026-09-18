@@ -210,8 +210,8 @@ abstract class TeamEditPagemodel extends State<TeamEditPage> {
     return switch (error.statusCode) {
       409 =>
         'Ekip bilgileri sen düzenlerken değiştirilmiş. Sayfayı kapatıp tekrar aç.',
-      // CMS token'da `skycms` audience'ı ya da `cms:access` rolü yoksa 401,
-      // kullanıcı bu ekibin lideri değilse 403 dönüyor.
+      // Token'ın `skyapp` client'ında `cms:access` yoksa ya da kullanıcı
+      // ekibin `LIDERLER` grubunda değilse CMS 401/403 dönüyor.
       401 || 403 => 'Bu ekibi düzenleme yetkin yok.',
       400 => 'Bilgiler kaydedilemedi; alanları kontrol et.',
       _ => error.userMessage,

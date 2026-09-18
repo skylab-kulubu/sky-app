@@ -6,7 +6,7 @@ import 'package:sky_app/core/services/links_service.dart';
 /// Alımdan yalnızca açık/kapalı bilgisi ([isRecruiting]) kullanılıyor;
 /// başvuru adresi CMS'teki `applyUrl` değil, kulübün kısa link servisi
 /// ([applyUrl]). `leads` ve `memberCount` CMS'te henüz doldurulmadığı için
-/// yok; üyeler Super Skylab'dan ayrıca geliyor (bkz.
+/// yok; üyeler core'dan ayrıca geliyor (bkz.
 /// `TeamService.fetchMembers`).
 class Team {
   const Team({
@@ -20,8 +20,8 @@ class Team {
     this.data = const {},
   });
 
-  /// CMS'teki anahtar, küçük harf (`mobilab`). Super Skylab ekip adını büyük
-  /// harf bekliyor; [key] onu veriyor.
+  /// CMS'teki anahtar, küçük harf (`mobilab`). Core ve Keycloak ekip adını
+  /// büyük harf kullanıyor; [key] onu veriyor.
   final String slug;
 
   final String description;
@@ -106,7 +106,8 @@ class Team {
   /// büyük harfle yazılıyor (MOBILAB, WEBLAB).
   String get name => slug.toUpperCase();
 
-  /// Super Skylab'daki ekip adı (`/api/teams/{key}/members`).
+  /// Keycloak grup adı; core'da `/v1/teams/{key}/members`, token'da
+  /// `User.teams` bununla eşleşiyor.
   String get key => slug.toUpperCase();
 
   /// Ekip şu an üye alıyor mu (CMS'te `recruiting`).

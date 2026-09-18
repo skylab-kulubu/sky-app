@@ -12,10 +12,9 @@ abstract class TeamDetailPagemodel extends State<TeamDetailPage> {
   Team get team =>
       context.watch<TeamProvider>().teamBySlug(widget.team.slug) ?? widget.team;
 
-  /// Kullanıcı bu ekibin lideri mi; düzenleme butonu yalnızca liderlere.
+  /// Düzenleme butonu yalnızca ekibin liderlerine (`cms:access` ile).
   bool get canEdit =>
-      context.watch<UserProvider>().user?.isTeamLeader(widget.team.key) ??
-      false;
+      context.watch<UserProvider>().user?.canEditTeam(widget.team.key) ?? false;
 
   @override
   void initState() {

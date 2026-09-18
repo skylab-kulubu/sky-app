@@ -78,10 +78,10 @@ abstract class TeamPagemodel extends State<TeamPage> {
   void _jumpToMyTeam() {
     if (!mounted || !pageController.hasClients) return;
 
-    final roles = context.read<UserProvider>().user?.realmRoles ?? const [];
+    final myTeams = context.read<UserProvider>().user?.teams ?? const [];
     final teams = _teamProvider.teams;
     final myIndexes = [
-      for (final team in _teamProvider.teamsOf(roles)) teams.indexOf(team),
+      for (final team in _teamProvider.teamsOf(myTeams)) teams.indexOf(team),
     ];
     if (myIndexes.isEmpty) return;
 

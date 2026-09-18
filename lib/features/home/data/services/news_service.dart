@@ -7,9 +7,10 @@ import 'package:sky_app/features/home/data/models/news_item.dart';
 
 /// SkyCMS `News` koleksiyonu.
 ///
-/// Okuma girişsiz. Yazma için token'da `skycms` client'ının `cms:access`
-/// rolü ve `skycms` audience'ı gerekiyor; bu rolü olan herkes bütün
-/// haberleri oluşturup düzenleyebiliyor. Silme endpoint'i yok.
+/// Okuma girişsiz. Yazma için token'ın `skyapp` client'ında `cms:access`
+/// rolü ve YK/DK/ADMIN grubu gerekiyor (`User.canManageNews`); bu
+/// kullanıcılar bütün haberleri oluşturup düzenleyebiliyor. Silme
+/// endpoint'i yok.
 ///
 /// Koleksiyon adı büyük harfle (`News`); yanıtlar `{data: ...}` zarfında
 /// değil.

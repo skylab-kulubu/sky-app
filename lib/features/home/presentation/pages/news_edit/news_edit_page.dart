@@ -25,9 +25,8 @@ part 'news_edit_pagemodel.dart';
 /// Haber oluşturma ve düzenleme. `cms:access` rolü olana açılıyor; kayıt
 /// CMS'e gidiyor, liste ve açık detay sayfası provider üzerinden güncelleniyor.
 ///
-/// Görsel yükleme yok, yalnızca bağlantı: Super Skylab'a yüklenen medya bir
-/// kayda bağlanmazsa gece temizleme işi 24 saat sonra siliyor ve CMS'teki
-/// haber bu bağlamayı yapamıyor. Silme de yok (CMS'te endpoint yok).
+/// Görsel yükleme yok, yalnızca bağlantı (CMS alanı bir URL). Silme de yok
+/// (CMS'te endpoint yok).
 class NewsEditPage extends StatefulWidget {
   const NewsEditPage({super.key, this.item});
 

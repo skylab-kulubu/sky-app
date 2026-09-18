@@ -1,4 +1,4 @@
-/// Super Skylab'daki herkese açık ekip üyesi (`TeamMemberDto`).
+/// Ekibin herkese açık üyesi (core `/v1/teams/{team}/members`).
 class TeamMember {
   const TeamMember({
     required this.firstName,

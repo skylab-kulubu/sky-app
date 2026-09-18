@@ -31,14 +31,14 @@ class TeamProvider extends ChangeNotifier {
     return null;
   }
 
-  /// Kullanıcının üyesi olduğu, carousel'de bulunan ekipler. Üyelik token'daki
-  /// realm rollerinden (`MOBILAB`); lider alt grubundakiler de bu rolü
-  /// üst gruptan miras alıyor.
-  List<Team> teamsOf(Iterable<String> realmRoles) {
-    final roles = realmRoles.toSet();
+  /// Kullanıcının üyesi olduğu, carousel'de bulunan ekipler. [groupNames]
+  /// `User.teams`: token'daki grup yollarından çıkan ekip adları
+  /// (`MOBILAB`); lider alt grubundakiler de ekibin üyesi sayılıyor.
+  List<Team> teamsOf(Iterable<String> groupNames) {
+    final names = groupNames.toSet();
     return [
       for (final team in _teams)
-        if (roles.contains(team.key)) team,
+        if (names.contains(team.key)) team,
     ];
   }
 

@@ -93,10 +93,10 @@ class _TeamPageState extends TeamPagemodel {
   }
 
   Widget _summaryRow(List<Team> teams) {
-    final roles = context.watch<UserProvider>().user?.realmRoles ?? const [];
+    final myTeams = context.watch<UserProvider>().user?.teams ?? const [];
 
     return TeamSummaryRow(
-      myTeams: context.read<TeamProvider>().teamsOf(roles),
+      myTeams: context.read<TeamProvider>().teamsOf(myTeams),
       recruitingTeams: [
         for (final team in teams)
           if (team.isRecruiting) team,

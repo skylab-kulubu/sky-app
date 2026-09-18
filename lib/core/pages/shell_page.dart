@@ -152,8 +152,8 @@ class _ShellPageState extends ShellPagemodel {
   List<String> _actionsFor(_AppBarConfig config) {
     if (!identical(config, _AppBarConfig._team)) return config.actions;
 
-    final roles = context.watch<UserProvider>().user?.realmRoles ?? const [];
-    final hasTeam = context.watch<TeamProvider>().teamsOf(roles).isNotEmpty;
+    final myTeams = context.watch<UserProvider>().user?.teams ?? const [];
+    final hasTeam = context.watch<TeamProvider>().teamsOf(myTeams).isNotEmpty;
     return hasTeam ? const [AppIcons.myTeam] : config.actions;
   }
 
