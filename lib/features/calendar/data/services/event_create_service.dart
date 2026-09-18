@@ -1,48 +1,69 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sky_app/core/services/api_client.dart';
+import 'package:sky_app/core/extensions/date_time_extensions.dart';
 import 'package:sky_app/core/services/api_exception.dart';
+import 'package:sky_app/core/services/core_api.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/data/models/season.dart';
 
-/// Etkinlik oluşturma, düzenleme ve silmenin ağ işleri: sezon listesi,
-/// kapak yükleme, kayıt, güncelleme, silme.
-///
-/// Yetki OPA'da: sahip ekipte lider (GECEKODU'da üye) ya da YK/DK/ADMIN
-/// olmayan kullanıcının isteği 403 ile reddediliyor.
-class EventCreateService {
-  final Dio _dio = ApiClient.instance.dio;
+/// Formdan gelen etkinlik bilgileri; oluşturma ve düzenlemede aynı.
+class EventDraft {
+  const EventDraft({
+    required this.name,
+    required this.location,
+    required this.ownerTeam,
+    required this.startDate,
+    required this.endDate,
+    required this.active,
+    required this.description,
+    required this.formUrl,
+    required this.linkedin,
+    required this.capacity,
+    this.coverImageId,
+  });
 
-  /// Bütün sezonlar; girişsiz okunuyor. Etkinlik oluştururken sezon zorunlu.
+  final String name;
+  final String location;
+  final String ownerTeam;
+  final DateTime startDate;
+  final DateTime endDate;
+  final bool active;
+  final String description;
+  final String formUrl;
+  final String linkedin;
+
+  /// 0 sınırsız.
+  final int capacity;
+
+  /// Yeni yüklenen kapağın medya id'si; `null` ise kapak değişmiyor.
+  final String? coverImageId;
+}
+
+/// Etkinlik oluşturma, düzenleme ve silmenin ağ işleri (core `/v1`):
+/// sezon listesi, kapak yükleme, kayıt, sezona bağlama, güncelleme, silme.
+///
+/// Yetki core'da (`internal/authz`): sahip ekipte lider (GECEKODU'da üye)
+/// ya da YK/DK/ADMIN olmayan kullanıcının isteği 403 ile reddediliyor.
+/// Sezona bağlama yalnızca YK/DK/ADMIN'e açık.
+class EventCreateService {
+  /// Bütün sezonlar; girişsiz okunuyor.
   Future<List<Season>> fetchSeasons() async {
-    final data = await _unwrap(() => _dio.get<dynamic>('/api/seasons'));
-    if (data is! List) {
-      throw const ApiException(
-        ApiErrorType.server,
-        message: 'Yanıtta sezon listesi yok',
-      );
-    }
-    return data
-        .whereType<Map<String, dynamic>>()
+    final body = await CoreApi.get('/seasons');
+    return CoreApi.list(body, what: 'sezon listesi')
         .map(Season.fromJson)
         .where((season) => season.id.isNotEmpty)
         .toList(growable: false);
   }
 
-  /// Kapak görselini yükler ve medya id'sini döner. Backend yalnızca görsel
-  /// dosyalarını kabul ediyor; alan adı `file`.
+  /// Kapak görselini yükler ve medya id'sini döner. Alan adı `file`.
   Future<String> uploadCover(XFile image) async {
     final form = FormData.fromMap({
       'file': await MultipartFile.fromFile(image.path, filename: image.name),
     });
 
-    final data = await _unwrap(
-      () => _dio.post<dynamic>('/api/media', data: form),
-    );
-    final id = data is Map<String, dynamic> ? data['id'] as String? : null;
-    if (id == null || id.isEmpty) {
+    final body = await CoreApi.post('/media', body: form);
+    final id = CoreApi.object(body, what: 'yüklenen görsel')['id'];
+    if (id is! String || id.isEmpty) {
       throw const ApiException(
         ApiErrorType.server,
         message: 'Yüklenen görselin kimliği dönmedi',
@@ -51,135 +72,75 @@ class EventCreateService {
     return id;
   }
 
-  /// Etkinliği oluşturur ve oluşturulan hâlini döner.
+  /// Etkinliği oluşturur; [seasonId] verilirse sezona da bağlar ve son
+  /// hâlini döner.
   ///
-  /// İstek JSON değil multipart: veri `data` adlı parçada, JSON içerik
-  /// tipiyle gidiyor (`@RequestPart("data")`). Tarihler saat dilimsiz
-  /// (`LocalDateTime`), cihazın yerel saatiyle yazılıyor.
-  Future<EventModel> createEvent({
-    required String name,
-    required String location,
-    required String ownerTeam,
-    required String seasonId,
-    required DateTime startDate,
-    required DateTime endDate,
-    required bool active,
-    String description = '',
-    String? coverImageId,
-    String formUrl = '',
-    String linkedin = '',
-    int capacity = 0,
-  }) async {
-    final payload = {
-      'name': name,
-      'location': location,
-      'ownerTeam': ownerTeam,
-      'seasonId': seasonId,
-      'startDate': _localDateTime(startDate),
-      'endDate': _localDateTime(endDate),
-      'active': active,
-      'description': description,
-      'coverImageId': ?coverImageId,
-      'formUrl': formUrl,
-      'linkedin': linkedin,
-      'capacity': capacity,
-    };
-
-    final form = FormData.fromMap({
-      'data': MultipartFile.fromString(
-        jsonEncode(payload),
-        contentType: DioMediaType('application', 'json'),
-      ),
-    });
-
-    final data = await _unwrap(
-      () => _dio.post<dynamic>('/api/events', data: form),
+  /// Sezon oluşturma isteğinde gitmiyor, ayrı bir çağrıyla bağlanıyor ve bu
+  /// yalnızca YK/DK/ADMIN'e açık. Bağlama düşerse etkinlik yine oluşmuş
+  /// oluyor; o durumda sezonsuz hâli dönüyor.
+  Future<EventModel> createEvent(EventDraft draft, {String? seasonId}) async {
+    final body = await CoreApi.post('/events', body: _payload(draft));
+    final created = EventModel.fromJson(
+      CoreApi.object(body, what: 'oluşturulan etkinlik'),
     );
-    if (data is! Map<String, dynamic>) {
-      throw const ApiException(
-        ApiErrorType.server,
-        message: 'Oluşturulan etkinlik dönmedi',
-      );
-    }
-    return EventModel.fromJson(data);
-  }
 
-  /// Etkinliği günceller (`PATCH`, düz JSON) ve güncel hâlini döner.
-  ///
-  /// Kapak ve kontenjan güncelleme isteğinde yok; backend yalnızca
-  /// oluştururken alıyor.
-  Future<EventModel> updateEvent(
-    String id, {
-    required String name,
-    required String location,
-    required String ownerTeam,
-    required String seasonId,
-    required DateTime startDate,
-    required DateTime endDate,
-    required bool active,
-    required String description,
-    required String formUrl,
-    required String linkedin,
-  }) async {
-    final data = await _unwrap(
-      () => _dio.patch<dynamic>(
-        '/api/events/$id',
-        data: {
-          'name': name,
-          'location': location,
-          'ownerTeam': ownerTeam,
-          'seasonId': seasonId,
-          'startDate': _localDateTime(startDate),
-          'endDate': _localDateTime(endDate),
-          'active': active,
-          'description': description,
-          'formUrl': formUrl,
-          'linkedin': linkedin,
-        },
-      ),
-    );
-    if (data is! Map<String, dynamic>) {
-      throw const ApiException(
-        ApiErrorType.server,
-        message: 'Güncellenen etkinlik dönmedi',
-      );
-    }
-    return EventModel.fromJson(data);
-  }
-
-  /// Etkinliği siler. Bilet alınmış ya da günü tanımlanmış etkinliği
-  /// backend 400 ile reddediyor.
-  Future<void> deleteEvent(String id) async {
-    await _unwrap(() => _dio.delete<dynamic>('/api/events/$id'));
-  }
-
-  /// `2026-09-20T18:00:00`: saniyeli, saat dilimsiz.
-  static String _localDateTime(DateTime value) {
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${value.year}-${two(value.month)}-${two(value.day)}'
-        'T${two(value.hour)}:${two(value.minute)}:00';
-  }
-
-  /// İsteği atar, `{data: ...}` zarfını açar.
-  Future<Object?> _unwrap(Future<Response<dynamic>> Function() request) async {
-    final Response<dynamic> response;
+    if (seasonId == null || seasonId.isEmpty) return created;
     try {
-      response = await request();
-    } catch (e) {
-      throw ApiException.from(e);
+      return await assignSeason(created.id, seasonId);
+    } on ApiException {
+      return created;
     }
-
-    dynamic body = response.data;
-    if (body is String) {
-      try {
-        body = jsonDecode(body);
-      } catch (_) {
-        throw const ApiException(
-          ApiErrorType.server,
-          message: 'Yanıt çözümlenemedi',
-        );
-      }
-    }
-    return body is Map<String, dynamic> ? body['data'] : null;
   }
+
+  /// Etkinliği günceller ve güncel hâlini döner.
+  ///
+  /// Core güncellemede bütün alanları yazıyor; formda olmayanlar
+  /// ([original]'dan sıralama, ödül, katılım kuralı) aynen geri gönderiliyor
+  /// ki silinmesin. Kapak değişmediyse mevcut kapak id'si gidiyor.
+  Future<EventModel> updateEvent(EventModel original, EventDraft draft) async {
+    final coverImageId =
+        draft.coverImageId ??
+        (original.coverImageId.isEmpty ? null : original.coverImageId);
+
+    final body = await CoreApi.put(
+      '/events/${original.id}',
+      body: {
+        ..._payload(draft),
+        'coverImageId': coverImageId,
+        'ranked': original.ranked,
+        'prizeInfo': original.prizeInfo,
+        if (original.attendanceRule.isNotEmpty)
+          'attendanceRule': original.attendanceRule,
+        'attendanceRatio': original.attendanceRatio,
+      },
+    );
+    return EventModel.fromJson(
+      CoreApi.object(body, what: 'güncellenen etkinlik'),
+    );
+  }
+
+  /// Etkinliği sezona bağlar (YK/DK/ADMIN) ve güncel hâlini döner.
+  Future<EventModel> assignSeason(String eventId, String seasonId) async {
+    final body = await CoreApi.post('/seasons/$seasonId/events/$eventId');
+    return EventModel.fromJson(CoreApi.object(body, what: 'etkinlik'));
+  }
+
+  /// Etkinliği siler (204). Core biletleri, yoklamaları ve sertifikaları da
+  /// birlikte siliyor.
+  Future<void> deleteEvent(String id) => CoreApi.delete('/events/$id');
+
+  /// Tarihler UTC, RFC 3339.
+  static Map<String, dynamic> _payload(EventDraft draft) => {
+    'name': draft.name,
+    'location': draft.location,
+    'ownerTeam': draft.ownerTeam,
+    'startDate': draft.startDate.toApiString(),
+    'endDate': draft.endDate.toApiString(),
+    'active': draft.active,
+    'description': draft.description,
+    'formUrl': draft.formUrl,
+    'linkedin': draft.linkedin,
+    'capacity': draft.capacity,
+    'coverImageId': ?draft.coverImageId,
+  };
 }

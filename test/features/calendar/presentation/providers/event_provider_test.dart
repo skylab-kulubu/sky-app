@@ -6,7 +6,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sky_app/core/services/api_client.dart';
 import 'package:sky_app/core/services/api_exception.dart';
-import 'package:sky_app/features/calendar/data/services/event_service.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 
 const String _eventsPath = '/v1/events';
@@ -241,15 +240,14 @@ void main() {
     });
   });
 
-  group('örnek veri', () {
-    test('boş yanıt debug derlemesinde örnek etkinliklere düşer', () async {
-      // `flutter test` debug modda koşuyor; release'de bu liste boş kalır.
+  group('boş yanıt', () {
+    test('etkinlik yoksa liste boş kalır, hata yok', () async {
       adapter.handlers[_eventsPath] = () async => _okBody([]);
 
       await provider.ensureLoaded();
 
       expect(provider.error, isNull);
-      expect(provider.events.length, EventService.mockEvents.length);
+      expect(provider.events, isEmpty);
     });
   });
 }

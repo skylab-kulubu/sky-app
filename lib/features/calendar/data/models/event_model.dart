@@ -28,6 +28,12 @@ class EventModel {
     required this.ownerTeam,
     this.linkedin = '',
     this.seasonId = '',
+    this.coverImageId = '',
+    this.capacity = 0,
+    this.ranked = false,
+    this.prizeInfo = '',
+    this.attendanceRule = '',
+    this.attendanceRatio,
   });
 
   /// Etkinliğin LinkedIn gönderisi; düzenleme formu için.
@@ -35,6 +41,22 @@ class EventModel {
 
   /// Bağlı olduğu sezonun id'si; sezona bağlanmamışsa boş.
   final String seasonId;
+
+  // Aşağıdakiler arayüzde gösterilmiyor ama düzenlemede geri gönderiliyor:
+  // core'da güncelleme (PUT/PATCH) bütün alanları yazıyor, gönderilmeyen
+  // alan sıfırlanıyor.
+
+  /// Kapak görselinin medya id'si; kapak yoksa boş.
+  final String coverImageId;
+
+  /// Kontenjan; 0 sınırsız.
+  final int capacity;
+  final bool ranked;
+  final String prizeInfo;
+
+  /// Sertifika için katılım kuralı (`none`, `once`, `ratio`).
+  final String attendanceRule;
+  final double? attendanceRatio;
 
   /// Core `EventResponse`'u (`/v1/events`).
   factory EventModel.fromJson(Map<String, dynamic> json) {
@@ -51,6 +73,12 @@ class EventModel {
       formUrl: json['formUrl'] as String? ?? '',
       active: json['active'] as bool? ?? false,
       ownerTeam: json['ownerTeam'] as String? ?? '',
+      coverImageId: json['coverImageId'] as String? ?? '',
+      capacity: (json['capacity'] as num?)?.toInt() ?? 0,
+      ranked: json['ranked'] as bool? ?? false,
+      prizeInfo: json['prizeInfo'] as String? ?? '',
+      attendanceRule: json['attendanceRule'] as String? ?? '',
+      attendanceRatio: (json['attendanceRatio'] as num?)?.toDouble(),
     );
   }
 

@@ -8,15 +8,25 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
+import 'package:sky_app/core/widgets/cover_image.dart';
 
-/// Etkinlik oluştururken kapak alanı. Etkinlik kartındaki kapakla aynı oran
+/// Etkinlik formundaki kapak alanı. Etkinlik kartındaki kapakla aynı oran
 /// ve köşeler; listede nasıl görüneceği burada da görülüyor. Görsel yokken
 /// dokunmaya davet eden boş alan, seçilince önizleme; dokununca değişiyor.
+/// Düzenlemede yeni görsel seçilene kadar mevcut kapak ([imageUrl]) görünüyor.
 class EventCoverPicker extends StatelessWidget {
-  const EventCoverPicker({super.key, required this.image, required this.onTap});
+  const EventCoverPicker({
+    super.key,
+    required this.image,
+    required this.onTap,
+    this.imageUrl = '',
+  });
 
   final XFile? image;
   final VoidCallback onTap;
+
+  /// Etkinliğin mevcut kapağı; boşsa yok.
+  final String imageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +40,11 @@ class EventCoverPicker extends StatelessWidget {
           borderRadius: AppRadiuses.cardBorderRadius,
           child: ColoredBox(
             color: context.tileColor,
-            child: image == null ? _placeholder(context) : _preview(image),
+            child: image != null
+                ? _preview(image)
+                : imageUrl.isNotEmpty
+                ? CoverImage(imageUrl: imageUrl)
+                : _placeholder(context),
           ),
         ),
       ),

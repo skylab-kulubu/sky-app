@@ -45,9 +45,17 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
   bool get canDelete =>
       isEditing && (_user?.canDeleteEvent(_editing!.ownerTeam) ?? false);
 
+  /// Etkinliği sezona yalnızca YK/DK/ADMIN bağlayabiliyor; diğerlerinde
+  /// sezon satırı görünmüyor ve etkinlik sezonsuz oluşuyor.
+  late final bool canChooseSeason = _user?.isPrivileged ?? false;
+
+  /// Düzenlenen etkinliğin mevcut kapağı; yeni görsel seçilmediyse
+  /// önizlemede bu görünüyor.
+  String get currentCoverUrl => _editing?.coverImageUrl ?? '';
+
   List<Season> seasons = const [];
   Season? season;
-  bool isLoadingSeasons = true;
+  late bool isLoadingSeasons = canChooseSeason;
 
   int capacity = 0;
   bool isActive = true;
@@ -67,12 +75,13 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       formUrlController.text = event.formUrl;
       linkedinController.text = event.linkedin;
       isActive = event.active;
+      capacity = event.capacity;
       final start = event.startDateTime;
       final end = event.endDateTime;
       if (start != null) startDate = start;
       if (end != null) endDate = end;
     }
-    _loadSeasons();
+    if (canChooseSeason) _loadSeasons();
   }
 
   @override
@@ -117,14 +126,14 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
     return season?.name ?? (seasons.isEmpty ? 'Sezon yok' : 'Seç');
   }
 
-  /// Zorunlular: ad, konum, sahip ekip, sezon ve bitişin başlangıçtan sonra
-  /// olması. Tarihler varsayılanla dolu geldiği için ayrıca boş kontrolü yok.
+  /// Zorunlular: ad, konum, sahip ekip ve bitişin başlangıçtan sonra olması.
+  /// Sezon isteğe bağlı (bağlamayı YK panelden de yapabiliyor). Tarihler
+  /// varsayılanla dolu geldiği için ayrıca boş kontrolü yok.
   bool get canSubmit =>
       !isBusy &&
       nameController.text.trim().isNotEmpty &&
       locationController.text.trim().isNotEmpty &&
       ownerTeam != null &&
-      season != null &&
       endDate.isAfter(startDate);
 
   void onFormChanged() => setState(() {});
@@ -254,55 +263,43 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
 
   Future<void> onSubmit() async {
     final ownerTeam = this.ownerTeam;
-    final season = this.season;
-    if (ownerTeam == null || season == null) return;
+    if (ownerTeam == null) return;
 
     setState(() => isSaving = true);
 
     try {
-      final editing = _editing;
-      if (editing != null) {
-        final updated = await _service.updateEvent(
-          editing.id,
-          name: nameController.text.trim(),
-          location: locationController.text.trim(),
-          ownerTeam: ownerTeam,
-          seasonId: season.id,
-          startDate: startDate,
-          endDate: endDate,
-          active: isActive,
-          description: descriptionController.text.trim(),
-          formUrl: formUrlController.text.trim(),
-          linkedin: linkedinController.text.trim(),
-        );
-        if (!mounted) return;
-        context.read<EventProvider>().refresh();
-        Navigator.of(context).pop(EventFormResult.saved(updated));
-        return;
-      }
-
       final cover = this.cover;
       final coverId = cover == null ? null : await _service.uploadCover(cover);
 
-      final event = await _service.createEvent(
+      final draft = EventDraft(
         name: nameController.text.trim(),
         location: locationController.text.trim(),
         ownerTeam: ownerTeam,
-        seasonId: season.id,
         startDate: startDate,
         endDate: endDate,
         active: isActive,
         description: descriptionController.text.trim(),
-        coverImageId: coverId,
         formUrl: formUrlController.text.trim(),
         linkedin: linkedinController.text.trim(),
         capacity: capacity,
+        coverImageId: coverId,
       );
+
+      final editing = _editing;
+      final EventModel saved;
+      if (editing != null) {
+        saved = await _updateAndAssign(editing, draft);
+      } else {
+        saved = await _service.createEvent(
+          draft,
+          seasonId: canChooseSeason ? season?.id : null,
+        );
+      }
       if (!mounted) return;
 
-      // Listeler yeni etkinliği göstersin; sonuç beklenmiyor.
+      // Listeler yeni hâli göstersin; sonuç beklenmiyor.
       context.read<EventProvider>().refresh();
-      Navigator.of(context).pop(EventFormResult.saved(event));
+      Navigator.of(context).pop(EventFormResult.saved(saved));
     } catch (e) {
       final error = ApiException.from(e);
       log('Etkinlik kaydedilemedi: $error');
@@ -312,19 +309,36 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
     }
   }
 
+  /// Günceller; sezon değiştiyse (yalnızca YK/DK/ADMIN) yeni sezona bağlar.
+  /// Bağlama düşerse güncelleme yine geçerli, sezon eski kalıyor.
+  Future<EventModel> _updateAndAssign(
+    EventModel editing,
+    EventDraft draft,
+  ) async {
+    final updated = await _service.updateEvent(editing, draft);
+    final seasonId = season?.id;
+    if (!canChooseSeason || seasonId == null || seasonId == editing.seasonId) {
+      return updated;
+    }
+
+    try {
+      return await _service.assignSeason(updated.id, seasonId);
+    } on ApiException catch (e) {
+      log('Sezona bağlanamadı: $e');
+      return updated;
+    }
+  }
+
   String _errorMessage(ApiException error) {
     return switch (error.statusCode) {
       403 => 'Bu ekip adına etkinlik yönetme yetkin yok.',
       400 => 'Etkinlik kaydedilemedi; alanları kontrol et.',
-      // Super Skylab veritabanı kısıtı ihlalini (DataIntegrityViolation) 409
-      // ile dönüyor; formdaki bir alandan değil sunucu tarafından kaynaklı.
-      409 => 'Sunucu etkinliği kaydedemedi. Lütfen daha sonra tekrar dene.',
       _ => error.userMessage,
     };
   }
 
-  /// Onaydan sonra siler. Bilet alınmış ya da günü tanımlanmış etkinliği
-  /// backend reddediyor (400); mesaj bunu söylüyor.
+  /// Onaydan sonra siler. Core etkinlikle birlikte biletleri, yoklamaları
+  /// ve sertifikaları da siliyor; onay metni bunu söylüyor.
   Future<void> onDeletePressed() async {
     final editing = _editing;
     if (editing == null) return;
@@ -344,7 +358,6 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       if (!mounted) return;
       setState(() => isDeleting = false);
       _showMessage(switch (error.statusCode) {
-        400 => 'Bu etkinliğe kayıt yapılmış ya da günü eklenmiş; silinemez.',
         403 => 'Bu etkinliği silme yetkin yok.',
         _ => error.userMessage,
       });
@@ -366,7 +379,8 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
           ),
         ),
         content: Text(
-          '${event.name} kalıcı olarak silinecek. Bu işlem geri alınamaz.',
+          '${event.name} kalıcı olarak silinecek. Etkinliğe ait kayıtlar, '
+          'yoklamalar ve sertifikalar da silinir. Bu işlem geri alınamaz.',
           style: dialogContext.textTheme.bodyMedium?.copyWith(
             color: dialogContext.textSecondary,
           ),

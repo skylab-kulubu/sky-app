@@ -88,11 +88,13 @@ class _EventCreatePageState extends EventCreatePagemodel {
       body: ListView(
         padding: AppPaddings.mainPaddingAll,
         children: [
-          if (!isEditing) ...[
-            const SectionHeader('Kapak', isFirst: true),
-            EventCoverPicker(image: cover, onTap: onPickCover),
-          ],
-          SectionHeader('Bilgiler', isFirst: isEditing),
+          const SectionHeader('Kapak', isFirst: true),
+          EventCoverPicker(
+            image: cover,
+            imageUrl: currentCoverUrl,
+            onTap: onPickCover,
+          ),
+          const SectionHeader('Bilgiler'),
           SkyTextField(
             controller: nameController,
             hintText: 'Etkinlik adı',
@@ -176,21 +178,21 @@ class _EventCreatePageState extends EventCreatePagemodel {
           trailingIcon: ownerOptions.length > 1 ? AppIcons.chevronRight : null,
           onTap: onChooseOwner,
         ),
-        SettingsTile(
-          icon: AppIcons.calendar,
-          iconColor: AppColors.purple,
-          title: 'Sezon',
-          value: seasonLabel,
-          onTap: onChooseSeason,
-        ),
-        if (!isEditing)
+        if (canChooseSeason)
           SettingsTile(
-            icon: AppIcons.capacity,
-            iconColor: AppColors.orange,
-            title: 'Kontenjan',
-            value: capacity > 0 ? '$capacity kişi' : 'Sınırsız',
-            onTap: onEditCapacity,
+            icon: AppIcons.calendar,
+            iconColor: AppColors.purple,
+            title: 'Sezon',
+            value: seasonLabel,
+            onTap: onChooseSeason,
           ),
+        SettingsTile(
+          icon: AppIcons.capacity,
+          iconColor: AppColors.orange,
+          title: 'Kontenjan',
+          value: capacity > 0 ? '$capacity kişi' : 'Sınırsız',
+          onTap: onEditCapacity,
+        ),
         _activeRow(context),
       ],
     );

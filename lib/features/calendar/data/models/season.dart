@@ -1,4 +1,4 @@
-/// Etkinliklerin bağlı olduğu dönem (Super Skylab `SeasonDto`).
+/// Etkinliklerin bağlı olduğu dönem (core `/v1/seasons`).
 class Season {
   const Season({required this.id, required this.name, required this.active});
 
