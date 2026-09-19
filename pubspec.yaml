@@ -47,6 +47,7 @@ dependencies:
   flutter_nfc_kit: 3.6.2
   image_picker: 1.2.3
   pretty_qr_code: 3.6.0
+  mobile_scanner: 7.4.2
 
 dev_dependencies:
   flutter_test:

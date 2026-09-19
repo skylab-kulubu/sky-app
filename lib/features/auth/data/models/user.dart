@@ -243,6 +243,20 @@ class User {
   bool canDeleteEvent(String ownerTeam) =>
       ownerTeam.isNotEmpty && (isPrivileged || leaderTeams.contains(ownerTeam));
 
+  /// Verilen etkinlikte kapıda okutabilir mi; core `allowDoorCheckIn`'in
+  /// uygulamadaki karşılığı: YK/DK/ADMIN, etkinliğin sahip ekibinin lideri
+  /// ya da koordinatörü, ya da etkinliğin kapı görevlisi.
+  ///
+  /// Grubunda `team_door_scan=true` olan ekiplerin üyeleri de core'da
+  /// okutabiliyor ama bu ayar token'a yansımıyor; uygulama onları bilemiyor.
+  bool canCheckIn({
+    required String ownerTeam,
+    List<String> doorStaffIds = const [],
+  }) =>
+      isPrivileged ||
+      (ownerTeam.isNotEmpty && leaderTeams.contains(ownerTeam)) ||
+      (id.isNotEmpty && doorStaffIds.contains(id));
+
   /// Kullanıcı adının gösterim hâli; arayüzde hep `@` ile yazılıyor.
   String get usernameDisplay =>
       preferredUsername.isEmpty ? '' : '@$preferredUsername';

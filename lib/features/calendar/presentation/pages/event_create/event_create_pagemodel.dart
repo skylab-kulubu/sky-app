@@ -219,6 +219,13 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
     });
   }
 
+  /// Programı (günler, oturumlar) düzenleme sayfasını açar.
+  Future<void> onEditSchedule() async {
+    final editing = _editing;
+    if (editing == null) return;
+    await EventSchedulePage.open(context, editing);
+  }
+
   Future<void> onChooseOwner() async {
     if (ownerOptions.length <= 1) return;
 

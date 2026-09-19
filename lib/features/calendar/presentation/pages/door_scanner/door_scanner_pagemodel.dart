@@ -1,0 +1,248 @@
+part of 'door_scanner_page.dart';
+
+/// Son okutmanın sonucu; okuyucunun altında gösteriliyor.
+enum DoorResultKind { success, already, error }
+
+class DoorResult {
+  const DoorResult(this.kind, this.title, [this.detail = '']);
+
+  final DoorResultKind kind;
+  final String title;
+  final String detail;
+}
+
+abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
+  final DoorService _service = DoorService();
+
+  final MobileScannerController scanner = MobileScannerController(
+    formats: const [BarcodeFormat.qrCode],
+  );
+
+  /// Aynı kod bu süre içinde tekrar okunursa yok sayılıyor; kamera aynı
+  /// kodu saniyede birkaç kez görüyor.
+  static const Duration _repeatWindow = Duration(seconds: 4);
+
+  /// Sonuç kartı bu kadar sonra kayboluyor; sıradaki kişi temiz ekran görsün.
+  static const Duration _resultDuration = Duration(seconds: 5);
+
+  late final User? _user = context.read<UserProvider>().user;
+
+  /// Okutulabilecek etkinlikler: bitmemiş ve kullanıcının kapı yetkisi olan.
+  late final List<EventModel> events = [
+    for (final event in context.read<EventProvider>().upcomingEvents)
+      if (_user?.canCheckIn(
+            ownerTeam: event.ownerTeam,
+            doorStaffIds: event.doorStaffIds,
+          ) ??
+          false)
+        event,
+  ];
+
+  EventModel? event;
+  List<({EventDay day, EventSession session})> sessions = const [];
+  ({EventDay day, EventSession session})? selected;
+  bool isLoadingSessions = false;
+  ApiException? sessionsError;
+
+  DoorResult? result;
+  bool _busy = false;
+  String? _lastRaw;
+  DateTime? _lastRawAt;
+  Timer? _resultTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    final first = events.firstOrNull;
+    if (first != null) _selectEvent(first);
+  }
+
+  @override
+  void dispose() {
+    _resultTimer?.cancel();
+    scanner.dispose();
+    super.dispose();
+  }
+
+  String get eventLabel => event?.name ?? 'Seç';
+
+  String get sessionLabel {
+    if (isLoadingSessions) return 'Yükleniyor…';
+    final s = selected;
+    if (s == null) return sessions.isEmpty ? 'Oturum yok' : 'Seç';
+    return s.session.title.isEmpty ? s.day.name : s.session.title;
+  }
+
+  Future<void> _selectEvent(EventModel value) async {
+    setState(() {
+      event = value;
+      sessions = const [];
+      selected = null;
+      sessionsError = null;
+      isLoadingSessions = true;
+    });
+
+    try {
+      final result = await _service.fetchSessions(value.id);
+      if (!mounted || event?.id != value.id) return;
+      setState(() {
+        sessions = result;
+        selected = _defaultSession(result);
+        isLoadingSessions = false;
+      });
+    } catch (e) {
+      final error = ApiException.from(e);
+      log('Oturumlar alınamadı: $error');
+      if (!mounted || event?.id != value.id) return;
+      setState(() {
+        sessionsError = error;
+        isLoadingSessions = false;
+      });
+    }
+  }
+
+  /// Şu an süren oturum; yoksa bitmemiş ilk oturum; o da yoksa ilki.
+  static ({EventDay day, EventSession session})? _defaultSession(
+    List<({EventDay day, EventSession session})> all,
+  ) {
+    final now = DateTime.now();
+    return all.where((s) => s.session.isNow).firstOrNull ??
+        all
+            .where((s) => s.session.endTime?.isAfter(now) ?? false)
+            .firstOrNull ??
+        all.firstOrNull;
+  }
+
+  /// Seçili etkinliğin programını düzenleyebilir mi (oturum yoksa buton).
+  bool get canEditSchedule {
+    final current = event;
+    if (current == null) return false;
+    return _user?.canEditEvent(current.ownerTeam) ?? false;
+  }
+
+  /// Programı açar; dönünce oturumları yeniden yükler.
+  Future<void> onEditSchedule() async {
+    final current = event;
+    if (current == null) return;
+    final changed = await EventSchedulePage.open(context, current);
+    if (changed && mounted) await _selectEvent(current);
+  }
+
+  void onRetrySessions() {
+    final current = event;
+    if (current != null) _selectEvent(current);
+  }
+
+  Future<void> onChooseEvent() async {
+    if (events.length <= 1) return;
+    final index = await EventOptionSheet.show(
+      context,
+      title: 'Etkinlik',
+      options: [for (final e in events) e.name],
+      selectedIndex: event == null ? null : events.indexOf(event!),
+      icon: AppIcons.calendar,
+      iconColor: AppColors.blue,
+    );
+    if (index == null || !mounted) return;
+    await _selectEvent(events[index]);
+  }
+
+  Future<void> onChooseSession() async {
+    if (sessions.length <= 1) return;
+    final index = await EventOptionSheet.show(
+      context,
+      title: 'Oturum',
+      options: [
+        for (final s in sessions)
+          [
+            if (s.session.title.isNotEmpty) s.session.title,
+            if (s.session.timeRange.isNotEmpty) s.session.timeRange,
+          ].join('  •  '),
+      ],
+      selectedIndex: selected == null ? null : sessions.indexOf(selected!),
+      icon: AppIcons.clock,
+      iconColor: AppColors.purple,
+    );
+    if (index == null || !mounted) return;
+    setState(() => selected = sessions[index]);
+  }
+
+  /// Kameranın gördüğü kod. Bir istek sürerken ya da aynı kod az önce
+  /// okunduysa yok sayılıyor.
+  Future<void> onDetect(BarcodeCapture capture) async {
+    final raw = capture.barcodes.firstOrNull?.rawValue;
+    final session = selected?.session;
+    if (raw == null || raw.isEmpty || session == null || _busy) return;
+
+    final now = DateTime.now();
+    if (raw == _lastRaw &&
+        _lastRawAt != null &&
+        now.difference(_lastRawAt!) < _repeatWindow) {
+      return;
+    }
+    _lastRaw = raw;
+    _lastRawAt = now;
+
+    final holder = DoorService.holderFrom(raw);
+    if (holder == null) {
+      _show(
+        const DoorResult(DoorResultKind.error, 'Bu bir SkyPass kodu değil'),
+      );
+      return;
+    }
+
+    _busy = true;
+    try {
+      await _service.checkInWithPass(session.id, raw);
+      _show(DoorResult(DoorResultKind.success, 'Giriş alındı', _who(holder)));
+    } catch (e) {
+      final error = ApiException.from(e);
+      log('Kapı girişi alınamadı: $error');
+      _show(switch (error.statusCode) {
+        409 => DoorResult(
+          DoorResultKind.already,
+          'Zaten giriş yapmış',
+          _who(holder),
+        ),
+        404 => DoorResult(
+          DoorResultKind.error,
+          'Bu etkinliğe kaydı yok',
+          _who(holder),
+        ),
+        401 => const DoorResult(
+          DoorResultKind.error,
+          'Kodun süresi dolmuş',
+          'Kişiden kartını yeniden açmasını iste.',
+        ),
+        403 => const DoorResult(
+          DoorResultKind.error,
+          'Bu etkinlikte okutma yetkin yok',
+        ),
+        _ => DoorResult(DoorResultKind.error, error.userMessage),
+      });
+    } finally {
+      _busy = false;
+    }
+  }
+
+  static String _who(DoorHolder holder) => [
+    holder.name,
+    holder.skyNumber,
+  ].where((part) => part.isNotEmpty).join('  •  ');
+
+  void _show(DoorResult value) {
+    if (!mounted) return;
+    switch (value.kind) {
+      case DoorResultKind.success:
+        HapticFeedback.mediumImpact();
+      case DoorResultKind.already:
+      case DoorResultKind.error:
+        HapticFeedback.heavyImpact();
+    }
+    _resultTimer?.cancel();
+    setState(() => result = value);
+    _resultTimer = Timer(_resultDuration, () {
+      if (mounted) setState(() => result = null);
+    });
+  }
+}

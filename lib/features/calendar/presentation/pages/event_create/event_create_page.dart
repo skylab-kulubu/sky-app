@@ -23,6 +23,7 @@ import 'package:sky_app/features/auth/presentation/providers/user_provider.dart'
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/data/models/season.dart';
 import 'package:sky_app/features/calendar/data/services/event_create_service.dart';
+import 'package:sky_app/features/calendar/presentation/pages/event_schedule/event_schedule_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_capacity_dialog.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_cover_picker.dart';
@@ -194,6 +195,15 @@ class _EventCreatePageState extends EventCreatePagemodel {
           onTap: onEditCapacity,
         ),
         _activeRow(context),
+        // Program ayrı sayfada; yalnızca var olan etkinlikte (günler
+        // etkinliğe bağlanıyor).
+        if (isEditing)
+          SettingsTile(
+            icon: AppIcons.calendarEdit,
+            iconColor: AppColors.purple,
+            title: 'Programı Düzenle',
+            onTap: onEditSchedule,
+          ),
       ],
     );
   }

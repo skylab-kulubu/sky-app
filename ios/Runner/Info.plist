@@ -42,7 +42,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Oluşturduğun etkinliğe kapak görseli seçebilmen için fotoğraflarına erişim gerekiyor.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Etkinlik kapağı için fotoğraf çekmek istediğinde kamera erişimi gerekiyor.</string>
+	<string>Etkinlik girişinde SkyPass kodlarını okutabilmen için kamera erişimi gerekiyor.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

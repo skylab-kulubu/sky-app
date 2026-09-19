@@ -46,6 +46,7 @@ class EventModel {
     this.prizeInfo = '',
     this.attendanceRule = '',
     this.attendanceRatio,
+    this.doorStaffIds = const [],
   });
 
   /// Etkinliğin LinkedIn gönderisi; düzenleme formu için.
@@ -70,6 +71,11 @@ class EventModel {
   final String attendanceRule;
   final double? attendanceRatio;
 
+  /// Bu etkinlikte kapıda okutma yetkisi verilen kullanıcıların id'leri
+  /// (panelde "Kapı görevlileri"). Güncellemede gönderilmiyor; core
+  /// gönderilmeyen listeyi olduğu gibi bırakıyor.
+  final List<String> doorStaffIds;
+
   /// Core `EventResponse`'u (`/v1/events`).
   factory EventModel.fromJson(Map<String, dynamic> json) {
     return EventModel(
@@ -91,6 +97,10 @@ class EventModel {
       prizeInfo: json['prizeInfo'] as String? ?? '',
       attendanceRule: json['attendanceRule'] as String? ?? '',
       attendanceRatio: (json['attendanceRatio'] as num?)?.toDouble(),
+      doorStaffIds: [
+        for (final id in json['doorStaffIds'] as List<dynamic>? ?? const [])
+          if (id is String) id,
+      ],
     );
   }
 

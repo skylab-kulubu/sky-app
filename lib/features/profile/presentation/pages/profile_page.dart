@@ -11,6 +11,8 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/features/calendar/presentation/pages/door_scanner/door_scanner_page.dart';
+import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/features/profile/data/models/nfc_card.dart';
 import 'package:sky_app/features/profile/data/services/nfc_service.dart';
@@ -79,7 +81,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
   /// QR kartın arka yüzünde; "QR'ı Göster" ayrı bir sayfa açmıyor, kartı
   /// çeviriyor. Karta dokunmakla aynı iş, keşfedilmesi kolay olsun diye.
+  ///
+  /// Yaklaşan bir etkinlikte kapı yetkisi olan kullanıcıda (YK/DK/ADMIN,
+  /// sahip ekibin lideri, kapı görevlisi) bu buton "QR'ı Okut" oluyor ve
+  /// kapı okuyucusunu açıyor; kendi kodunu görmek için karta dokunması yeter.
   Widget _quickActions(BuildContext context, User user, String subtitle) {
+    final canScan = context.watch<EventProvider>().upcomingEvents.any(
+      (event) => user.canCheckIn(
+        ownerTeam: event.ownerTeam,
+        doorStaffIds: event.doorStaffIds,
+      ),
+    );
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -103,11 +116,17 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         Expanded(
-          child: QuickActionButton(
-            icon: AppIcons.qr,
-            label: "QR'ı Göster",
-            onTap: _cardController.flip,
-          ),
+          child: canScan
+              ? QuickActionButton(
+                  icon: AppIcons.scan,
+                  label: "QR'ı Okut",
+                  onTap: () => DoorScannerPage.open(context),
+                )
+              : QuickActionButton(
+                  icon: AppIcons.qr,
+                  label: "QR'ı Göster",
+                  onTap: _cardController.flip,
+                ),
         ),
       ],
     );

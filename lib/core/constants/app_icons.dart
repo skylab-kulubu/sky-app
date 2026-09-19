@@ -49,6 +49,10 @@ class AppIcons {
 
   // Content
   static const String clock = 'clock';
+  static const String category = 'category';
+  static const String microphone = 'microphone2';
+  static const String calendarAdd = 'calendarAdd';
+  static const String calendarEdit = 'calendarEdit';
   static const String location = 'location';
   static const String bell = 'bell';
   static const String bellOff = 'bellOff';

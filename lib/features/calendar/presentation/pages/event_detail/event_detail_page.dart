@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,9 +18,12 @@ import 'package:sky_app/core/widgets/color_glow.dart';
 import 'package:sky_app/core/widgets/cover_image.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
+import 'package:sky_app/features/calendar/data/models/event_session.dart';
+import 'package:sky_app/features/calendar/data/services/schedule_service.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/data/services/event_palette_service.dart';
 import 'package:sky_app/features/calendar/presentation/pages/event_create/event_create_page.dart';
+import 'package:sky_app/features/calendar/presentation/pages/event_schedule/event_schedule_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_cover_hero.dart';
 
@@ -77,6 +81,9 @@ class EventDetailPage extends StatefulWidget {
 }
 
 class _EventDetailPageState extends EventDetailPagemodel {
+  /// Programdaki saat sütununun genişliği; başlıklar hizalı dursun.
+  static const double _sessionTimeWidth = 64;
+
   static const double _descriptionLineHeight = 1.6;
 
   /// Başlık iki satıra taştığında satırlar birbirine yapışmasın diye.
@@ -309,6 +316,28 @@ class _EventDetailPageState extends EventDetailPagemodel {
         _sectionHeader(context, 'Etkinlik Hakkında'),
         const SizedBox(height: AppSizes.bigSpace),
         _description(context),
+        // Program herkese; boşken yalnızca düzenleyebilene "Program ekle".
+        if (hasSchedule || canEdit) ...[
+          _sectionHeader(
+            context,
+            'Program',
+            onEdit: hasSchedule && canEdit ? onEditSchedule : null,
+          ),
+          const SizedBox(height: AppSizes.bigSpace),
+          if (hasSchedule)
+            _schedule(context)
+          else
+            GestureDetector(
+              onTap: onEditSchedule,
+              behavior: HitTestBehavior.opaque,
+              child: _infoBlock(
+                context,
+                icon: AppIcons.calendarAdd,
+                title: 'Program ekle',
+                subtitle: 'Günleri ve oturumları gir; yoklama oturuma göre.',
+              ),
+            ),
+        ],
       ],
     );
   }
@@ -426,21 +455,127 @@ class _EventDetailPageState extends EventDetailPagemodel {
   /// Bölüm başlığı: ayarlar sayfasındaki biçimin aynısı (boşluk, kademe,
   /// ağırlık), altında bir de ayraç. Rengi farklı, çünkü bu sayfanın zemini
   /// temadan bağımsız koyu.
-  Widget _sectionHeader(BuildContext context, String title) {
+  Widget _sectionHeader(
+    BuildContext context,
+    String title, {
+    VoidCallback? onEdit,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: AppPaddings.sectionHeader,
-          child: Text(
-            title,
-            style: context.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.onCoverFaint,
-            ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.onCoverFaint,
+                  ),
+                ),
+              ),
+              if (onEdit != null)
+                GestureDetector(
+                  onTap: onEdit,
+                  behavior: HitTestBehavior.opaque,
+                  child: AppIcon(
+                    AppIcons.edit,
+                    size: AppSizes.iconSmall,
+                    color: AppColors.onCoverFaint,
+                  ),
+                ),
+            ],
           ),
         ),
         Divider(color: AppColors.onCoverDivider, height: 1),
+      ],
+    );
+  }
+
+  /// Günler ve oturumları. Birden fazla gün varsa her günün başlığı
+  /// yazılıyor; tek günde gerek yok, tarih zaten yukarıda.
+  Widget _schedule(BuildContext context) {
+    final days = schedule.where((e) => e.sessions.isNotEmpty).toList();
+    final showDayTitles = days.length > 1;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final (index, entry) in days.indexed) ...[
+          if (showDayTitles) ...[
+            if (index > 0) const SizedBox(height: AppSizes.largeSpace),
+            Text(
+              [
+                entry.day.name,
+                entry.day.dateLabel,
+              ].where((p) => p.isNotEmpty).join('  •  '),
+              style: context.textTheme.titleSmall?.copyWith(
+                color: AppColors.onCover,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppSizes.bigSpace),
+          ],
+          for (final (i, session) in entry.sessions.indexed) ...[
+            if (i > 0) const SizedBox(height: AppSizes.bigSpace),
+            _sessionRow(context, session),
+          ],
+        ],
+      ],
+    );
+  }
+
+  /// Solda saat, sağda başlık ve konuşmacı. İptal edilen oturum üstü çizili.
+  Widget _sessionRow(BuildContext context, EventSession session) {
+    final cancelled = session.cancelled;
+    final start = session.startTime;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: _sessionTimeWidth,
+          child: Text(
+            start == null
+                ? '–'
+                : '${start.hour.toString().padLeft(2, '0')}:'
+                      '${start.minute.toString().padLeft(2, '0')}',
+            style: context.textTheme.bodyLarge?.copyWith(
+              color: AppColors.primaryColor,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                session.title,
+                style: context.textTheme.bodyLarge?.copyWith(
+                  color: cancelled ? AppColors.onCoverFaint : AppColors.onCover,
+                  fontWeight: FontWeight.w500,
+                  decoration: cancelled ? TextDecoration.lineThrough : null,
+                  decorationColor: AppColors.onCoverFaint,
+                ),
+              ),
+              const SizedBox(height: AppSizes.smallSpace),
+              Text(
+                cancelled
+                    ? 'İptal edildi'
+                    : [
+                        session.speakerName,
+                        session.typeLabel,
+                      ].where((p) => p.isNotEmpty).join('  •  '),
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.onCoverMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

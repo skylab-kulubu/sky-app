@@ -13,6 +13,30 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
   /// Gösterilen etkinlik; düzenlenince yerinde güncelleniyor.
   late EventModel event = widget.event;
 
+  final ScheduleService _scheduleService = ScheduleService();
+
+  /// Etkinliğin programı (günler ve oturumlar); herkese gösteriliyor.
+  /// Yüklenemezse bölüm sessizce görünmüyor.
+  List<ScheduleDay> schedule = const [];
+
+  bool get hasSchedule => schedule.any((entry) => entry.sessions.isNotEmpty);
+
+  Future<void> _loadSchedule() async {
+    try {
+      final result = await _scheduleService.fetchSchedule(event.id);
+      if (!mounted) return;
+      setState(() => schedule = result);
+    } catch (e) {
+      log('Program alınamadı: $e');
+    }
+  }
+
+  /// Programı düzenleme sayfasını açar; değiştiyse bölümü yeniler.
+  Future<void> onEditSchedule() async {
+    final changed = await EventSchedulePage.open(context, event);
+    if (changed && mounted) await _loadSchedule();
+  }
+
   /// Düzenleme butonu yalnızca yetkisi olana (etkinliğin ekibinde lider,
   /// GECEKODU üyesi ya da YK/DK/ADMIN).
   bool get canEdit =>
@@ -62,6 +86,8 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     // çıkarımı ana iş parçacığında çalıştığı için açılış animasyonunu
     // takıyor.
     WidgetsBinding.instance.addPostFrameCallback((_) => _afterTransition());
+
+    _loadSchedule();
   }
 
   @override
