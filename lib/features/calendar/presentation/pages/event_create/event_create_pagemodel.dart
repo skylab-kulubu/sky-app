@@ -13,11 +13,6 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
   /// kayıyor.
   static const Duration _defaultDuration = Duration(hours: 2);
 
-  /// Kapak kalitesi: afişler çoğu zaman çok büyük geliyor; bu sınırlarla
-  /// yükleme hızlı, görünüm etkilenmiyor.
-  static const double _coverMaxSide = 2000;
-  static const int _coverQuality = 85;
-
   XFile? cover;
 
   late DateTime startDate = _nextFullHour();
@@ -142,12 +137,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
 
   Future<void> onPickCover() async {
     try {
-      final picked = await ImagePicker().pickImage(
-        source: ImageSource.gallery,
-        maxWidth: _coverMaxSide,
-        maxHeight: _coverMaxSide,
-        imageQuality: _coverQuality,
-      );
+      final picked = await MediaService.pickImage();
       if (picked == null || !mounted) return;
       setState(() => cover = picked);
     } on PlatformException catch (e) {

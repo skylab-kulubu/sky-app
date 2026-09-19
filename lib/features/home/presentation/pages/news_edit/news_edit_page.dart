@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
@@ -8,9 +10,12 @@ import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/services/api_exception.dart';
+import 'package:sky_app/core/services/media_service.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
+import 'package:sky_app/core/widgets/cover_picker.dart';
 import 'package:sky_app/core/widgets/icon_circle.dart';
 import 'package:sky_app/core/widgets/section_header.dart';
+import 'package:sky_app/core/widgets/settings_tile.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/core/widgets/sky_tag_editor.dart';
 import 'package:sky_app/core/widgets/sky_text_field.dart';
@@ -25,8 +30,8 @@ part 'news_edit_pagemodel.dart';
 /// Haber oluşturma ve düzenleme. `cms:access` rolü olana açılıyor; kayıt
 /// CMS'e gidiyor, liste ve açık detay sayfası provider üzerinden güncelleniyor.
 ///
-/// Görsel yükleme yok, yalnızca bağlantı (CMS alanı bir URL). Silme de yok
-/// (CMS'te endpoint yok).
+/// Görsel galeriden seçilip core'a yükleniyor (`POST /v1/media`), CMS'e
+/// adresi yazılıyor (CMS alanı bir URL). Silme yok (CMS'te endpoint yok).
 class NewsEditPage extends StatefulWidget {
   const NewsEditPage({super.key, this.item});
 
@@ -58,7 +63,27 @@ class _NewsEditPageState extends NewsEditPagemodel {
       body: ListView(
         padding: AppPaddings.mainPaddingAll,
         children: [
-          const SectionHeader('Bilgiler', isFirst: true),
+          const SectionHeader('Görsel', isFirst: true),
+          CoverPicker(
+            image: image,
+            imageUrl: currentImageUrl,
+            onTap: onPickImage,
+            label: 'Görsel seç (isteğe bağlı)',
+          ),
+          if (hasImage) ...[
+            const SizedBox(height: AppSizes.bigSpace),
+            TileGroup(
+              children: [
+                SettingsTile(
+                  icon: AppIcons.delete,
+                  iconColor: AppColors.red,
+                  title: 'Görseli Kaldır',
+                  onTap: onRemoveImage,
+                ),
+              ],
+            ),
+          ],
+          const SectionHeader('Bilgiler'),
           SkyTextField(
             controller: titleController,
             hintText: 'Başlık',
@@ -78,12 +103,6 @@ class _NewsEditPageState extends NewsEditPagemodel {
             minLines: 6,
             maxLines: 20,
             onChanged: (_) => onFormChanged(),
-          ),
-          const SectionHeader('Görsel'),
-          SkyTextField(
-            controller: imageController,
-            hintText: 'Görsel bağlantısı (isteğe bağlı)',
-            keyboardType: TextInputType.url,
           ),
           const SectionHeader('Etiketler'),
           SkyTagEditor(

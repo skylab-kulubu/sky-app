@@ -11,7 +11,9 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/services/api_exception.dart';
+import 'package:sky_app/core/services/media_service.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
+import 'package:sky_app/core/widgets/cover_picker.dart';
 import 'package:sky_app/core/widgets/icon_circle.dart';
 import 'package:sky_app/core/widgets/section_header.dart';
 import 'package:sky_app/core/widgets/settings_tile.dart';
@@ -26,7 +28,6 @@ import 'package:sky_app/features/calendar/data/services/event_create_service.dar
 import 'package:sky_app/features/calendar/presentation/pages/event_schedule/event_schedule_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_capacity_dialog.dart';
-import 'package:sky_app/features/calendar/presentation/widgets/event_cover_picker.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_option_sheet.dart';
 
 part 'event_create_pagemodel.dart';
@@ -90,7 +91,7 @@ class _EventCreatePageState extends EventCreatePagemodel {
         padding: AppPaddings.mainPaddingAll,
         children: [
           const SectionHeader('Kapak', isFirst: true),
-          EventCoverPicker(
+          CoverPicker(
             image: cover,
             imageUrl: currentCoverUrl,
             onTap: onPickCover,

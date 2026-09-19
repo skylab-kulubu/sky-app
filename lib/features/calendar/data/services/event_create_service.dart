@@ -1,8 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sky_app/core/extensions/date_time_extensions.dart';
 import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/services/core_api.dart';
+import 'package:sky_app/core/services/media_service.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/data/models/season.dart';
 
@@ -46,6 +46,8 @@ class EventDraft {
 /// ya da YK/DK/ADMIN olmayan kullanıcının isteği 403 ile reddediliyor.
 /// Sezona bağlama yalnızca YK/DK/ADMIN'e açık.
 class EventCreateService {
+  final MediaService _media = MediaService();
+
   /// Bütün sezonlar; girişsiz okunuyor.
   Future<List<Season>> fetchSeasons() async {
     final body = await CoreApi.get('/seasons');
@@ -55,22 +57,9 @@ class EventCreateService {
         .toList(growable: false);
   }
 
-  /// Kapak görselini yükler ve medya id'sini döner. Alan adı `file`.
-  Future<String> uploadCover(XFile image) async {
-    final form = FormData.fromMap({
-      'file': await MultipartFile.fromFile(image.path, filename: image.name),
-    });
-
-    final body = await CoreApi.post('/media', body: form);
-    final id = CoreApi.object(body, what: 'yüklenen görsel')['id'];
-    if (id is! String || id.isEmpty) {
-      throw const ApiException(
-        ApiErrorType.server,
-        message: 'Yüklenen görselin kimliği dönmedi',
-      );
-    }
-    return id;
-  }
+  /// Kapak görselini yükler ve medya id'sini döner.
+  Future<String> uploadCover(XFile image) async =>
+      (await _media.uploadImage(image)).id;
 
   /// Etkinliği oluşturur; [seasonId] verilirse sezona da bağlar ve son
   /// hâlini döner.

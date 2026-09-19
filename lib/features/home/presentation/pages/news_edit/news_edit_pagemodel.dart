@@ -2,14 +2,22 @@ part of 'news_edit_page.dart';
 
 abstract class NewsEditPagemodel extends State<NewsEditPage> {
   final NewsService _service = NewsService();
+  final MediaService _media = MediaService();
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController summaryController = TextEditingController();
   final TextEditingController bodyController = TextEditingController();
-  final TextEditingController imageController = TextEditingController();
   final TextEditingController tagInputController = TextEditingController();
 
   List<String> tags = const [];
+
+  /// Galeriden yeni seçilen görsel; kayıtta yükleniyor.
+  XFile? image;
+
+  /// Haberin mevcut görseli; kaldırılınca boş.
+  String currentImageUrl = '';
+
+  bool get hasImage => image != null || currentImageUrl.isNotEmpty;
   bool featured = false;
   bool isSaving = false;
 
@@ -25,7 +33,7 @@ abstract class NewsEditPagemodel extends State<NewsEditPage> {
     summaryController.text = item.summary;
     // Düz metne çevrilmiş hâli; kaydedince düz metin olarak gidiyor.
     bodyController.text = item.bodyText;
-    imageController.text = item.heroImage;
+    currentImageUrl = item.heroImage;
     tags = item.tags;
     featured = item.featured;
   }
@@ -35,7 +43,6 @@ abstract class NewsEditPagemodel extends State<NewsEditPage> {
     titleController.dispose();
     summaryController.dispose();
     bodyController.dispose();
-    imageController.dispose();
     tagInputController.dispose();
     super.dispose();
   }
@@ -52,6 +59,28 @@ abstract class NewsEditPagemodel extends State<NewsEditPage> {
 
   void onFeaturedChanged(bool value) => setState(() => featured = value);
 
+  Future<void> onPickImage() async {
+    try {
+      final picked = await MediaService.pickImage();
+      if (picked == null || !mounted) return;
+      setState(() => image = picked);
+    } on PlatformException catch (e) {
+      // Galeri izni reddedildiğinde buraya düşüyor.
+      log('Görsel seçilemedi: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Galeriye erişilemedi. İzinleri kontrol et.'),
+        ),
+      );
+    }
+  }
+
+  void onRemoveImage() => setState(() {
+    image = null;
+    currentImageUrl = '';
+  });
+
   Future<void> onSubmit() async {
     setState(() => isSaving = true);
 
@@ -62,13 +91,40 @@ abstract class NewsEditPagemodel extends State<NewsEditPage> {
     final author =
         original?.author ?? context.read<UserProvider>().user?.name ?? '';
 
+    // CMS alanı bir URL: yeni görsel önce core'a yükleniyor, adresi yazılıyor.
+    final String heroImage;
+    final picked = image;
+    if (picked == null) {
+      heroImage = currentImageUrl;
+    } else {
+      try {
+        heroImage = (await _media.uploadImage(picked)).url;
+      } catch (e) {
+        final error = ApiException.from(e);
+        log('Haber görseli yüklenemedi: $error');
+        if (!mounted) return;
+        setState(() => isSaving = false);
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              error.isConnectivityIssue
+                  ? error.userMessage
+                  : 'Görsel yüklenemedi. Başka bir görsel dene.',
+            ),
+          ),
+        );
+        return;
+      }
+      if (!mounted) return;
+    }
+
     final draft = NewsItem(
       slug: original?.slug ?? '',
       version: original?.version ?? 0,
       title: titleController.text.trim(),
       summary: summaryController.text.trim(),
       body: bodyController.text.trim(),
-      heroImage: imageController.text.trim(),
+      heroImage: heroImage,
       tags: SkyTagEditor.withPending(tags, tagInputController.text),
       author: author,
       featured: featured,
