@@ -58,7 +58,7 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("QR'ı Okut"),
+        title: const Text('Giriş Al'),
         leading: IconButton(
           icon: const AppIcon(AppIcons.arrowBack),
           onPressed: () => Navigator.of(context).maybePop(),

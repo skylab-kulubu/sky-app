@@ -40,6 +40,9 @@ class AppIcons {
   // QR & Scan
   static const String qr = 'qr';
   static const String scan = 'scan';
+
+  /// Kapıda giriş alma (QR ya da öğrenci kartı).
+  static const String checkIn = 'arrowDoorIn';
   static const String camera = 'camera';
 
   // People

@@ -83,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
   /// çeviriyor. Karta dokunmakla aynı iş, keşfedilmesi kolay olsun diye.
   ///
   /// Yaklaşan bir etkinlikte kapı yetkisi olan kullanıcıda (YK/DK/ADMIN,
-  /// sahip ekibin lideri, kapı görevlisi) bu buton "QR'ı Okut" oluyor ve
+  /// sahip ekibin lideri, kapı görevlisi) bu buton "Giriş Al" oluyor ve
   /// kapı okuyucusunu açıyor; kendi kodunu görmek için karta dokunması yeter.
   Widget _quickActions(BuildContext context, User user, String subtitle) {
     final canScan = context.watch<EventProvider>().upcomingEvents.any(
@@ -118,8 +118,8 @@ class _ProfilePageState extends State<ProfilePage> {
         Expanded(
           child: canScan
               ? QuickActionButton(
-                  icon: AppIcons.scan,
-                  label: "QR'ı Okut",
+                  icon: AppIcons.checkIn,
+                  label: 'Giriş Al',
                   onTap: () => DoorScannerPage.open(context),
                 )
               : QuickActionButton(

@@ -48,7 +48,10 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
   ApiException? sessionsError;
 
   DoorResult? result;
-  DoorMode mode = DoorMode.qr;
+
+  /// Varsayılan öğrenci kartı: kapıda en hızlı yol, kamera izni de
+  /// istemiyor. QR'a geçilince kamera açılıyor.
+  DoorMode mode = DoorMode.card;
 
   /// NFC okuma ya da kartla giriş isteği sürüyor.
   bool isReadingCard = false;
