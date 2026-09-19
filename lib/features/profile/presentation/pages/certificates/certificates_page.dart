@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
@@ -15,12 +16,14 @@ import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/core/widgets/tile_group.dart';
 import 'package:sky_app/features/profile/data/models/certificate.dart';
 import 'package:sky_app/features/profile/data/services/certificate_service.dart';
+import 'package:sky_app/features/profile/presentation/widgets/certificate_actions_sheet.dart';
 import 'package:sky_app/features/profile/presentation/widgets/certificate_tile.dart';
 
 part 'certificates_pagemodel.dart';
 
 /// Kullanıcının katılım sertifikaları. Core sertifikayı etkinliğin katılım
-/// kuralına göre veriyor; dokunulan sertifikanın PDF'i açılıyor.
+/// kuralına göre veriyor. Geçerli ve iptal edilmiş sertifikalar birlikte
+/// listeleniyor; dokununca PDF, doğrulama ve paylaşma işlemleri açılıyor.
 class CertificatesPage extends StatefulWidget {
   const CertificatesPage({super.key});
 

@@ -1,48 +1,86 @@
 import 'package:sky_app/core/extensions/date_time_extensions.dart';
-import 'package:sky_app/features/calendar/data/models/event_model.dart';
 
-/// Kullanıcıya verilmiş katılım sertifikası (core `GET /v1/certificates/me`).
+/// Sertifikanın durumu. Bilinmeyen (ileride eklenecek) durumlar hiçbir zaman
+/// geçerli gösterilmiyor.
+enum CertificateStatus { valid, revoked, unknown }
+
+/// Kullanıcıya verilmiş sertifika (core `GET /v1/certificates/me`,
+/// `docs/mobile-certificates-v2.md`).
 ///
-/// Sertifikayı core, etkinliğin katılım kuralına göre (`attendanceRule`)
-/// oturum yoklamalarından hesaplayıp veriyor; uygulama yalnızca listeliyor.
+/// Uygulama şablon ya da üretimle ilgilenmiyor; yalnızca listeliyor ve
+/// core'un verdiği adresleri açıyor. Adresler kurulmuyor, olduğu gibi
+/// kullanılıyor.
 class Certificate {
   const Certificate({
     required this.serial,
     required this.eventName,
     required this.ownerTeam,
-    required this.verifyUrl,
+    required this.status,
     required this.issuedAt,
-    required this.revoked,
+    required this.verifyUrl,
+    required this.shareTitle,
+    required this.shareText,
+    required this.shareUrl,
+    this.revokedAt,
+    this.pdfUrl,
   });
 
   factory Certificate.fromJson(Map<String, dynamic> json) {
+    final event = json['event'] as Map<String, dynamic>? ?? const {};
+    final share = json['share'] as Map<String, dynamic>? ?? const {};
     return Certificate(
       serial: json['serial'] as String? ?? '',
-      eventName: json['eventName'] as String? ?? '',
-      ownerTeam: json['ownerTeam'] as String? ?? '',
-      verifyUrl: json['verifyUrl'] as String? ?? '',
+      eventName: (event['name'] as String? ?? '').trim(),
+      ownerTeam: (event['ownerTeam'] as String? ?? '').trim(),
+      status: switch (json['status']) {
+        'valid' => CertificateStatus.valid,
+        'revoked' => CertificateStatus.revoked,
+        _ => CertificateStatus.unknown,
+      },
       issuedAt: ApiDateTime.parse(json['issuedAt'] as String?),
-      revoked: json['revokedAt'] != null,
+      revokedAt: ApiDateTime.parse(json['revokedAt'] as String?),
+      pdfUrl: _https(json['pdfUrl']),
+      verifyUrl: _https(json['verifyUrl']),
+      shareTitle: share['title'] as String? ?? '',
+      shareText: share['text'] as String? ?? '',
+      shareUrl: _https(share['url']),
     );
   }
 
-  /// Doğrulama kodu; sertifikanın herkese açık adresinde kullanılıyor.
   final String serial;
   final String eventName;
   final String ownerTeam;
-
-  /// Herkese açık doğrulama adresi (`/v1/certificates/verify/{serial}`).
-  final String verifyUrl;
+  final CertificateStatus status;
   final DateTime? issuedAt;
+  final DateTime? revokedAt;
 
-  /// İptal edilmiş sertifika listede gösterilmiyor.
-  final bool revoked;
+  /// Yalnızca geçerli sertifikada; iptal edilende yok.
+  final String? pdfUrl;
 
-  /// Sertifikanın PDF'i; girişsiz açılıyor.
-  String get pdfUrl => verifyUrl.isEmpty ? '' : '$verifyUrl/pdf';
+  /// Herkese açık doğrulama sayfası (`https://skyl.app/c/{serial}`).
+  final String? verifyUrl;
 
-  /// Veren ekip; YK ve DK "SKY LAB" olarak.
-  String get issuerLabel => EventModel.ownerLabelFor(ownerTeam);
+  final String shareTitle;
+  final String shareText;
+
+  /// Paylaşılan adres doğrulama sayfası, PDF değil.
+  final String? shareUrl;
+
+  bool get isValid => status == CertificateStatus.valid;
+
+  /// Yalnızca `https` adresler açılıyor; başka biçimdeki değer yok sayılıyor.
+  static String? _https(Object? value) {
+    if (value is! String) return null;
+    final uri = Uri.tryParse(value.trim());
+    if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) return null;
+    return uri.toString();
+  }
+
+  static const Set<String> _clubWideTeams = {'', 'YK', 'DK'};
+
+  /// Veren: ekip boşsa, YK ya da DK ise "SKY LAB", değilse ekibin adı.
+  String get issuerLabel =>
+      _clubWideTeams.contains(ownerTeam) ? 'SKY LAB' : ownerTeam;
 
   static const List<String> _months = [
     'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', //

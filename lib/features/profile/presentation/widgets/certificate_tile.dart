@@ -9,7 +9,7 @@ import 'package:sky_app/core/widgets/icon_circle.dart';
 import 'package:sky_app/features/profile/data/models/certificate.dart';
 
 /// Sertifika listesindeki tek satır: solda ikon dairesi, sağda etkinlik adı
-/// ve altında veren ekip ile tarih. Dokununca sertifikanın PDF'i açılıyor.
+/// ve altında veren ekip ile tarih, sağda durum. Dokununca işlemler açılıyor.
 ///
 /// Düzeni ve tipografisi ayarlardaki hesap satırıyla aynı; tek farkı solundaki
 /// avatarın yerini renkli ikon dairesinin alması. Ortak bir widget'a
@@ -33,17 +33,41 @@ class CertificateTile extends StatelessWidget {
         padding: AppPaddings.accountTile,
         child: Row(
           children: [
-            const IconCircle(icon: AppIcons.certificate, color: AppColors.blue),
+            IconCircle(
+              icon: AppIcons.certificate,
+              color: certificate.isValid
+                  ? AppColors.blue
+                  : context.textTertiary,
+            ),
             const SizedBox(width: AppSizes.bigSpace),
             Expanded(child: _texts(context)),
-            // PDF uygulamanın dışında (tarayıcı sayfasında) açılıyor.
+            const SizedBox(width: AppSizes.midSpace),
+            _status(context),
+            const SizedBox(width: AppSizes.midSpace),
             AppIcon(
-              AppIcons.externalLink,
+              AppIcons.chevronRight,
               size: AppSizes.iconSmall,
               color: context.textTertiary,
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// "Geçerli" ya da "İptal"; bilinmeyen durum hiçbir zaman geçerli
+  /// gösterilmiyor.
+  Widget _status(BuildContext context) {
+    final (label, color) = switch (certificate.status) {
+      CertificateStatus.valid => ('Geçerli', AppColors.green),
+      CertificateStatus.revoked => ('İptal', AppColors.red),
+      CertificateStatus.unknown => ('Belirsiz', context.textTertiary),
+    };
+    return Text(
+      label,
+      style: context.textTheme.labelMedium?.copyWith(
+        color: color,
+        fontWeight: FontWeight.w600,
       ),
     );
   }
@@ -54,7 +78,8 @@ class CertificateTile extends StatelessWidget {
       children: [
         Text(
           certificate.eventName,
-          maxLines: 1,
+          // Uzun etkinlik adları iki satıra iniyor, rozet ve ok yerinde kalıyor.
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: context.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,

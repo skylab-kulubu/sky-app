@@ -41,17 +41,44 @@ abstract class CertificatesPagemodel extends State<CertificatesPage> {
   /// Aşağı çekerek yenileme; gösterge istek bitene kadar dönüyor.
   Future<void> onRefresh() => _fetchCertificates();
 
-  /// Sertifikanın PDF'ini kulüp siteleri gibi tarayıcı sayfasında açar.
-  void onCertificateTap(Certificate certificate) {
-    if (certificate.pdfUrl.isEmpty) return;
+  /// İşlemleri gösterir: PDF'i aç (yalnızca geçerli), doğrula, paylaş.
+  Future<void> onCertificateTap(Certificate certificate) async {
+    final action = await CertificateActionsSheet.show(context, certificate);
+    if (action == null || !mounted) return;
+
+    switch (action) {
+      case CertificateAction.openPdf:
+        _open(certificate.pdfUrl, certificate.eventName);
+      case CertificateAction.verify:
+        _open(certificate.verifyUrl, 'Sertifika Doğrulama');
+      case CertificateAction.share:
+        final url = certificate.shareUrl;
+        if (url == null) return;
+        await SharePlus.instance.share(
+          ShareParams(
+            title: certificate.shareTitle,
+            subject: certificate.shareTitle,
+            text: [
+              certificate.shareText,
+              url,
+            ].where((p) => p.isNotEmpty).join('\n'),
+          ),
+        );
+    }
+  }
+
+  /// Adresler core'dan olduğu gibi (yalnızca https) açılıyor; kulüp siteleri
+  /// gibi tarayıcı sayfasında.
+  void _open(String? url, String title) {
+    if (url == null) return;
     WebviewService.openLink(
       context,
       LinkItem(
-        name: certificate.eventName,
+        name: title,
         description: 'Sertifika',
         icon: AppIcons.certificate,
         color: AppColors.blue,
-        url: certificate.pdfUrl,
+        url: url,
       ),
     );
   }
