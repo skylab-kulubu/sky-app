@@ -21,8 +21,11 @@ class EventModel {
   /// Arayüzde gösterilen sahip: YK ve DK'nin etkinlikleri kulübün kendisi
   /// adına düzenlendiği için "SKY LAB" yazıyor; yetki hesapları yine
   /// [ownerTeam]'e bakıyor.
-  String get ownerLabel =>
-      _clubWideTeams.contains(ownerTeam) ? 'SKY LAB' : ownerTeam;
+  String get ownerLabel => ownerLabelFor(ownerTeam);
+
+  /// [ownerLabel]'ın etkinlik dışındaki kayıtlar (sertifika) için hâli.
+  static String ownerLabelFor(String team) =>
+      _clubWideTeams.contains(team) ? 'SKY LAB' : team;
 
   EventModel({
     required this.id,
