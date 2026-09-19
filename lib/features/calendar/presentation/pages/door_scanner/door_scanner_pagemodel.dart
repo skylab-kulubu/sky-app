@@ -3,6 +3,9 @@ part of 'door_scanner_page.dart';
 /// Son okutmanın sonucu; okuyucunun altında gösteriliyor.
 enum DoorResultKind { success, already, error }
 
+/// Girişin nasıl alındığı: SkyPass QR'ı kamerayla ya da öğrenci kartı NFC ile.
+enum DoorMode { qr, card }
+
 class DoorResult {
   const DoorResult(this.kind, this.title, [this.detail = '']);
 
@@ -45,6 +48,12 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
   ApiException? sessionsError;
 
   DoorResult? result;
+  DoorMode mode = DoorMode.qr;
+
+  /// NFC okuma ya da kartla giriş isteği sürüyor.
+  bool isReadingCard = false;
+
+  final NfcService _nfc = NfcService();
   bool _busy = false;
   String? _lastRaw;
   DateTime? _lastRawAt;
@@ -167,6 +176,77 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
     setState(() => selected = sessions[index]);
   }
 
+  /// QR ile kart arasında geçer. Kart modunda kamera kapatılıyor; QR'a
+  /// dönünce okuyucu widget'ı kamerayı yeniden başlatıyor.
+  Future<void> onModeChanged(DoorMode value) async {
+    if (value == mode || isReadingCard) return;
+    if (value == DoorMode.card) await scanner.stop();
+    if (!mounted) return;
+    setState(() {
+      mode = value;
+      result = null;
+    });
+  }
+
+  /// Öğrenci kartını NFC ile okur ve girişi alır. iOS her okumada sistem
+  /// penceresini açtığı için okuma her kişi için butonla başlatılıyor.
+  Future<void> onReadCard() async {
+    final session = selected?.session;
+    if (session == null || isReadingCard) return;
+
+    final availability = await _nfc.checkAvailability();
+    if (!mounted) return;
+    if (availability == NFCAvailability.not_supported) {
+      _show(const DoorResult(DoorResultKind.error, 'Bu cihazda NFC yok'));
+      return;
+    }
+    if (availability == NFCAvailability.disabled) {
+      _show(
+        const DoorResult(
+          DoorResultKind.error,
+          'NFC kapalı',
+          'Telefonun ayarlarından NFC\'yi açıp tekrar dene.',
+        ),
+      );
+      return;
+    }
+
+    setState(() => isReadingCard = true);
+    try {
+      final NfcCard card;
+      try {
+        card = await _nfc.pollCard(
+          iosAlertMessage: 'Öğrenci kartını telefonun arkasına yaklaştır',
+        );
+      } catch (e) {
+        log('Kart okunamadı: $e');
+        await _nfc.finishSession(iosErrorMessage: 'Kart okunamadı');
+        _show(const DoorResult(DoorResultKind.error, 'Kart okunamadı'));
+        return;
+      }
+      await _nfc.finishSession(iosAlertMessage: 'Kart okundu');
+
+      final uid = card.normalizedHex;
+      final holder = await _service.cardHolder(uid);
+      try {
+        await _service.checkInWithCard(session.id, uid);
+        _show(
+          DoorResult(
+            DoorResultKind.success,
+            'Giriş alındı',
+            holder == null ? '' : _who(holder),
+          ),
+        );
+      } catch (e) {
+        final error = ApiException.from(e);
+        log('Kartla giriş alınamadı: $error');
+        _show(_resultForError(error, holder, byCard: true));
+      }
+    } finally {
+      if (mounted) setState(() => isReadingCard = false);
+    }
+  }
+
   /// Kameranın gördüğü kod. Bir istek sürerken ya da aynı kod az önce
   /// okunduysa yok sayılıyor.
   Future<void> onDetect(BarcodeCapture capture) async {
@@ -198,31 +278,43 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
     } catch (e) {
       final error = ApiException.from(e);
       log('Kapı girişi alınamadı: $error');
-      _show(switch (error.statusCode) {
-        409 => DoorResult(
-          DoorResultKind.already,
-          'Zaten giriş yapmış',
-          _who(holder),
-        ),
-        404 => DoorResult(
-          DoorResultKind.error,
-          'Bu etkinliğe kaydı yok',
-          _who(holder),
-        ),
-        401 => const DoorResult(
-          DoorResultKind.error,
-          'Kodun süresi dolmuş',
-          'Kişiden kartını yeniden açmasını iste.',
-        ),
-        403 => const DoorResult(
-          DoorResultKind.error,
-          'Bu etkinlikte okutma yetkin yok',
-        ),
-        _ => DoorResult(DoorResultKind.error, error.userMessage),
-      });
+      _show(_resultForError(error, holder, byCard: false));
     } finally {
       _busy = false;
     }
+  }
+
+  static DoorResult _resultForError(
+    ApiException error,
+    DoorHolder? holder, {
+    required bool byCard,
+  }) {
+    final who = holder == null ? '' : _who(holder);
+    return switch (error.statusCode) {
+      409 => DoorResult(DoorResultKind.already, 'Zaten giriş yapmış', who),
+      // Kartta 404 iki anlama geliyor: kart kimseye eşli değil ya da kişinin
+      // bu etkinlikte bileti yok; core ikisini ayırmıyor.
+      404 when byCard => const DoorResult(
+        DoorResultKind.error,
+        'Giriş alınamadı',
+        'Kart bir hesaba eşli değil ya da kişinin bu etkinlikte kaydı yok.',
+      ),
+      404 => DoorResult(DoorResultKind.error, 'Bu etkinliğe kaydı yok', who),
+      401 => const DoorResult(
+        DoorResultKind.error,
+        'Kodun süresi dolmuş',
+        'Kişiden kartını yeniden açmasını iste.',
+      ),
+      403 => const DoorResult(
+        DoorResultKind.error,
+        'Bu etkinlikte okutma yetkin yok',
+      ),
+      400 when byCard => const DoorResult(
+        DoorResultKind.error,
+        'Kart numarası okunamadı',
+      ),
+      _ => DoorResult(DoorResultKind.error, error.userMessage),
+    };
   }
 
   static String _who(DoorHolder holder) => [

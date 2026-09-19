@@ -42,6 +42,37 @@ class DoorService {
     );
   }
 
+  /// Öğrenci kartıyla (NFC UID) oturuma giriş. Kart kimseye eşli değilse ya
+  /// da kişinin bu etkinlikte bileti yoksa 404; diğerleri QR ile aynı.
+  Future<void> checkInWithCard(String sessionId, String uid) async {
+    await CoreApi.post(
+      '/sessions/$sessionId/check-in/skypass',
+      body: {'uid': uid},
+    );
+  }
+
+  /// Kartın sahibinin adı ve SKY numarası. Core bu sorguyu yalnızca
+  /// YK/DK/ADMIN'e açıyor; diğer görevlilerde `null` dönüyor ve giriş adsız
+  /// gösteriliyor.
+  Future<DoorHolder?> cardHolder(String uid) async {
+    try {
+      final body = CoreApi.object(
+        await CoreApi.get('/skypass/card', query: {'uid': uid}),
+        what: 'kart sahibi',
+      );
+      final name = [
+        body['firstName'] as String? ?? '',
+        body['lastName'] as String? ?? '',
+      ].where((p) => p.isNotEmpty).join(' ');
+      return DoorHolder(
+        name: name,
+        skyNumber: body['skyNumber'] as String? ?? '',
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Okunan QR'daki SkyPass belirtecinden ad ve SKY numarası; SkyPass
   /// değilse `null`.
   static DoorHolder? holderFrom(String raw) {

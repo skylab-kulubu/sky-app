@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
@@ -25,6 +26,8 @@ import 'package:sky_app/features/calendar/data/services/door_service.dart';
 import 'package:sky_app/features/calendar/presentation/pages/event_schedule/event_schedule_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_option_sheet.dart';
+import 'package:sky_app/features/profile/data/models/nfc_card.dart';
+import 'package:sky_app/features/profile/data/services/nfc_service.dart';
 
 part 'door_scanner_pagemodel.dart';
 
@@ -75,6 +78,8 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
                 const SectionHeader('Yoklama', isFirst: true),
                 _selectors(),
                 const SizedBox(height: AppSizes.largeSpace),
+                _modeSwitch(),
+                const SizedBox(height: AppSizes.bigSpace),
                 _scannerArea(),
                 const SizedBox(height: AppSizes.bigSpace),
                 _resultCard(),
@@ -136,6 +141,8 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
         actionLabel: canEditSchedule ? 'Programı Düzenle' : null,
         onAction: canEditSchedule ? onEditSchedule : null,
       );
+    } else if (mode == DoorMode.card) {
+      child = _cardReader();
     } else {
       child = MobileScanner(
         controller: scanner,
@@ -159,6 +166,71 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
     );
   }
 
+  /// QR ile öğrenci kartı arasında seçim; iki eşit hap.
+  Widget _modeSwitch() {
+    Widget option(DoorMode value, String icon, String label) {
+      final selected = mode == value;
+      return Expanded(
+        child: GestureDetector(
+          onTap: () => onModeChanged(value),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: AppPaddings.buttonInternalPadding,
+            decoration: BoxDecoration(
+              color: selected ? context.accentColor : context.tileColor,
+              borderRadius: AppRadiuses.stadiumBorderRadius,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AppIcon(
+                  icon,
+                  size: AppSizes.iconSmall,
+                  color: selected
+                      ? context.onAccentColor
+                      : context.textSecondary,
+                ),
+                const SizedBox(width: AppSizes.midSpace),
+                Text(
+                  label,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: selected
+                        ? context.onAccentColor
+                        : context.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        option(DoorMode.qr, AppIcons.scan, 'QR Okut'),
+        const SizedBox(width: AppSizes.midSpace),
+        option(DoorMode.card, AppIcons.studentCard, 'Öğrenci Kartı'),
+      ],
+    );
+  }
+
+  /// Kart modu: NFC okumayı butonla başlatıyor (iOS her seferinde sistem
+  /// penceresini açıyor).
+  Widget _cardReader() {
+    return _message(
+      icon: AppIcons.nfc,
+      title: 'Öğrenci Kartını Okut',
+      message:
+          'Kişinin öğrenci kartını telefonun arkasına yaklaştır. Kartın '
+          'önceden SkyPass\'e eşlenmiş olması gerekiyor.',
+      actionLabel: isReadingCard ? null : 'Kartı Okut',
+      onAction: isReadingCard ? null : onReadCard,
+      loading: isReadingCard,
+    );
+  }
+
   /// Son okutmanın sonucu; yoksa ne yapılacağını söyleyen ipucu.
   Widget _resultCard() {
     final value = result;
@@ -166,7 +238,10 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
       DoorResultKind.success => (AppIcons.checkCircle, AppColors.green),
       DoorResultKind.already => (AppIcons.clock, AppColors.orange),
       DoorResultKind.error => (AppIcons.warning, AppColors.red),
-      null => (AppIcons.qr, context.textTertiary),
+      null => (
+        mode == DoorMode.card ? AppIcons.studentCard : AppIcons.qr,
+        context.textTertiary,
+      ),
     };
 
     return AnimatedSwitcher(
@@ -187,7 +262,10 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    value?.title ?? 'Kişinin SkyPass QR\'ını kameraya tut',
+                    value?.title ??
+                        (mode == DoorMode.card
+                            ? 'Kartı okut, giriş otomatik alınır'
+                            : 'Kişinin SkyPass QR\'ını kameraya tut'),
                     style: context.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: value == null ? context.textSecondary : color,
@@ -217,6 +295,7 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
     required String message,
     String? actionLabel,
     VoidCallback? onAction,
+    bool loading = false,
   }) {
     return Center(
       child: Padding(
@@ -245,6 +324,10 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
                 color: context.textTertiary,
               ),
             ),
+            if (loading) ...[
+              const SizedBox(height: AppSizes.largeSpace),
+              const CircularProgressIndicator.adaptive(),
+            ],
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: AppSizes.largeSpace),
               SkyButton(text: actionLabel, onPressed: onAction),
