@@ -11,6 +11,7 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/features/calendar/data/services/door_service.dart';
 import 'package:sky_app/features/calendar/presentation/pages/door_scanner/door_scanner_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/core/services/api_exception.dart';
@@ -38,6 +39,28 @@ class _ProfilePageState extends State<ProfilePage> {
 
   /// "QR'ı Göster" butonu kartı bununla çeviriyor.
   final SkyPassCardController _cardController = SkyPassCardController();
+
+  /// Core'a göre giriş alınabilecek yaklaşan bir etkinlik var mı
+  /// (`/v1/door/events`). Grubunda `team_door_scan` açık ekiplerin üyeleri
+  /// yalnızca buradan anlaşılıyor; token'da görünmüyor.
+  bool _hasDoorEvents = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkDoorEvents();
+  }
+
+  Future<void> _checkDoorEvents() async {
+    try {
+      final events = await DoorService().fetchDoorEvents();
+      if (!mounted) return;
+      setState(() => _hasDoorEvents = events.any((e) => e.isUpcoming));
+    } catch (e) {
+      // Yerel yetki kuralı yine çalışıyor; sessizce geçiliyor.
+      log('Kapı etkinlikleri alınamadı: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,12 +109,16 @@ class _ProfilePageState extends State<ProfilePage> {
   /// sahip ekibin lideri, kapı görevlisi) bu buton "Giriş Al" oluyor ve
   /// kapı okuyucusunu açıyor; kendi kodunu görmek için karta dokunması yeter.
   Widget _quickActions(BuildContext context, User user, String subtitle) {
-    final canScan = context.watch<EventProvider>().upcomingEvents.any(
-      (event) => user.canCheckIn(
-        ownerTeam: event.ownerTeam,
-        doorStaffIds: event.doorStaffIds,
-      ),
-    );
+    // Yerel kural (token'daki gruplar + etkinlik listesi) anında sonuç
+    // veriyor; core'un listesi gelince team_door_scan üyeleri de ekleniyor.
+    final canScan =
+        _hasDoorEvents ||
+        context.watch<EventProvider>().upcomingEvents.any(
+          (event) => user.canCheckIn(
+            ownerTeam: event.ownerTeam,
+            doorStaffIds: event.doorStaffIds,
+          ),
+        );
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

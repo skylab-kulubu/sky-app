@@ -53,13 +53,21 @@ class EventPaletteService {
 
   /// Hesaplanmışsa renkleri döndürür, yoksa boş liste. Beklemek istemeyen
   /// çağıranlar için (sayfa ilk karede doğru renkle açılsın diye).
-  static List<Color> cached(String imageUrl) => _cache[imageUrl] ?? const [];
+  ///
+  /// [known] sunucunun gönderdiği renkler (`EventModel.coverColors`); varsa
+  /// hesap yapılmadan onlar kullanılıyor.
+  static List<Color> cached(String imageUrl, {List<Color> known = const []}) =>
+      known.isNotEmpty ? known : _cache[imageUrl] ?? const [];
 
   /// Renkleri döndürür; bellekte ya da diskte yoksa hesaplar.
   ///
   /// Görsel indirilemez ya da çözülemezse boş liste döner — çağıran taraf
   /// düz zemine düşer.
-  static Future<List<Color>> resolve(String imageUrl) {
+  static Future<List<Color>> resolve(
+    String imageUrl, {
+    List<Color> known = const [],
+  }) {
+    if (known.isNotEmpty) return Future.value(known);
     if (imageUrl.trim().isEmpty) return Future.value(const []);
 
     final cached = _cache[imageUrl];

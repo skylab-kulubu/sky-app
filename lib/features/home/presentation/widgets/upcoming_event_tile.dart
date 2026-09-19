@@ -39,7 +39,10 @@ class _UpcomingEventTileState extends State<UpcomingEventTile> {
     super.initState();
     // Detay sayfasının zemini kapağın renklerinden kuruluyor; hesap satır
     // göründüğü anda başlıyor ki sayfa açıldığında hazır olsun.
-    unawaited(EventPaletteService.resolve(event.coverImageUrl));
+    // Sunucu renkleri gönderdiyse hesaplanacak bir şey yok.
+    if (event.coverColors.isEmpty) {
+      unawaited(EventPaletteService.resolve(event.coverImageUrl));
+    }
   }
 
   @override

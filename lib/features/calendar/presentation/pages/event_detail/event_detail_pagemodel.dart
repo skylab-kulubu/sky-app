@@ -66,7 +66,10 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     setState(() {
       event = updated;
       if (coverChanged) {
-        backdropTints = EventPaletteService.cached(updated.coverImageUrl);
+        backdropTints = EventPaletteService.cached(
+          updated.coverImageUrl,
+          known: updated.coverColors,
+        );
       }
     });
     if (coverChanged && backdropTints.isEmpty) {
@@ -80,7 +83,10 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
 
     // Renkler kart göründüğünde hesaplanmaya başlamıştı; çoğu zaman burada
     // hazır ve zemin ilk karede doğru renkte açılıyor.
-    backdropTints = EventPaletteService.cached(event.coverImageUrl);
+    backdropTints = EventPaletteService.cached(
+      event.coverImageUrl,
+      known: event.coverColors,
+    );
 
     // Hazır değilse beklemek gerekiyor ama sayfa açılırken değil: palet
     // çıkarımı ana iş parçacığında çalıştığı için açılış animasyonunu
@@ -127,7 +133,10 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
   /// süren bir işe bağlanıyor, yenisini başlatmıyor.
   Future<void> _resolveBackdropTint() async {
     final imageUrl = event.coverImageUrl;
-    final tints = await EventPaletteService.resolve(imageUrl);
+    final tints = await EventPaletteService.resolve(
+      imageUrl,
+      known: event.coverColors,
+    );
 
     // Görsel indirilemediyse zemin düz taban renginde kalır; sayfanın geri
     // kalanı bundan etkilenmiyor.

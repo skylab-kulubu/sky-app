@@ -1,23 +1,36 @@
 import 'dart:convert';
 
 import 'package:sky_app/core/services/core_api.dart';
+import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/data/models/event_session.dart';
 import 'package:sky_app/features/calendar/data/services/schedule_service.dart';
 
-/// Kapıda okutulan kodun sahibi; QR'daki imzalı belirtecin içinden okunuyor.
-/// Doğrulama sunucuda (check-in isteğinde) yapılıyor, bu yalnızca ekranda
-/// kimin girdiğini göstermek için.
-class DoorHolder {
-  const DoorHolder({required this.name, required this.skyNumber});
+/// Kapıdaki bir girişin sonucu: kimin girdiği ve oturumdaki toplam giriş.
+class DoorCheckIn {
+  const DoorCheckIn({required this.personName, required this.total});
 
-  final String name;
-  final String skyNumber;
+  /// Girenin adı; bulunamazsa boş.
+  final String personName;
+
+  /// Oturumda şimdiye kadar alınan giriş sayısı; bilinmiyorsa `null`.
+  final int? total;
 }
 
-/// Kapı okuyucusunun ağ işleri (core): etkinliğin günleri ve oturumları,
-/// SkyPass ile giriş.
+/// Kapıda giriş almanın ağ işleri (core): görevlinin etkinlikleri,
+/// oturumlar, SkyPass/öğrenci kartıyla giriş ve oturumun giriş kaydı.
 class DoorService {
   final ScheduleService _schedule = ScheduleService();
+
+  /// Kullanıcının kapıda giriş alabildiği etkinlikler
+  /// (`GET /v1/door/events`). Yetkiyi core hesaplıyor; grubunda
+  /// `team_door_scan` açık ekiplerin üyeleri de dahil.
+  Future<List<EventModel>> fetchDoorEvents() async {
+    final body = await CoreApi.get('/door/events');
+    return CoreApi.list(
+      body,
+      what: 'kapı etkinlikleri',
+    ).map(EventModel.fromJson).where((e) => e.id.isNotEmpty).toList();
+  }
 
   /// Etkinliğin iptal edilmemiş bütün oturumları, günleriyle birlikte;
   /// programdaki sırayla.
@@ -32,65 +45,83 @@ class DoorService {
     ];
   }
 
-  /// SkyPass QR'ı ile oturuma giriş. Hatalar `ApiException`: 409 zaten
-  /// girmiş, 404 bu etkinlikte kaydı yok, 401 kodun süresi dolmuş ya da
-  /// imza geçersiz, 403 okutma yetkisi yok.
-  Future<void> checkInWithPass(String sessionId, String token) async {
-    await CoreApi.post(
-      '/sessions/$sessionId/check-in/skypass',
-      body: {'token': token},
+  /// SkyPass QR'ı (`{token}`) ya da öğrenci kartıyla (`{uid}`) oturuma
+  /// giriş; ardından girenin adını oturumun giriş kaydından alıyor.
+  ///
+  /// Hatalar `ApiException`: 409 zaten girmiş, 404 bu etkinlikte kaydı yok
+  /// (kartta: kart eşli değil de olabilir), 401 kodun süresi dolmuş ya da
+  /// imza geçersiz, 403 giriş alma yetkisi yok.
+  Future<DoorCheckIn> checkIn(
+    String sessionId, {
+    String? token,
+    String? uid,
+  }) async {
+    final created = CoreApi.object(
+      await CoreApi.post(
+        '/sessions/$sessionId/check-in/skypass',
+        body: {'token': ?token, 'uid': ?uid},
+      ),
+      what: 'giriş',
     );
+    return _describe(sessionId, created['id'] as String? ?? '');
   }
 
-  /// Öğrenci kartıyla (NFC UID) oturuma giriş. Kart kimseye eşli değilse ya
-  /// da kişinin bu etkinlikte bileti yoksa 404; diğerleri QR ile aynı.
-  Future<void> checkInWithCard(String sessionId, String uid) async {
-    await CoreApi.post(
-      '/sessions/$sessionId/check-in/skypass',
-      body: {'uid': uid},
-    );
-  }
-
-  /// Kartın sahibinin adı ve SKY numarası. Core bu sorguyu yalnızca
-  /// YK/DK/ADMIN'e açıyor; diğer görevlilerde `null` dönüyor ve giriş adsız
-  /// gösteriliyor.
-  Future<DoorHolder?> cardHolder(String uid) async {
+  /// Oturumun son girişlerinde bu girişi bulup adı döndürür. SkyPass kodu
+  /// kişinin adını taşımıyor, kart sorgusu ise yalnızca YK/DK/ADMIN'e açık;
+  /// giriş kaydı (`GET /v1/sessions/{id}/check-ins`) her görevliye açık.
+  /// Alınamazsa adsız dönüyor, giriş yine de alınmış sayılıyor.
+  Future<DoorCheckIn> _describe(String sessionId, String checkInId) async {
     try {
-      final body = CoreApi.object(
-        await CoreApi.get('/skypass/card', query: {'uid': uid}),
-        what: 'kart sahibi',
-      );
-      final name = [
-        body['firstName'] as String? ?? '',
-        body['lastName'] as String? ?? '',
-      ].where((p) => p.isNotEmpty).join(' ');
-      return DoorHolder(
-        name: name,
-        skyNumber: body['skyNumber'] as String? ?? '',
+      final activity = await sessionActivity(sessionId);
+      return DoorCheckIn(
+        personName: activity.names[checkInId] ?? '',
+        total: activity.total,
       );
     } catch (_) {
-      return null;
+      return const DoorCheckIn(personName: '', total: null);
     }
   }
 
-  /// Okunan QR'daki SkyPass belirtecinden ad ve SKY numarası; SkyPass
-  /// değilse `null`.
-  static DoorHolder? holderFrom(String raw) {
+  /// Oturumdaki toplam giriş ve son girişlerin adları (giriş id'sine göre).
+  Future<({int total, Map<String, String> names})> sessionActivity(
+    String sessionId,
+  ) async {
+    final body = CoreApi.object(
+      await CoreApi.get('/sessions/$sessionId/check-ins'),
+      what: 'giriş kaydı',
+    );
+    final items = body['items'] as List<dynamic>? ?? const [];
+    return (
+      total: (body['total'] as num?)?.toInt() ?? items.length,
+      names: {
+        for (final item in items.whereType<Map<String, dynamic>>())
+          if (item['id'] is String)
+            item['id'] as String: (item['personName'] as String? ?? '').trim(),
+      },
+    );
+  }
+
+  /// QR'dan okunan değer SkyPass kodu mu: ES256 imzalı, konusu (`sub`)
+  /// kullanıcı id'si olan bir belirteç. Asıl doğrulama sunucuda; bu yalnızca
+  /// alakasız QR'ları (web adresi, bilet vb.) sunucuya göndermemek için.
+  static bool isSkyPassToken(String raw) {
     final parts = raw.trim().split('.');
-    if (parts.length != 3) return null;
+    if (parts.length != 3) return false;
     try {
-      final payload = jsonDecode(
-        utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
-      );
-      if (payload is! Map<String, dynamic> || payload['iss'] != 'skypass') {
-        return null;
-      }
-      return DoorHolder(
-        name: payload['name'] as String? ?? '',
-        skyNumber: payload['skyNumber'] as String? ?? '',
-      );
+      final header = _decodePart(parts[0]);
+      final payload = _decodePart(parts[1]);
+      return header['alg'] == 'ES256' &&
+          payload['sub'] is String &&
+          (payload['sub'] as String).isNotEmpty;
     } catch (_) {
-      return null;
+      return false;
     }
+  }
+
+  static Map<String, dynamic> _decodePart(String part) {
+    final decoded = jsonDecode(
+      utf8.decode(base64Url.decode(base64Url.normalize(part))),
+    );
+    return decoded is Map<String, dynamic> ? decoded : const {};
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 import 'package:sky_app/core/extensions/date_time_extensions.dart';
 
 class EventModel {
@@ -47,6 +49,7 @@ class EventModel {
     this.attendanceRule = '',
     this.attendanceRatio,
     this.doorStaffIds = const [],
+    this.coverColors = const [],
   });
 
   /// Etkinliğin LinkedIn gönderisi; düzenleme formu için.
@@ -76,6 +79,11 @@ class EventModel {
   /// gönderilmeyen listeyi olduğu gibi bırakıyor.
   final List<String> doorStaffIds;
 
+  /// Core'un kapak yüklenirken hesapladığı zemin renkleri (`coverColors`,
+  /// uygulamadaki `CoverColorExtractor`'ın Go karşılığı). Boşsa renkler
+  /// cihazda hesaplanıyor.
+  final List<Color> coverColors;
+
   /// Core `EventResponse`'u (`/v1/events`).
   factory EventModel.fromJson(Map<String, dynamic> json) {
     return EventModel(
@@ -101,6 +109,10 @@ class EventModel {
         for (final id in json['doorStaffIds'] as List<dynamic>? ?? const [])
           if (id is String) id,
       ],
+      coverColors: [
+        for (final hex in json['coverColors'] as List<dynamic>? ?? const [])
+          ?_parseHex(hex),
+      ],
     );
   }
 
@@ -116,6 +128,15 @@ class EventModel {
   }
 
   static DateTime? _parse(String value) => ApiDateTime.parse(value);
+
+  /// `#8a602d` → [Color]; biçim bozuksa `null`.
+  static Color? _parseHex(Object? value) {
+    if (value is! String) return null;
+    final hex = value.startsWith('#') ? value.substring(1) : value;
+    if (hex.length != 6) return null;
+    final rgb = int.tryParse(hex, radix: 16);
+    return rgb == null ? null : Color(0xFF000000 | rgb);
+  }
 
   DateTime? get startDateTime => _parse(startDate);
 

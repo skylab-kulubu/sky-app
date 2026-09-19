@@ -24,7 +24,6 @@ import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/data/models/event_session.dart';
 import 'package:sky_app/features/calendar/data/services/door_service.dart';
 import 'package:sky_app/features/calendar/presentation/pages/event_schedule/event_schedule_page.dart';
-import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_option_sheet.dart';
 import 'package:sky_app/features/profile/data/models/nfc_card.dart';
 import 'package:sky_app/features/profile/data/services/nfc_service.dart';
@@ -64,12 +63,24 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
       ),
-      body: events.isEmpty
+      body: isLoadingEvents
+          ? const Center(child: CircularProgressIndicator.adaptive())
+          : eventsError != null
+          ? _message(
+              icon: eventsError!.isConnectivityIssue
+                  ? AppIcons.wifiOff
+                  : AppIcons.warning,
+              title: 'Etkinlikler Yüklenemedi',
+              message: eventsError!.userMessage,
+              actionLabel: 'Tekrar Dene',
+              onAction: onRetryEvents,
+            )
+          : events.isEmpty
           ? _message(
               icon: AppIcons.calendar,
               title: 'Okutulacak Etkinlik Yok',
               message:
-                  'Kapı yetkin olan yaklaşan bir etkinlik bulunamadı. Etkinliğin '
+                  'Giriş alabileceğin yaklaşan bir etkinlik yok. Etkinliğin '
                   'lideri ya da kapı görevlisi olduğunda burada görünecek.',
             )
           : ListView(
@@ -104,9 +115,7 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
           iconColor: AppColors.purple,
           title: 'Oturum',
           value: sessionLabel,
-          subtitle: selected?.session.timeRange.isNotEmpty ?? false
-              ? selected!.session.timeRange
-              : null,
+          subtitle: sessionSubtitle,
           trailingIcon: sessions.length > 1 ? AppIcons.chevronRight : null,
           onTap: onChooseSession,
         ),

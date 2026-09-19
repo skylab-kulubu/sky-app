@@ -30,16 +30,11 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
 
   late final User? _user = context.read<UserProvider>().user;
 
-  /// Okutulabilecek etkinlikler: bitmemiş ve kullanıcının kapı yetkisi olan.
-  late final List<EventModel> events = [
-    for (final event in context.read<EventProvider>().upcomingEvents)
-      if (_user?.canCheckIn(
-            ownerTeam: event.ownerTeam,
-            doorStaffIds: event.doorStaffIds,
-          ) ??
-          false)
-        event,
-  ];
+  /// Giriş alınabilecek, bitmemiş etkinlikler. Liste core'dan
+  /// (`/v1/door/events`); yetkiyi core hesaplıyor.
+  List<EventModel> events = const [];
+  bool isLoadingEvents = true;
+  ApiException? eventsError;
 
   EventModel? event;
   List<({EventDay day, EventSession session})> sessions = const [];
@@ -48,6 +43,9 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
   ApiException? sessionsError;
 
   DoorResult? result;
+
+  /// Seçili oturumda alınan toplam giriş; bilinmiyorsa `null`.
+  int? sessionTotal;
 
   /// Varsayılan öğrenci kartı: kapıda en hızlı yol, kamera izni de
   /// istemiyor. QR'a geçilince kamera açılıyor.
@@ -65,9 +63,42 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
   @override
   void initState() {
     super.initState();
-    final first = events.firstOrNull;
-    if (first != null) _selectEvent(first);
+    _loadEvents();
   }
+
+  Future<void> _loadEvents() async {
+    setState(() {
+      isLoadingEvents = true;
+      eventsError = null;
+    });
+    try {
+      final all = await _service.fetchDoorEvents();
+      if (!mounted) return;
+      final upcoming = all.where((e) => e.isUpcoming).toList()
+        ..sort((a, b) {
+          final aStart = a.startDateTime;
+          final bStart = b.startDateTime;
+          if (aStart == null || bStart == null) return 0;
+          return aStart.compareTo(bStart);
+        });
+      setState(() {
+        events = upcoming;
+        isLoadingEvents = false;
+      });
+      final first = upcoming.firstOrNull;
+      if (first != null) await _selectEvent(first);
+    } catch (e) {
+      final error = ApiException.from(e);
+      log('Kapı etkinlikleri alınamadı: $error');
+      if (!mounted) return;
+      setState(() {
+        eventsError = error;
+        isLoadingEvents = false;
+      });
+    }
+  }
+
+  void onRetryEvents() => _loadEvents();
 
   @override
   void dispose() {
@@ -77,6 +108,16 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
   }
 
   String get eventLabel => event?.name ?? 'Seç';
+
+  /// Oturum satırının alt yazısı: saat ve alınan giriş sayısı.
+  String? get sessionSubtitle {
+    final parts = [
+      if (selected?.session.timeRange.isNotEmpty ?? false)
+        selected!.session.timeRange,
+      if (sessionTotal != null) '$sessionTotal giriş',
+    ];
+    return parts.isEmpty ? null : parts.join('  •  ');
+  }
 
   String get sessionLabel {
     if (isLoadingSessions) return 'Yükleniyor…';
@@ -90,6 +131,7 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
       event = value;
       sessions = const [];
       selected = null;
+      sessionTotal = null;
       sessionsError = null;
       isLoadingSessions = true;
     });
@@ -102,6 +144,7 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
         selected = _defaultSession(result);
         isLoadingSessions = false;
       });
+      _loadTotal();
     } catch (e) {
       final error = ApiException.from(e);
       log('Oturumlar alınamadı: $error');
@@ -176,7 +219,24 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
       iconColor: AppColors.purple,
     );
     if (index == null || !mounted) return;
-    setState(() => selected = sessions[index]);
+    setState(() {
+      selected = sessions[index];
+      sessionTotal = null;
+    });
+    _loadTotal();
+  }
+
+  /// Seçili oturumdaki giriş sayısı; alınamazsa gösterilmiyor.
+  Future<void> _loadTotal() async {
+    final sessionId = selected?.session.id;
+    if (sessionId == null) return;
+    try {
+      final activity = await _service.sessionActivity(sessionId);
+      if (!mounted || selected?.session.id != sessionId) return;
+      setState(() => sessionTotal = activity.total);
+    } catch (e) {
+      log('Giriş sayısı alınamadı: $e');
+    }
   }
 
   /// QR ile kart arasında geçer. Kart modunda kamera kapatılıyor; QR'a
@@ -229,21 +289,16 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
       }
       await _nfc.finishSession(iosAlertMessage: 'Kart okundu');
 
-      final uid = card.normalizedHex;
-      final holder = await _service.cardHolder(uid);
       try {
-        await _service.checkInWithCard(session.id, uid);
-        _show(
-          DoorResult(
-            DoorResultKind.success,
-            'Giriş alındı',
-            holder == null ? '' : _who(holder),
-          ),
+        final done = await _service.checkIn(
+          session.id,
+          uid: card.normalizedHex,
         );
+        _showSuccess(done);
       } catch (e) {
         final error = ApiException.from(e);
         log('Kartla giriş alınamadı: $error');
-        _show(_resultForError(error, holder, byCard: true));
+        _show(_resultForError(error, byCard: true));
       }
     } finally {
       if (mounted) setState(() => isReadingCard = false);
@@ -266,8 +321,7 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
     _lastRaw = raw;
     _lastRawAt = now;
 
-    final holder = DoorService.holderFrom(raw);
-    if (holder == null) {
+    if (!DoorService.isSkyPassToken(raw)) {
       _show(
         const DoorResult(DoorResultKind.error, 'Bu bir SkyPass kodu değil'),
       );
@@ -276,25 +330,30 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
 
     _busy = true;
     try {
-      await _service.checkInWithPass(session.id, raw);
-      _show(DoorResult(DoorResultKind.success, 'Giriş alındı', _who(holder)));
+      final done = await _service.checkIn(session.id, token: raw);
+      _showSuccess(done);
     } catch (e) {
       final error = ApiException.from(e);
       log('Kapı girişi alınamadı: $error');
-      _show(_resultForError(error, holder, byCard: false));
+      _show(_resultForError(error, byCard: false));
     } finally {
       _busy = false;
     }
   }
 
+  /// Başarılı girişte kimin girdiği görünüyor; görevli karşısındakinin o kişi
+  /// olduğunu teyit edebilsin. Sayaç da güncelleniyor.
+  void _showSuccess(DoorCheckIn done) {
+    if (done.total != null) setState(() => sessionTotal = done.total);
+    _show(DoorResult(DoorResultKind.success, 'Giriş alındı', done.personName));
+  }
+
   static DoorResult _resultForError(
-    ApiException error,
-    DoorHolder? holder, {
+    ApiException error, {
     required bool byCard,
   }) {
-    final who = holder == null ? '' : _who(holder);
     return switch (error.statusCode) {
-      409 => DoorResult(DoorResultKind.already, 'Zaten giriş yapmış', who),
+      409 => const DoorResult(DoorResultKind.already, 'Zaten giriş yapmış'),
       // Kartta 404 iki anlama geliyor: kart kimseye eşli değil ya da kişinin
       // bu etkinlikte bileti yok; core ikisini ayırmıyor.
       404 when byCard => const DoorResult(
@@ -302,7 +361,7 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
         'Giriş alınamadı',
         'Kart bir hesaba eşli değil ya da kişinin bu etkinlikte kaydı yok.',
       ),
-      404 => DoorResult(DoorResultKind.error, 'Bu etkinliğe kaydı yok', who),
+      404 => const DoorResult(DoorResultKind.error, 'Bu etkinliğe kaydı yok'),
       401 => const DoorResult(
         DoorResultKind.error,
         'Kodun süresi dolmuş',
@@ -319,11 +378,6 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
       _ => DoorResult(DoorResultKind.error, error.userMessage),
     };
   }
-
-  static String _who(DoorHolder holder) => [
-    holder.name,
-    holder.skyNumber,
-  ].where((part) => part.isNotEmpty).join('  •  ');
 
   void _show(DoorResult value) {
     if (!mounted) return;
