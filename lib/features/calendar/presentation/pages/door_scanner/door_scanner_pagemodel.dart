@@ -1,18 +1,7 @@
 part of 'door_scanner_page.dart';
 
-/// Son okutmanın sonucu; okuyucunun altında gösteriliyor.
-enum DoorResultKind { success, already, error }
-
 /// Girişin nasıl alındığı: SkyPass QR'ı kamerayla ya da öğrenci kartı NFC ile.
 enum DoorMode { qr, card }
-
-class DoorResult {
-  const DoorResult(this.kind, this.title, [this.detail = '']);
-
-  final DoorResultKind kind;
-  final String title;
-  final String detail;
-}
 
 abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
   final DoorService _service = DoorService();
@@ -42,7 +31,7 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
   bool isLoadingSessions = false;
   ApiException? sessionsError;
 
-  DoorResult? result;
+  ScanResult? result;
 
   /// Seçili oturumda alınan toplam giriş; bilinmiyorsa `null`.
   int? sessionTotal;
@@ -260,13 +249,13 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
     final availability = await _nfc.checkAvailability();
     if (!mounted) return;
     if (availability == NFCAvailability.not_supported) {
-      _show(const DoorResult(DoorResultKind.error, 'Bu cihazda NFC yok'));
+      _show(const ScanResult(ScanResultKind.error, 'Bu cihazda NFC yok'));
       return;
     }
     if (availability == NFCAvailability.disabled) {
       _show(
-        const DoorResult(
-          DoorResultKind.error,
+        const ScanResult(
+          ScanResultKind.error,
           'NFC kapalı',
           'Telefonun ayarlarından NFC\'yi açıp tekrar dene.',
         ),
@@ -284,7 +273,7 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
       } catch (e) {
         log('Kart okunamadı: $e');
         await _nfc.finishSession(iosErrorMessage: 'Kart okunamadı');
-        _show(const DoorResult(DoorResultKind.error, 'Kart okunamadı'));
+        _show(const ScanResult(ScanResultKind.error, 'Kart okunamadı'));
         return;
       }
       await _nfc.finishSession(iosAlertMessage: 'Kart okundu');
@@ -323,7 +312,7 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
 
     if (!DoorService.isSkyPassToken(raw)) {
       _show(
-        const DoorResult(DoorResultKind.error, 'Bu bir SkyPass kodu değil'),
+        const ScanResult(ScanResultKind.error, 'Bu bir SkyPass kodu değil'),
       );
       return;
     }
@@ -345,47 +334,47 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
   /// olduğunu teyit edebilsin. Sayaç da güncelleniyor.
   void _showSuccess(DoorCheckIn done) {
     if (done.total != null) setState(() => sessionTotal = done.total);
-    _show(DoorResult(DoorResultKind.success, 'Giriş alındı', done.personName));
+    _show(ScanResult(ScanResultKind.success, 'Giriş alındı', done.personName));
   }
 
-  static DoorResult _resultForError(
+  static ScanResult _resultForError(
     ApiException error, {
     required bool byCard,
   }) {
     return switch (error.statusCode) {
-      409 => const DoorResult(DoorResultKind.already, 'Zaten giriş yapmış'),
+      409 => const ScanResult(ScanResultKind.already, 'Zaten giriş yapmış'),
       // Kartta 404 iki anlama geliyor: kart kimseye eşli değil ya da kişinin
       // bu etkinlikte bileti yok; core ikisini ayırmıyor.
-      404 when byCard => const DoorResult(
-        DoorResultKind.error,
+      404 when byCard => const ScanResult(
+        ScanResultKind.error,
         'Giriş alınamadı',
         'Kart bir hesaba eşli değil ya da kişinin bu etkinlikte kaydı yok.',
       ),
-      404 => const DoorResult(DoorResultKind.error, 'Bu etkinliğe kaydı yok'),
-      401 => const DoorResult(
-        DoorResultKind.error,
+      404 => const ScanResult(ScanResultKind.error, 'Bu etkinliğe kaydı yok'),
+      401 => const ScanResult(
+        ScanResultKind.error,
         'Kodun süresi dolmuş',
         'Kişiden kartını yeniden açmasını iste.',
       ),
-      403 => const DoorResult(
-        DoorResultKind.error,
+      403 => const ScanResult(
+        ScanResultKind.error,
         'Bu etkinlikte okutma yetkin yok',
       ),
-      400 when byCard => const DoorResult(
-        DoorResultKind.error,
+      400 when byCard => const ScanResult(
+        ScanResultKind.error,
         'Kart numarası okunamadı',
       ),
-      _ => DoorResult(DoorResultKind.error, error.userMessage),
+      _ => ScanResult(ScanResultKind.error, error.userMessage),
     };
   }
 
-  void _show(DoorResult value) {
+  void _show(ScanResult value) {
     if (!mounted) return;
     switch (value.kind) {
-      case DoorResultKind.success:
+      case ScanResultKind.success:
         HapticFeedback.mediumImpact();
-      case DoorResultKind.already:
-      case DoorResultKind.error:
+      case ScanResultKind.already:
+      case ScanResultKind.error:
         HapticFeedback.heavyImpact();
     }
     _resultTimer?.cancel();

@@ -16,7 +16,6 @@ import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/section_header.dart';
 import 'package:sky_app/core/widgets/settings_tile.dart';
-import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/core/widgets/tile_group.dart';
 import 'package:sky_app/features/auth/data/models/user.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
@@ -25,6 +24,8 @@ import 'package:sky_app/features/calendar/data/models/event_session.dart';
 import 'package:sky_app/features/calendar/data/services/door_service.dart';
 import 'package:sky_app/features/calendar/presentation/pages/event_schedule/event_schedule_page.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_option_sheet.dart';
+import 'package:sky_app/features/calendar/presentation/widgets/scan_message.dart';
+import 'package:sky_app/features/calendar/presentation/widgets/scan_result_card.dart';
 import 'package:sky_app/features/profile/data/models/nfc_card.dart';
 import 'package:sky_app/features/profile/data/services/nfc_service.dart';
 
@@ -66,7 +67,7 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
       body: isLoadingEvents
           ? const Center(child: CircularProgressIndicator.adaptive())
           : eventsError != null
-          ? _message(
+          ? ScanMessage(
               icon: eventsError!.isConnectivityIssue
                   ? AppIcons.wifiOff
                   : AppIcons.warning,
@@ -76,7 +77,7 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
               onAction: onRetryEvents,
             )
           : events.isEmpty
-          ? _message(
+          ? ScanMessage(
               icon: AppIcons.calendar,
               title: 'Okutulacak Etkinlik Yok',
               message:
@@ -93,7 +94,15 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
                 const SizedBox(height: AppSizes.bigSpace),
                 _scannerArea(),
                 const SizedBox(height: AppSizes.bigSpace),
-                _resultCard(),
+                ScanResultCard(
+                  result: result,
+                  hintIcon: mode == DoorMode.card
+                      ? AppIcons.studentCard
+                      : AppIcons.qr,
+                  hint: mode == DoorMode.card
+                      ? 'Kartı okut, giriş otomatik alınır'
+                      : 'Kişinin SkyPass QR\'ını kameraya tut',
+                ),
               ],
             ),
     );
@@ -129,7 +138,7 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
     if (isLoadingSessions) {
       child = const Center(child: CircularProgressIndicator.adaptive());
     } else if (sessionsError != null) {
-      child = _message(
+      child = ScanMessage(
         icon: sessionsError!.isConnectivityIssue
             ? AppIcons.wifiOff
             : AppIcons.warning,
@@ -139,7 +148,7 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
         onAction: onRetrySessions,
       );
     } else if (selected == null) {
-      child = _message(
+      child = ScanMessage(
         icon: AppIcons.clock,
         title: 'Oturum Yok',
         message: canEditSchedule
@@ -156,7 +165,7 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
       child = MobileScanner(
         controller: scanner,
         onDetect: onDetect,
-        errorBuilder: (context, error) => _message(
+        errorBuilder: (context, error) => ScanMessage(
           icon: AppIcons.camera,
           title: 'Kamera Açılamadı',
           message: error.errorCode == MobileScannerErrorCode.permissionDenied
@@ -228,7 +237,7 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
   /// Kart modu: NFC okumayı butonla başlatıyor (iOS her seferinde sistem
   /// penceresini açıyor).
   Widget _cardReader() {
-    return _message(
+    return ScanMessage(
       icon: AppIcons.nfc,
       title: 'Öğrenci Kartını Okut',
       message:
@@ -237,113 +246,6 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
       actionLabel: isReadingCard ? null : 'Kartı Okut',
       onAction: isReadingCard ? null : onReadCard,
       loading: isReadingCard,
-    );
-  }
-
-  /// Son okutmanın sonucu; yoksa ne yapılacağını söyleyen ipucu.
-  Widget _resultCard() {
-    final value = result;
-    final (icon, color) = switch (value?.kind) {
-      DoorResultKind.success => (AppIcons.checkCircle, AppColors.green),
-      DoorResultKind.already => (AppIcons.clock, AppColors.orange),
-      DoorResultKind.error => (AppIcons.warning, AppColors.red),
-      null => (
-        mode == DoorMode.card ? AppIcons.studentCard : AppIcons.qr,
-        context.textTertiary,
-      ),
-    };
-
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
-      child: Container(
-        key: ValueKey(value),
-        padding: AppPaddings.settingsTile,
-        decoration: BoxDecoration(
-          color: context.tileColor,
-          borderRadius: AppRadiuses.cardBorderRadius,
-        ),
-        child: Row(
-          children: [
-            AppIcon(icon, size: AppSizes.iconMedium, color: color),
-            const SizedBox(width: AppSizes.bigSpace),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value?.title ??
-                        (mode == DoorMode.card
-                            ? 'Kartı okut, giriş otomatik alınır'
-                            : 'Kişinin SkyPass QR\'ını kameraya tut'),
-                    style: context.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: value == null ? context.textSecondary : color,
-                    ),
-                  ),
-                  if (value != null && value.detail.isNotEmpty) ...[
-                    const SizedBox(height: AppSizes.smallSpace),
-                    Text(
-                      value.detail,
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: context.textSecondary,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _message({
-    required String icon,
-    required String title,
-    required String message,
-    String? actionLabel,
-    VoidCallback? onAction,
-    bool loading = false,
-  }) {
-    return Center(
-      child: Padding(
-        padding: AppPaddings.mainPaddingAll,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AppIcon(
-              icon,
-              size: AppSizes.iconLarge,
-              color: context.textTertiary,
-            ),
-            const SizedBox(height: AppSizes.bigSpace),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: context.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: AppSizes.smallSpace),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: context.textTertiary,
-              ),
-            ),
-            if (loading) ...[
-              const SizedBox(height: AppSizes.largeSpace),
-              const CircularProgressIndicator.adaptive(),
-            ],
-            if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: AppSizes.largeSpace),
-              SkyButton(text: actionLabel, onPressed: onAction),
-            ],
-          ],
-        ),
-      ),
     );
   }
 }

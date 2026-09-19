@@ -13,6 +13,7 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/data/services/door_service.dart';
 import 'package:sky_app/features/calendar/presentation/pages/door_scanner/door_scanner_page.dart';
+import 'package:sky_app/features/calendar/presentation/pages/session_check_in/session_check_in_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/profile/data/services/nfc_service.dart';
 import 'package:sky_app/features/profile/presentation/widgets/activity_list.dart';
@@ -140,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         // Kart eşliyse eşleme bir kez yapıldığı için buton yok; yerinde
-        // "QR Okut" (oturum QR'ıyla yoklama, henüz bağlı değil).
+        // "QR Okut" (oturumdaki QR'la kendi yoklamasını verme).
         Expanded(
           child: AnimatedSwitcher(
             duration: _buttonFadeDuration,
@@ -160,7 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     key: const ValueKey('scan-qr'),
                     icon: AppIcons.scan,
                     label: 'QR Okut',
-                    onTap: () {},
+                    onTap: () => SessionCheckInPage.open(context),
                   ),
           ),
         ),
