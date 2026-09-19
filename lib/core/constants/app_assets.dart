@@ -1,6 +1,9 @@
 class AppAssets {
   static const String skylab = 'assets/images/skylab.svg';
 
+  /// YTÜ yıldızı (dış hat). SkyPass'te öğrenci kartı eşlendiğinin işareti.
+  static const String ytuStar = 'assets/images/ytu-star.svg';
+
   //Teams
   static const String mobilab = 'assets/images/mobilab.svg';
 

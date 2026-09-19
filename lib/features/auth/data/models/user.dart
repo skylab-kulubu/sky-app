@@ -41,8 +41,9 @@ class User {
   final String profilePictureUrl;
   final String linkedin;
 
-  /// Eşlenmiş öğrenci kartının UID'si (NFC); eşlenmemişse boş.
-  final String studentCardUid;
+  /// Öğrenci kartı SkyPass'e eşlenmiş mi (core `studentCardLinked`). Kartın
+  /// numarası gizli, yalnızca bu bilgi geliyor.
+  final bool studentCardLinked;
 
   const User({
     required this.id,
@@ -60,7 +61,7 @@ class User {
     this.faculty = '',
     this.profilePictureUrl = '',
     this.linkedin = '',
-    this.studentCardUid = '',
+    this.studentCardLinked = false,
     this.groups = const [],
     this.cmsRoles = const [],
   });
@@ -110,7 +111,7 @@ class User {
       faculty: data['faculty'] ?? '',
       profilePictureUrl: data['profilePictureUrl'] ?? '',
       linkedin: data['linkedin'] ?? '',
-      studentCardUid: data['studentCardUid'] ?? '',
+      studentCardLinked: data['studentCardLinked'] == true,
     );
   }
 
@@ -141,7 +142,8 @@ class User {
       faculty: pick(profile.faculty, faculty),
       profilePictureUrl: pick(profile.profilePictureUrl, profilePictureUrl),
       linkedin: pick(profile.linkedin, linkedin),
-      studentCardUid: pick(profile.studentCardUid, studentCardUid),
+      // JWT'de karşılığı yok; profil API'si neyse o.
+      studentCardLinked: profile.studentCardLinked,
     );
   }
 

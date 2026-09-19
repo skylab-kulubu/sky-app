@@ -48,6 +48,16 @@ class UserProvider extends ChangeNotifier {
     return success;
   }
 
+  /// Profili (`/v1/users/me`) yeniden okur; ör. öğrenci kartı eşlendikten
+  /// sonra kartın durumu güncellensin diye. Oturum yoksa bir şey yapmıyor.
+  Future<void> reloadProfile() async {
+    if (_user == null) return;
+    final refreshed = await _authService.getUser();
+    if (refreshed == null || _user == null) return;
+    _user = refreshed;
+    notifyListeners();
+  }
+
   Future<void> logout() async {
     await _authService.logout();
     _user = null;

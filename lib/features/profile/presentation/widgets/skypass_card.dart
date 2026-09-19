@@ -52,6 +52,7 @@ class SkyPassCard extends StatefulWidget {
     required this.skyNumber,
     required this.subtitle,
     this.controller,
+    this.showStudentCardMark = false,
   });
 
   final SkyPassCardController? controller;
@@ -61,6 +62,9 @@ class SkyPassCard extends StatefulWidget {
 
   /// Bölüm ya da ekip bilgisi; boşsa satır çizilmez.
   final String subtitle;
+
+  /// Ön yüzde büyük YTÜ yıldızı: öğrenci kartı SkyPass'e eşlenmiş.
+  final bool showStudentCardMark;
 
   @override
   State<SkyPassCard> createState() => _SkyPassCardState();
@@ -171,10 +175,11 @@ class _SkyPassCardState extends State<SkyPassCard>
     );
   }
 
-  /// İki yüzün ortak zemini: gradyan ve yuvarlak köşeler.
-  Widget _surface({required Widget child}) {
+  /// İki yüzün ortak zemini: gradyan ve yuvarlak köşeler. [mark] zeminle
+  /// içerik arasında, kartın köşelerine kırpılarak çiziliyor.
+  Widget _surface({required Widget child, Widget? mark}) {
     return Container(
-      padding: AppPaddings.skyPassCard,
+      clipBehavior: Clip.antiAlias,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -186,12 +191,67 @@ class _SkyPassCardState extends State<SkyPassCard>
         ),
         borderRadius: AppRadiuses.skyPassCardBorderRadius,
       ),
-      child: child,
+      child: Stack(
+        children: [
+          ?mark,
+          Positioned.fill(
+            child: Padding(padding: AppPaddings.skyPassCard, child: child),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Oranlar kartın boyutuna göre: yıldız kart genişliğinin %80'i, tepesi
+  /// kart yüksekliğinin üçte birinde; alt kısmı kartın dışına taşıp
+  /// kırpılıyor. Yazıların arkasında kalıyor ve okunurluğu bozmasın diye
+  /// yarı saydam.
+  static const double _markWidthFactor = 0.9;
+  static const double _markTopFactor = 0.25;
+  static const double _markAspect = 58 / 56;
+  static const double _markOpacity = 0.2;
+
+  /// Yıldız açılıp kapanırken geçen süre; eşleme anında yavaşça beliriyor.
+  static const Duration _markFadeDuration = Duration(milliseconds: 900);
+
+  Widget _studentCardMark() {
+    return Positioned.fill(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth * _markWidthFactor;
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                left: (constraints.maxWidth - width) / 2,
+                top: constraints.maxHeight * _markTopFactor,
+                width: width,
+                height: width * _markAspect,
+                // Hep ağaçta; görünürlük opaklıkla. İlk çizimde animasyon
+                // yok, sonradan açılınca (eşleme anı) yavaşça beliriyor.
+                child: AnimatedOpacity(
+                  opacity: widget.showStudentCardMark ? 1 : 0,
+                  duration: _markFadeDuration,
+                  curve: Curves.easeOut,
+                  child: SvgPicture.asset(
+                    AppAssets.ytuStar,
+                    colorFilter: ColorFilter.mode(
+                      AppColors.primaryStrong.withValues(alpha: _markOpacity),
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
   Widget _front() {
     return _surface(
+      mark: _studentCardMark(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [_header(), const Spacer(), _footer()],

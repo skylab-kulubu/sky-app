@@ -1,23 +1,27 @@
-import 'dart:math';
+import 'dart:developer';
+import 'dart:math' hide log;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/features/profile/data/models/nfc_card.dart';
 import 'package:sky_app/features/profile/data/services/nfc_service.dart';
+import 'package:sky_app/features/profile/data/services/skypass_service.dart';
 import 'package:sky_app/features/profile/presentation/widgets/skypass_card.dart';
 
-/// NFC öğrenci kartı okutma overlay'i.
+/// Öğrenci kartını SkyPass'e eşleme overlay'i.
 ///
-/// Profil sayfasındaki orijinal [SkyPassCard]'ı boyutunu milimetrik olarak
-/// %100 aynı tutarak, [Hero] geçişi sırasında 90 derece döndürür (rotate).
-/// Kart merkezde beklerken 2 saniyede bir hafifçe titrer ve haptic vibration
-/// geri bildirimi verir. NFC kart algılandığında titreme durur, kart mıknatıs
-/// efektiyle yukarı çekilirken işlem tamamlanır ve sonuç ekranda gösterilir.
-/// Kullanıcı geri çıkmak isterse (pop / arka plana dokunma) NFC oturumu ve
-/// animasyonlar anında güvenli bir şekilde iptal edilir.
+/// Profil sayfasındaki [SkyPassCard] [Hero] ile ortaya uçup 90 derece
+/// dönüyor ve 2 saniyede bir hafifçe titreyerek kartı bekliyor. Kart
+/// okununca UID sunucuya gönderiliyor (`POST /v1/skypass/card-bind`); istek
+/// sürerken titreme devam ediyor. Başarılıysa kart mıknatıs gibi yukarı
+/// çekiliyor, üstünde YTÜ yıldızı yavaşça beliriyor, profil yenileniyor
+/// ([onLinked]) ve kart yıldızıyla birlikte yerine uçuyor. Hata olursa mesaj
+/// gösterilip kapanıyor. Geri çıkılırsa NFC oturumu ve animasyonlar
+/// güvenle iptal ediliyor. Eşlendiyse `true` döner.
 class NfcScanOverlay extends StatefulWidget {
   const NfcScanOverlay({
     super.key,
@@ -25,6 +29,7 @@ class NfcScanOverlay extends StatefulWidget {
     required this.skyNumber,
     required this.subtitle,
     required this.routeAnimation,
+    required this.onLinked,
   });
 
   final String userName;
@@ -32,15 +37,21 @@ class NfcScanOverlay extends StatefulWidget {
   final String subtitle;
   final Animation<double> routeAnimation;
 
+  /// Eşleme başarılı olunca, kart yerine dönmeden önce bekleniyor (profili
+  /// yenilemek için); dönen kart ve profil aynı durumu göstersin.
+  final Future<void> Function() onLinked;
+
   /// Overlay'i saydam bir PageRoute olarak kök navigator üzerinde açar.
-  static Future<NfcCard?> show(
+  /// Kart eşlendiyse `true`.
+  static Future<bool> show(
     BuildContext context, {
     required String userName,
     required String skyNumber,
     required String subtitle,
-  }) {
-    return Navigator.of(context, rootNavigator: true).push<NfcCard>(
-      PageRouteBuilder<NfcCard>(
+    required Future<void> Function() onLinked,
+  }) async {
+    final linked = await Navigator.of(context, rootNavigator: true).push<bool>(
+      PageRouteBuilder<bool>(
         opaque: false,
         barrierDismissible: true,
         barrierColor: Colors.transparent,
@@ -51,9 +62,11 @@ class NfcScanOverlay extends StatefulWidget {
           skyNumber: skyNumber,
           subtitle: subtitle,
           routeAnimation: animation,
+          onLinked: onLinked,
         ),
       ),
     );
+    return linked ?? false;
   }
 
   @override
@@ -71,6 +84,10 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
   /// Sonuç gösterildikten sonra otomatik kapanış bekleme süresi.
   static const Duration _resultDelay = Duration(milliseconds: 1100);
 
+  /// Yıldız belirdikten sonra kart yerine dönmeden önce bekleme; yıldızın
+  /// belirişi (SkyPassCard'da ~900 ms) bitsin ve bir an görünsün.
+  static const Duration _starHold = Duration(milliseconds: 1500);
+
   /// Kartın yukarı çekilme oranı (ekran yüksekliğine göre).
   static const double _pullRatio = -0.13;
 
@@ -85,8 +102,16 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
 
   NfcCard? _card;
   String? _errorMessage;
-  bool _showUid = false;
   bool _isFinished = false;
+
+  /// UID sunucuya gönderiliyor; titreme bu sırada da sürüyor.
+  bool _isLinking = false;
+
+  /// Eşleme başarılı; kart yukarı çekildi, yıldız görünüyor.
+  bool _isLinked = false;
+
+  /// Kart hâlâ bekleme/eşleme hâlinde mi (titreme ve haptic için).
+  bool get _isWaiting => !_isFinished && _errorMessage == null && !_isLinked;
   bool _hasVibratedInCurrentCycle = false;
 
   @override
@@ -110,7 +135,7 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
   }
 
   void _handlePulseHaptic() {
-    if (_isFinished || _card != null || _errorMessage != null) return;
+    if (!_isWaiting) return;
 
     if (_pulseController.value < 0.10) {
       if (!_hasVibratedInCurrentCycle) {
@@ -146,62 +171,81 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
 
       if (!mounted || _isFinished) return;
 
-      // 1. NFC kart algılandığı an titreme hemen durur
-      _pulseController.stop();
-
-      // 2. Kimliği çözülemeyen kart (id == "unknown") burada eleniyor.
+      // Kimliği çözülemeyen kart (id == "unknown") burada eleniyor.
       if (!card.hasReadableUid) {
         HapticFeedback.heavyImpact();
         await _nfcService.finishSession(iosErrorMessage: 'Kart okunamadı.');
         if (!mounted || _isFinished) return;
-        setState(() {
-          _errorMessage = 'Kart okunamadı';
-        });
-        _completeAndExit(null);
+        _fail('Kart okunamadı');
         return;
       }
 
-      // Başarılı okuma titreşimi
       HapticFeedback.mediumImpact();
-
-      await _nfcService.finishSession(
-        iosAlertMessage: 'Kart başarıyla okundu!',
-      );
-
+      await _nfcService.finishSession(iosAlertMessage: 'Kart okundu');
       if (!mounted || _isFinished) return;
 
-      // 3. Kart geçerli: Mıknatıs efektiyle yukarı çekilme başlar!
+      // Sunucuya gönderilirken kart titremeye devam ediyor.
       setState(() {
         _card = card;
+        _isLinking = true;
       });
 
-      final pullFuture = _pullController.forward();
-
-      // Çekilme devam ederken UID'yi göster
-      await Future.delayed(const Duration(milliseconds: 250));
+      try {
+        await SkyPassService.bindCard(card.normalizedHex);
+      } catch (e) {
+        final error = ApiException.from(e);
+        log('Öğrenci kartı eşlenemedi: $error');
+        if (!mounted || _isFinished) return;
+        HapticFeedback.heavyImpact();
+        _fail(switch (error.statusCode) {
+          409 => 'Bu kart başka bir hesaba eşli',
+          400 => 'Kart numarası okunamadı',
+          _ => error.userMessage,
+        });
+        return;
+      }
       if (!mounted || _isFinished) return;
+
+      // Başarılı: titreme durur, kart yukarı çekilir, yıldız belirir.
+      _pulseController.stop();
+      HapticFeedback.heavyImpact();
       setState(() {
-        _showUid = true;
+        _isLinking = false;
+        _isLinked = true;
       });
-
-      // 4. Kart en yukarı geldiğinde işlem tamamlanır
-      await pullFuture;
-
+      await _pullController.forward();
       if (!mounted || _isFinished) return;
-      _completeAndExit(card);
+
+      // Profil yıldızın belirmesiyle aynı anda yenileniyor; kart döndüğünde
+      // profildeki kart da yıldızlı olsun.
+      await Future.wait([
+        widget.onLinked().catchError(
+          (Object e) => log('Profil yenilenemedi: $e'),
+        ),
+        Future<void>.delayed(_starHold),
+      ]);
+      if (!mounted || _isFinished) return;
+      _isFinished = true;
+      Navigator.of(context).pop(true);
     } catch (_) {
       if (!mounted || _isFinished) return;
       await _nfcService.finishSession(iosErrorMessage: 'Okuma başarısız.');
       if (!mounted || _isFinished) return;
-      _pulseController.stop();
-      setState(() {
-        _errorMessage = 'Kart okunamadı';
-      });
-      _completeAndExit(null);
+      _fail('Kart okunamadı');
     }
   }
 
-  Future<void> _completeAndExit(NfcCard? result) async {
+  /// Hata mesajını gösterip bir süre sonra kapanır (eşlenmedi).
+  void _fail(String message) {
+    _pulseController.stop();
+    setState(() {
+      _isLinking = false;
+      _errorMessage = message;
+    });
+    _completeAndExit(false);
+  }
+
+  Future<void> _completeAndExit(bool result) async {
     if (_isFinished) return;
     _isFinished = true;
 
@@ -238,7 +282,7 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
 
   /// 2 saniyede bir gerçekleşen hafif mikro yatay titreme değeri.
   double get _vibrationOffset {
-    if (_isFinished || _card != null || _errorMessage != null) return 0.0;
+    if (!_isWaiting) return 0.0;
     final value = _pulseController.value;
     // 2000 ms'nin ilk 400 ms'sinde titrer, kalan 1600 ms durağandır.
     if (value > 0.20) return 0.0;
@@ -249,7 +293,7 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
 
   /// 2 saniyede bir gerçekleşen hafif mikro açı salınımı (~1 derece).
   double get _vibrationAngle {
-    if (_isFinished || _card != null || _errorMessage != null) return 0.0;
+    if (!_isWaiting) return 0.0;
     final value = _pulseController.value;
     if (value > 0.20) return 0.0;
     final t = value / 0.20;
@@ -364,6 +408,7 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
                       name: widget.userName,
                       skyNumber: widget.skyNumber,
                       subtitle: widget.subtitle,
+                      showStudentCardMark: _isLinked,
                     ),
                   ),
                 );
@@ -378,6 +423,7 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
             name: widget.userName,
             skyNumber: widget.skyNumber,
             subtitle: widget.subtitle,
+            showStudentCardMark: _isLinked,
           ),
         ),
       ),
@@ -406,14 +452,24 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
       );
     }
 
-    if (_showUid && _card != null) {
+    if (_isLinked) {
       return Text(
-        // Eşleme sunucuda, overlay kapandıktan sonra yapılıyor; burada
-        // yalnızca okuma sonucu.
-        'Kart okundu: ${_card!.formattedHex}',
-        key: const ValueKey('success'),
+        'Öğrenci kartın SkyPass\'e eşlendi',
+        key: const ValueKey('linked'),
         textAlign: TextAlign.center,
         style: baseStyle?.copyWith(color: AppColors.green),
+      );
+    }
+
+    if (_isLinking && _card != null) {
+      return Text(
+        'Kart eşleniyor…',
+        key: const ValueKey('linking'),
+        textAlign: TextAlign.center,
+        style: baseStyle?.copyWith(
+          fontWeight: FontWeight.w500,
+          color: AppColors.onScrim,
+        ),
       );
     }
 

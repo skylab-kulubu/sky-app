@@ -14,10 +14,7 @@ import 'package:sky_app/features/auth/presentation/providers/user_provider.dart'
 import 'package:sky_app/features/calendar/data/services/door_service.dart';
 import 'package:sky_app/features/calendar/presentation/pages/door_scanner/door_scanner_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
-import 'package:sky_app/core/services/api_exception.dart';
-import 'package:sky_app/features/profile/data/models/nfc_card.dart';
 import 'package:sky_app/features/profile/data/services/nfc_service.dart';
-import 'package:sky_app/features/profile/data/services/skypass_service.dart';
 import 'package:sky_app/features/profile/presentation/widgets/activity_list.dart';
 import 'package:sky_app/features/profile/presentation/widgets/nfc_scan_overlay.dart';
 import 'package:sky_app/features/profile/presentation/widgets/quick_action_button.dart';
@@ -44,6 +41,16 @@ class _ProfilePageState extends State<ProfilePage> {
   /// (`/v1/door/events`). Grubunda `team_door_scan` açık ekiplerin üyeleri
   /// yalnızca buradan anlaşılıyor; token'da görünmüyor.
   bool _hasDoorEvents = false;
+
+  /// Eşleme sürerken ve kart yerine dönerken "Öğrenci Kartını Eşle" butonu
+  /// yerinde kalıyor; profil arkada yenilense de geçiş kart dönünce oluyor.
+  bool _isLinkRevealPending = false;
+
+  /// Overlay kapanırken kartın yerine uçma süresi (`NfcScanOverlay`'in
+  /// kapanış geçişi).
+  static const Duration _cardReturnDuration = Duration(milliseconds: 500);
+
+  static const Duration _buttonFadeDuration = Duration(milliseconds: 450);
 
   @override
   void initState() {
@@ -88,6 +95,8 @@ class _ProfilePageState extends State<ProfilePage> {
               skyNumber: user.skyNumber,
               subtitle: subtitle,
               controller: _cardController,
+              // Öğrenci kartı eşliyse ön yüzde YTÜ yıldızı.
+              showStudentCardMark: user.studentCardLinked,
             ),
           ),
         ),
@@ -130,16 +139,29 @@ class _ProfilePageState extends State<ProfilePage> {
             onTap: () => context.push('/profile/certificates'),
           ),
         ),
+        // Kart eşliyse eşleme bir kez yapıldığı için buton yok; yerinde
+        // "QR Okut" (oturum QR'ıyla yoklama, henüz bağlı değil).
         Expanded(
-          child: QuickActionButton(
-            icon: AppIcons.studentCard,
-            label: 'Öğrenci Kartını Eşle',
-            onTap: () => _onStudentCardTap(
-              context,
-              userName: user.name,
-              skyNumber: user.skyNumber,
-              subtitle: subtitle,
-            ),
+          child: AnimatedSwitcher(
+            duration: _buttonFadeDuration,
+            child: !user.studentCardLinked || _isLinkRevealPending
+                ? QuickActionButton(
+                    key: const ValueKey('link-card'),
+                    icon: AppIcons.studentCard,
+                    label: 'Öğrenci Kartını Eşle',
+                    onTap: () => _onStudentCardTap(
+                      context,
+                      userName: user.name,
+                      skyNumber: user.skyNumber,
+                      subtitle: subtitle,
+                    ),
+                  )
+                : QuickActionButton(
+                    key: const ValueKey('scan-qr'),
+                    icon: AppIcons.scan,
+                    label: 'QR Okut',
+                    onTap: () {},
+                  ),
           ),
         ),
         Expanded(
@@ -193,52 +215,30 @@ class _ProfilePageState extends State<ProfilePage> {
         return;
       }
 
-      // NFC açık — Hero animasyonlu dikey overlay'i aç
-      final card = await NfcScanOverlay.show(
+      // Eşleme bitene kadar buton yerinde kalıyor; kart yerine dönünce
+      // yumuşakça "QR Okut"a dönüşüyor.
+      setState(() => _isLinkRevealPending = true);
+      final userProvider = context.read<UserProvider>();
+
+      // NFC açık — Hero animasyonlu dikey overlay'i aç; eşleme orada.
+      final linked = await NfcScanOverlay.show(
         context,
         userName: userName,
         skyNumber: skyNumber,
         subtitle: subtitle,
+        onLinked: userProvider.reloadProfile,
       );
-      if (card == null || !context.mounted) return;
-      await _bindCard(context, card);
+
+      // Kart yerine dönerken (overlay'in kapanış süresi) buton beklesin.
+      if (linked) await Future<void>.delayed(_cardReturnDuration);
+      if (!mounted) return;
+      setState(() => _isLinkRevealPending = false);
     } catch (_) {
       if (!context.mounted) return;
       _showNfcAlert(
         context,
         title: 'NFC Hatası',
         message: 'NFC durumu kontrol edilemedi. Lütfen tekrar deneyin.',
-      );
-    }
-  }
-
-  /// Okunan kartı hesaba bağlar. Bir hesaba tek kart bağlanıyor; yeni kart
-  /// eskisinin yerini alıyor. Kart başka birine bağlıysa core 409 dönüyor.
-  Future<void> _bindCard(BuildContext context, NfcCard card) async {
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      await SkyPassService.bindCard(card.normalizedHex);
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Öğrenci kartın SkyPass\'e eşlendi. Kapıda kartını da okutabilirsin.',
-          ),
-        ),
-      );
-    } catch (e) {
-      final error = ApiException.from(e);
-      log('Öğrenci kartı eşlenemedi: $error');
-      if (!context.mounted) return;
-      _showNfcAlert(
-        context,
-        title: 'Kart Eşlenemedi',
-        message: switch (error.statusCode) {
-          409 =>
-            'Bu kart başka bir hesaba eşli. Kart senin ise kulüple iletişime '
-                'geç.',
-          400 => 'Kart numarası okunamadı. Kartı tekrar okut.',
-          _ => error.userMessage,
-        },
       );
     }
   }
