@@ -51,12 +51,7 @@ class _EventCardState extends State<EventCard> {
     // pahalı. Kart göründüğü anda başlatılıyor ki karta dokunulduğunda
     // sonuç çoktan hazır olsun; sayfa açılışında hesaplanınca geçiş
     // takılıyordu.
-    unawaited(
-      EventPaletteService.resolve(
-        eventId: event.id,
-        imageUrl: event.coverImageUrl,
-      ),
-    );
+    unawaited(EventPaletteService.resolve(event.coverImageUrl));
   }
 
   @override

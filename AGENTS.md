@@ -115,7 +115,6 @@ Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `te
 | -------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | `reicon_flutter`           | All icons (through `AppIcon`)                                                                              |
 | `animations`               | Only the `OpenContainer` transition of the news tile                                                       |
-| `palette_generator_master` | Backdrop color from the event cover (`EventPaletteService`) — the maintained fork, not `palette_generator` |
 | `share_plus`               | Share button on the event detail — **native dependency**, hot reload is not enough when it is added        |
 | `timeago`                  | Relative time in the notification list (`tr` and `tr_short` locales are registered in `main.dart`)         |
 | `flutter_nfc_kit`          | Student card scanning (`NfcService`) — **native dependency**, needs the iOS NFC entitlement                |
@@ -152,7 +151,7 @@ color: AppColors.red   // brand color
 
 The `dark*` / `light*` constants inside `AppColors` **only** feed the `ColorScheme`s in `theme.dart`; they are not used directly in widgets.
 
-> **Exception — the event detail page.** `features/calendar/presentation/pages/event_detail/event_detail_page.dart` is dark in both themes: its backdrop is derived from the dominant color of the cover image (`palette_generator`) and that color washes out when blended into a light surface. Colors on this page are read from the `AppColors.coverBackdropBase` and `onCover*` constants instead of the `context` accessors. For the same reason `SkyButton` and `AppBarActions` skip the theme defaults when they are given explicit colors.
+> **Exception — the event detail page.** `features/calendar/presentation/pages/event_detail/event_detail_page.dart` is dark in both themes: its backdrop is derived from the dominant color of the cover image (`EventPaletteService` / `CoverColorExtractor`) and that color washes out when blended into a light surface. Colors on this page are read from the `AppColors.coverBackdropBase` and `onCover*` constants instead of the `context` accessors. For the same reason `SkyButton` and `AppBarActions` skip the theme defaults when they are given explicit colors.
 
 A color coming from `context` is not a compile-time constant, so that widget cannot be `const` — remove the `const`. This is the compile error you will hit most often while refactoring.
 
@@ -236,11 +235,13 @@ This page is the screen with the most moving parts in the app; read this before 
 
 > `OpenContainer` (container transform) **cannot be used** here: it grows the box but cross-fades the two contents, meaning the image does not move from its place. It does not work together with Hero either — both hide the source widget and draw it in their own layer.
 
-**The backdrop color comes from the cover.** `EventPaletteService` extracts the dominant colors of the image and keeps them in memory; the page lays them over a dark base as scattered radial blobs. The service has two critical details:
+**The backdrop color comes from the cover.** `EventPaletteService` extracts the colors of the image with `CoverColorExtractor` (own k-means over a 120 px sample, clusters scored by share × saturation, near-black/white dropped when colorful clusters exist, then each color pulled to a mid lightness and minimum saturation so it glows on the dark base — `palette_generator_master` only kept the most frequent exact tones, so photos with spread-out greens/browns came out grey); the page lays them over a dark base as scattered radial blobs. Details that matter:
 
-- The image is decoded at ~120 pixels via `ResizeImage`. Without it the poster is decoded at full resolution, and on top of that **separately** from the copy the card shows (every request asking for a different size gets its own cache key).
-- Decoding stays on the main isolate (with a 15 s timeout); the quantization runs in a background isolate via `compute` (PR #48).
-- **Known bugs (to fix):** the cache is keyed by event id only, so after a cover change the old palette stays; the app occasionally stalls, suspected from one isolate per cover — profile before changing.
+- **Keyed by cover URL, not event id.** A new cover is a new media id and therefore a new CDN URL, so an edited cover gets fresh colors automatically. The detail page re-resolves when an edit returns a different `coverImageUrl`.
+- **Persisted:** results are kept in memory and in `SharedPreferences` (`event_palette_cache_v4`, last 150 covers), so each cover is computed once per device, not on every launch. Empty results (download failed) are not persisted.
+- The image is decoded at 120 px wide via `ResizeImage` (smaller samples visibly dulled the colors). Without it the poster is decoded at full resolution, and **separately** from the copy the card shows.
+- Work runs on the main isolate but one job at a time, each after `endOfFrame` (`_enqueue`), so opening the tab does not drop frames. There is no `compute`/isolate any more (PR #48's isolate-per-cover was suspected of stalls). Decoding has a 15 s timeout.
+- Long term the backend could compute `coverColors` once at upload and send them with the event; then this service is only a fallback.
 
 The computation is kicked off the moment the card/row becomes visible (`initState`); by the time the page opens the color is usually ready, and if it is not, it lands after the opening animation finishes.
 

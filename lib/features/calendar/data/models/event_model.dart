@@ -15,6 +15,15 @@ class EventModel {
   /// Yetkiler bu ekibe göre veriliyor.
   final String ownerTeam;
 
+  /// Kulüp yönetiminin grupları; etkinlikleri kulübün kendisi adına.
+  static const Set<String> _clubWideTeams = {'YK', 'DK'};
+
+  /// Arayüzde gösterilen sahip: YK ve DK'nin etkinlikleri kulübün kendisi
+  /// adına düzenlendiği için "SKY LAB" yazıyor; yetki hesapları yine
+  /// [ownerTeam]'e bakıyor.
+  String get ownerLabel =>
+      _clubWideTeams.contains(ownerTeam) ? 'SKY LAB' : ownerTeam;
+
   EventModel({
     required this.id,
     required this.name,

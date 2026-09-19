@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -281,7 +283,8 @@ class _EventDetailPageState extends EventDetailPagemodel {
     return ListView(
       controller: scrollController,
       padding: AppPaddings.mainPaddingHorizontal.copyWith(
-        top: AppSizes.bigSpace + _coverSize(context) + AppSizes.sectionSpace,
+        // Kapağın altındaki boşluk üstündekiyle aynı (haber ve ekip detayı gibi).
+        top: AppSizes.bigSpace + _coverSize(context) + AppSizes.bigSpace,
         bottom: AppSizes.navBarClearance,
       ),
       children: [
@@ -290,7 +293,9 @@ class _EventDetailPageState extends EventDetailPagemodel {
           const SizedBox(height: AppSizes.midSpace),
           _typeRow(context),
         ],
-        const SizedBox(height: AppSizes.sectionSpace),
+        // Gruplar arası boşluk bölüm başlıklarının üst boşluğuyla aynı
+        // (AppPaddings.sectionHeader, 24); grup içi satırlar bigSpace.
+        const SizedBox(height: AppSizes.largeSpace),
         _dateBlock(context),
         const SizedBox(height: AppSizes.bigSpace),
         _statusRow(context),
@@ -331,7 +336,7 @@ class _EventDetailPageState extends EventDetailPagemodel {
         const SizedBox(width: AppSizes.midSpace),
         Flexible(
           child: Text(
-            event.ownerTeam,
+            event.ownerLabel,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: context.textTheme.bodyMedium?.copyWith(

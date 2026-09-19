@@ -35,7 +35,19 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     }
 
     final updated = result.event;
-    if (updated != null) setState(() => event = updated);
+    if (updated == null) return;
+
+    // Kapak değiştiyse zemin yeni görselin renklerine geçiyor.
+    final coverChanged = updated.coverImageUrl != event.coverImageUrl;
+    setState(() {
+      event = updated;
+      if (coverChanged) {
+        backdropTints = EventPaletteService.cached(updated.coverImageUrl);
+      }
+    });
+    if (coverChanged && backdropTints.isEmpty) {
+      unawaited(_resolveBackdropTint());
+    }
   }
 
   @override
@@ -44,7 +56,7 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
 
     // Renkler kart göründüğünde hesaplanmaya başlamıştı; çoğu zaman burada
     // hazır ve zemin ilk karede doğru renkte açılıyor.
-    backdropTints = EventPaletteService.cached(event.id);
+    backdropTints = EventPaletteService.cached(event.coverImageUrl);
 
     // Hazır değilse beklemek gerekiyor ama sayfa açılırken değil: palet
     // çıkarımı ana iş parçacığında çalıştığı için açılış animasyonunu
@@ -88,14 +100,13 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
   /// almak kalıyor. Kart göründüğünde başlatıldığı için bu çağrı çoğu zaman
   /// süren bir işe bağlanıyor, yenisini başlatmıyor.
   Future<void> _resolveBackdropTint() async {
-    final tints = await EventPaletteService.resolve(
-      eventId: event.id,
-      imageUrl: event.coverImageUrl,
-    );
+    final imageUrl = event.coverImageUrl;
+    final tints = await EventPaletteService.resolve(imageUrl);
 
     // Görsel indirilemediyse zemin düz taban renginde kalır; sayfanın geri
     // kalanı bundan etkilenmiyor.
-    if (!mounted || tints.isEmpty) return;
+    // Beklerken kapak değiştiyse (düzenleme) bu sonuç artık eski.
+    if (!mounted || tints.isEmpty || imageUrl != event.coverImageUrl) return;
     setState(() => backdropTints = tints);
   }
 

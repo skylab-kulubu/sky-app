@@ -1,100 +1,120 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:palette_generator_master/palette_generator_master.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sky_app/core/widgets/cover_image.dart';
+import 'package:sky_app/features/calendar/data/services/cover_color_extractor.dart';
 
 /// Etkinlik kapaklarından çıkarılan zemin renklerini hesaplar ve saklar.
 ///
-/// Görsel çözme ana isolate'te kalır (platform gerektiriyor); pahalı olan
-/// kuantizasyon [compute] ile arka plan isolate'ine taşınmıştır. Böylece
-/// birçok kart aynı anda hesap istese de ana iş parçacığı bloklanmaz.
-/// Sonuç etkinlik başına bir kez hesaplanıp bellekte tutuluyor; listedeki kart
-/// göründüğü anda tetiklendiği için detay sayfası açıldığında renk çoğu zaman
-/// hazır oluyor.
+/// **Anahtar kapak adresi, etkinlik değil.** Kapak değiştiğinde yeni medya
+/// yeni bir CDN adresi alıyor; böylece eski görselin renkleri kendiliğinden
+/// geçersiz kalıyor, ayrıca silme gerekmiyor.
+///
+/// Renk seçimi [CoverColorExtractor]'da (benzer tonları kümeleyip renkli
+/// bölgeleri öne çıkarıyor); görsel [_sampleWidth] piksel genişliğe
+/// küçültülerek çözülüyor. Hesap ana
+/// iş parçacığında, ama aynı anda tek iş ve her biri bir kare bitişinden
+/// sonra ([_queue]); liste açılırken kareler düşmüyor. Sonuçlar bellekte ve
+/// diskte ([SharedPreferences]) tutuluyor: bir kapağın renkleri cihazda bir
+/// kez hesaplanıyor, uygulama yeniden açıldığında tekrar çıkarılmıyor.
 class EventPaletteService {
   EventPaletteService._();
 
   static final Map<String, List<Color>> _cache = {};
 
-  /// Süren hesaplamalar. Aynı etkinlik için ikinci bir istek geldiğinde
-  /// (kart yeniden göründü, sayfa açıldı) iş tekrarlanmıyor.
+  /// Süren hesaplamalar; aynı kapak için gelen ikinci istek bunu bekliyor.
   static final Map<String, Future<List<Color>>> _pending = {};
 
-  /// Görselin çözüleceği piksel genişliği.
-  ///
-  /// Kritik: bu verilmezse afiş tam çözünürlükte (çoğu zaman 2000 piksel)
-  /// çözülüyor — üstelik kartın gösterdiği kopyadan ayrı bir çözüm olarak,
-  /// çünkü farklı boyut isteyen her istek kendi önbellek anahtarını alıyor.
-  /// Kuantizasyon zaten pikselleri örnekleyerek tarıyor, o yüzden bu kadarı yeter.
-  static const int _decodeWidth = 120;
+  /// Görselin çözüleceği genişlik. Verilmezse afiş tam çözünürlükte
+  /// (çoğu zaman 2000 piksel) çözülüyor; çok küçüğünde renkler soluyor.
+  static const int _sampleWidth = 120;
 
-  /// Kaç renge indirgeneceği. Az tutuluyor: amaç görselin genel tonunu
-  /// yakalamak, ayrıntısını değil.
-  static const int _maxColors = 6;
+  /// Zemin için seçilecek en fazla renk.
+  static const int _maxColors = 5;
+
+  /// Sıradaki hesapları birbirine bağlayan zincir; aynı anda tek iş.
+  static Future<void> _queue = Future<void>.value();
+
+  /// Görsel bu süre içinde çözülemezse vazgeçiliyor; yoksa [_pending]
+  /// kaydı sonsuza dek asılı kalırdı.
+  static const Duration _decodeTimeout = Duration(seconds: 15);
+
+  static const String _prefsKey = 'event_palette_cache_v4';
+
+  /// Diskte tutulacak en fazla kapak; eskiler (ilk eklenenler) atılıyor.
+  static const int _diskLimit = 150;
+
+  static Future<void>? _diskLoad;
 
   /// Hesaplanmışsa renkleri döndürür, yoksa boş liste. Beklemek istemeyen
-  /// çağıranlar için.
-  static List<Color> cached(String eventId) => _cache[eventId] ?? const [];
+  /// çağıranlar için (sayfa ilk karede doğru renkle açılsın diye).
+  static List<Color> cached(String imageUrl) => _cache[imageUrl] ?? const [];
 
-  /// Renkleri hesaplar; daha önce hesaplandıysa doğrudan onu döndürür.
+  /// Renkleri döndürür; bellekte ya da diskte yoksa hesaplar.
   ///
   /// Görsel indirilemez ya da çözülemezse boş liste döner — çağıran taraf
   /// düz zemine düşer.
-  static Future<List<Color>> resolve({
-    required String eventId,
-    required String imageUrl,
-  }) {
-    final cached = _cache[eventId];
+  static Future<List<Color>> resolve(String imageUrl) {
+    if (imageUrl.trim().isEmpty) return Future.value(const []);
+
+    final cached = _cache[imageUrl];
     if (cached != null) return Future.value(cached);
 
-    return _pending[eventId] ??= _extract(eventId, imageUrl);
+    return _pending[imageUrl] ??= _resolve(imageUrl);
   }
 
-  static Future<List<Color>> _extract(String eventId, String imageUrl) async {
-    // Bir mikrotask atlanır: senkron ardışık `resolve()` çağrılarının
-    // (ör. aynı karede iki widget aynı eventId'yi isterse) aynı Future'ı
-    // paylaşabilmesi için `_pending` kaydı en az bir adım canlı kalmalı.
-    await Future<void>.value();
-
-    final provider = CoverImage.providerFor(imageUrl);
-    if (provider == null) return _store(eventId, const []);
-
+  static Future<List<Color>> _resolve(String imageUrl) async {
     try {
-      // Ana isolate: görsel çözme (ResizeImage ile küçük boyutta) ve ham
-      // pikselleri alma. Bu adım platform (dart:ui) gerektirdiği için
-      // arka plana taşınamaz.
-      final image = await _decodeImage(
-        ResizeImage(provider, width: _decodeWidth, allowUpscaling: false),
-      );
-      final byteData = await image.toByteData(
-        format: ui.ImageByteFormat.rawRgba,
-      );
-      if (byteData == null) return _store(eventId, const []);
+      await (_diskLoad ??= _loadDisk());
+      final fromDisk = _cache[imageUrl];
+      if (fromDisk != null) return fromDisk;
 
-      final params = _QuantizeParams(
-        pixels: byteData.buffer.asUint8List(),
-        width: image.width,
-        height: image.height,
-        maxColors: _maxColors,
-      );
-
-      // Arka plan isolate: renk kuantizasyonu (saf Dart, ana iş parçacığını
-      // bloklamaz).
-      final tints = await compute(_quantize, params);
-      return _store(eventId, tints);
-    } catch (_) {
-      return _store(eventId, const []);
+      final colors = await _enqueue(() => _extract(imageUrl));
+      _cache[imageUrl] = colors;
+      // Boş sonuç (indirilemedi) diske yazılmıyor; sonraki açılışta tekrar
+      // denensin.
+      if (colors.isNotEmpty) unawaited(_saveDisk());
+      return colors;
+    } catch (e) {
+      log('Kapak renkleri çıkarılamadı: $e');
+      return const [];
+    } finally {
+      unawaited(_pending.remove(imageUrl));
     }
   }
 
-  /// Görsel akışı bu süre içinde sonuçlanmazsa [_decodeImage] hata ile
-  /// tamamlanır. Eski [PaletteGeneratorMaster.fromImageProvider] da aynı
-  /// süreyi kullanıyordu; onsuz akış hiç tamamlanmazsa [_pending] kaydı
-  /// sonsuza dek asılı kalır.
-  static const Duration _decodeTimeout = Duration(seconds: 15);
+  /// İşi kuyruğun sonuna ekler ve bir kare bitişini bekletir; hesaplar
+  /// kaydırma ve açılış animasyonlarının arasına dağılıyor.
+  static Future<T> _enqueue<T>(Future<T> Function() task) {
+    final result = _queue.then((_) async {
+      await SchedulerBinding.instance.endOfFrame;
+      return task();
+    });
+    // Zincir hata yüzünden kopmasın: sıradaki iş yine de çalışmalı.
+    _queue = result.then((_) {}, onError: (_) {});
+    return result;
+  }
+
+  static Future<List<Color>> _extract(String imageUrl) async {
+    final provider = CoverImage.providerFor(imageUrl);
+    if (provider == null) return const [];
+
+    final image = await _decodeImage(
+      ResizeImage(provider, width: _sampleWidth, allowUpscaling: false),
+    );
+    try {
+      final bytes = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+      if (bytes == null) return const [];
+      return CoverColorExtractor.extract(bytes, maxColors: _maxColors);
+    } finally {
+      image.dispose();
+    }
+  }
 
   /// Bir [ImageProvider]'ı çözüp [ui.Image]'e ulaşır.
   static Future<ui.Image> _decodeImage(ImageProvider provider) {
@@ -111,7 +131,11 @@ class EventPaletteService {
     listener = ImageStreamListener(
       (info, _) {
         finish();
-        if (!completer.isCompleted) completer.complete(info.image);
+        if (completer.isCompleted) return;
+        // Önbellekteki görsel paylaşılıyor; kendi kopyamızı alıp sonra
+        // bırakıyoruz.
+        completer.complete(info.image.clone());
+        info.dispose();
       },
       onError: (error, stackTrace) {
         finish();
@@ -132,50 +156,42 @@ class EventPaletteService {
     return completer.future;
   }
 
-  static List<Color> _store(String eventId, List<Color> tints) {
-    _cache[eventId] = tints;
-    _pending.remove(eventId);
-    return tints;
+  /// Diskteki renkleri belleğe alır. Okunamazsa (test ortamı, bozuk kayıt)
+  /// sessizce boş başlıyor; renkler yeniden hesaplanır.
+  static Future<void> _loadDisk() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw == null) return;
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) return;
+      decoded.forEach((url, value) {
+        if (value is! List) return;
+        _cache.putIfAbsent(
+          url,
+          () => [for (final argb in value.whereType<int>()) Color(argb)],
+        );
+      });
+    } catch (e) {
+      log('Kapak renk önbelleği okunamadı: $e');
+    }
   }
-}
 
-/// [compute]'a geçen kuantizasyon girdisi. Alanların tümü isolate sınırından
-/// geçebilen tiplerdir.
-class _QuantizeParams {
-  const _QuantizeParams({
-    required this.pixels,
-    required this.width,
-    required this.height,
-    required this.maxColors,
-  });
-
-  final Uint8List pixels;
-  final int width;
-  final int height;
-  final int maxColors;
-}
-
-/// Arka plan isolate'inde çalışan kuantizasyon. Ham RGBA piksellerden paleti
-/// çıkarır; [PaletteGeneratorMaster.fromByteData] saf Dart olduğu için burada
-/// güvenle koşar.
-Future<List<Color>> _quantize(_QuantizeParams params) async {
-  final palette = await PaletteGeneratorMaster.fromByteData(
-    EncodedImageMaster(
-      params.pixels.buffer.asByteData(),
-      width: params.width,
-      height: params.height,
-      format: ui.ImageByteFormat.rawRgba,
-    ),
-    maximumColorCount: params.maxColors,
-  );
-
-  // Sıralama bilinçli: baskın renk görselin genel tonunu verir, canlı
-  // ve soluk tonlar onun yanına çeşni katar.
-  return <Color?>[
-    palette.dominantColor?.color,
-    palette.vibrantColor?.color,
-    palette.mutedColor?.color,
-    palette.darkVibrantColor?.color,
-    palette.lightMutedColor?.color,
-  ].whereType<Color>().toSet().toList();
+  static Future<void> _saveDisk() async {
+    try {
+      final entries = _cache.entries.where((e) => e.value.isNotEmpty).toList();
+      final kept = entries.length > _diskLimit
+          ? entries.sublist(entries.length - _diskLimit)
+          : entries;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        _prefsKey,
+        jsonEncode({
+          for (final e in kept) e.key: [for (final c in e.value) c.toARGB32()],
+        }),
+      );
+    } catch (e) {
+      log('Kapak renk önbelleği yazılamadı: $e');
+    }
+  }
 }

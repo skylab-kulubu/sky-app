@@ -39,12 +39,7 @@ class _UpcomingEventTileState extends State<UpcomingEventTile> {
     super.initState();
     // Detay sayfasının zemini kapağın renklerinden kuruluyor; hesap satır
     // göründüğü anda başlıyor ki sayfa açıldığında hazır olsun.
-    unawaited(
-      EventPaletteService.resolve(
-        eventId: event.id,
-        imageUrl: event.coverImageUrl,
-      ),
-    );
+    unawaited(EventPaletteService.resolve(event.coverImageUrl));
   }
 
   @override
@@ -85,7 +80,7 @@ class _UpcomingEventTileState extends State<UpcomingEventTile> {
       children: [
         if (event.ownerTeam.isNotEmpty) ...[
           Text(
-            event.ownerTeam,
+            event.ownerLabel,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: context.textTheme.labelMedium?.copyWith(
