@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:sky_app/features/auth/data/models/user.dart';
@@ -9,7 +11,10 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/core/services/api_exception.dart';
+import 'package:sky_app/features/profile/data/models/nfc_card.dart';
 import 'package:sky_app/features/profile/data/services/nfc_service.dart';
+import 'package:sky_app/features/profile/data/services/skypass_service.dart';
 import 'package:sky_app/features/profile/presentation/widgets/activity_list.dart';
 import 'package:sky_app/features/profile/presentation/widgets/nfc_scan_overlay.dart';
 import 'package:sky_app/features/profile/presentation/widgets/quick_action_button.dart';
@@ -143,18 +148,51 @@ class _ProfilePageState extends State<ProfilePage> {
       }
 
       // NFC açık — Hero animasyonlu dikey overlay'i aç
-      await NfcScanOverlay.show(
+      final card = await NfcScanOverlay.show(
         context,
         userName: userName,
         skyNumber: skyNumber,
         subtitle: subtitle,
       );
+      if (card == null || !context.mounted) return;
+      await _bindCard(context, card);
     } catch (_) {
       if (!context.mounted) return;
       _showNfcAlert(
         context,
         title: 'NFC Hatası',
         message: 'NFC durumu kontrol edilemedi. Lütfen tekrar deneyin.',
+      );
+    }
+  }
+
+  /// Okunan kartı hesaba bağlar. Bir hesaba tek kart bağlanıyor; yeni kart
+  /// eskisinin yerini alıyor. Kart başka birine bağlıysa core 409 dönüyor.
+  Future<void> _bindCard(BuildContext context, NfcCard card) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await SkyPassService.bindCard(card.normalizedHex);
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Öğrenci kartın SkyPass\'e eşlendi. Kapıda kartını da okutabilirsin.',
+          ),
+        ),
+      );
+    } catch (e) {
+      final error = ApiException.from(e);
+      log('Öğrenci kartı eşlenemedi: $error');
+      if (!context.mounted) return;
+      _showNfcAlert(
+        context,
+        title: 'Kart Eşlenemedi',
+        message: switch (error.statusCode) {
+          409 =>
+            'Bu kart başka bir hesaba eşli. Kart senin ise kulüple iletişime '
+                'geç.',
+          400 => 'Kart numarası okunamadı. Kartı tekrar okut.',
+          _ => error.userMessage,
+        },
       );
     }
   }

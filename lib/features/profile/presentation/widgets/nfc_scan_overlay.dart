@@ -408,7 +408,9 @@ class _NfcScanOverlayState extends State<NfcScanOverlay>
 
     if (_showUid && _card != null) {
       return Text(
-        'Kart Eşlendi: ${_card!.formattedHex}',
+        // Eşleme sunucuda, overlay kapandıktan sonra yapılıyor; burada
+        // yalnızca okuma sonucu.
+        'Kart okundu: ${_card!.formattedHex}',
         key: const ValueKey('success'),
         textAlign: TextAlign.center,
         style: baseStyle?.copyWith(color: AppColors.green),

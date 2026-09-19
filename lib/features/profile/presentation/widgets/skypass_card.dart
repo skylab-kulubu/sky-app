@@ -1,7 +1,10 @@
-import 'dart:math';
+import 'dart:async';
+import 'dart:developer';
+import 'dart:math' hide log;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
@@ -9,6 +12,8 @@ import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
+import 'package:sky_app/features/profile/data/models/skypass_token.dart';
+import 'package:sky_app/features/profile/data/services/skypass_service.dart';
 import 'package:sky_app/features/profile/presentation/widgets/tilt_builder.dart';
 
 /// [SkyPassCard]'ı karta dokunmadan çevirmek için.
@@ -117,9 +122,6 @@ class _SkyPassCardState extends State<SkyPassCard>
     }
   }
 
-  /// Gerçek üyelik QR'ı bağlanana kadar desenin tohumu.
-  String get _qrData => 'SKYPASS:${widget.skyNumber}:${widget.name}';
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -204,7 +206,15 @@ class _SkyPassCardState extends State<SkyPassCard>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AspectRatio(aspectRatio: 1, child: SkyPassQr(data: _qrData)),
+          AspectRatio(
+            aspectRatio: 1,
+            // Kod dönüş bitince çiziliyor: yoğun QR'ı dönüş sırasında
+            // kurmak animasyonu takıyordu.
+            child: SkyPassQr(
+              owner: widget.skyNumber,
+              active: _controller.status == AnimationStatus.completed,
+            ),
+          ),
           const SizedBox(width: AppSizes.bigSpace),
           Expanded(child: _backDetails()),
         ],
@@ -229,8 +239,8 @@ class _SkyPassCardState extends State<SkyPassCard>
         ],
         const SizedBox(height: AppSizes.bigSpace),
         Text(
-          'Girişte bu kodu okut',
-          maxLines: 2,
+          'Girişte bu kodu okut. Kod her dakika yenilenir.',
+          maxLines: 3,
           overflow: TextOverflow.ellipsis,
           style: _mutedStyle,
         ),
@@ -328,130 +338,173 @@ class _SkyPassCardState extends State<SkyPassCard>
   );
 }
 
-/// SkyPass'in arka yüzündeki QR görseli.
+/// SkyPass'in arka yüzündeki kapı kodu.
 ///
-/// **Gerçek bir QR değil.** İçinde okunabilir veri yok; kartın arka yüzü
-/// tasarlanabilsin diye [data]'dan türetilmiş sahte bir desen çiziyor. Aynı
-/// [data] için hep aynı desen çıkar, yani kart çevrildikçe kod değişmiyor.
-/// Üyelik QR'ı bağlandığında yalnızca bu widget'ın yeri değişecek.
-class SkyPassQr extends StatelessWidget {
-  const SkyPassQr({super.key, required this.data});
+/// Core'un imzaladığı kısa ömürlü belirteci ([SkyPassService.token]) QR
+/// olarak çiziyor ve süresi dolmadan yeniliyor. Kod arka yüz göründüğü anda
+/// istenmeye başlıyor ama QR ancak [active] olunca (kartın dönüşü bitince)
+/// kurulup yumuşakça beliriyor; o zamana kadar yükleniyor göstergesi var.
+/// Kart ön yüze dönünce widget kalkıyor, zamanlayıcı da duruyor. Kod
+/// alınamazsa (bağlantı yok) dokununca yeniden deneniyor.
+class SkyPassQr extends StatefulWidget {
+  const SkyPassQr({super.key, required this.owner, required this.active});
 
-  /// Desenin tohumu. Gerçek uygulamada QR'ın içeriği olacak.
-  final String data;
+  /// Kartın sahibi (SKY numarası); önbellekteki kodun başkasına ait
+  /// olmadığını anlamak için.
+  final String owner;
+
+  /// Kart yüzü tam görünüyor mu; değilse QR çizilmiyor.
+  final bool active;
+
+  @override
+  State<SkyPassQr> createState() => _SkyPassQrState();
+}
+
+class _SkyPassQrState extends State<SkyPassQr> {
+  /// Zamanlayıcı en az bu kadar bekliyor; cihaz saati sunucudan gerideyse
+  /// art arda istek atılmasın.
+  static const Duration _minRefreshDelay = Duration(seconds: 5);
+
+  static const Duration _fadeDuration = Duration(milliseconds: 250);
+
+  SkyPassToken? _token;
+
+  /// Çizime hazır QR; token ve [SkyPassQr.active] ikisi de varken kuruluyor.
+  QrImage? _qr;
+  String? _qrValue;
+
+  bool _failed = false;
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(SkyPassQr oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.active && !oldWidget.active) _prepareQr();
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    _refreshTimer?.cancel();
+    try {
+      final token = await SkyPassService.token(owner: widget.owner);
+      if (!mounted) return;
+      setState(() {
+        _token = token;
+        _failed = false;
+      });
+      _scheduleRefresh(token);
+      _prepareQr();
+    } catch (e) {
+      log('SkyPass kodu alınamadı: $e');
+      if (!mounted) return;
+      setState(() => _failed = true);
+    }
+  }
+
+  /// QR matrisini bir sonraki karede kurar; dönüş ya da açılış karesine
+  /// denk gelmesin.
+  void _prepareQr() {
+    final token = _token;
+    if (!widget.active || token == null || token.value == _qrValue) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !widget.active) return;
+      final qr = QrImage(
+        QrCode.fromData(
+          data: token.value,
+          errorCorrectLevel: QrErrorCorrectLevel.L,
+        ),
+      );
+      setState(() {
+        _qr = qr;
+        _qrValue = token.value;
+      });
+    });
+  }
+
+  void _scheduleRefresh(SkyPassToken token) {
+    var delay = token.expiresAt
+        .subtract(SkyPassService.refreshMargin)
+        .difference(DateTime.now());
+    if (delay < _minRefreshDelay) delay = _minRefreshDelay;
+    _refreshTimer = Timer(delay, _load);
+  }
+
+  void _retry() {
+    setState(() => _failed = false);
+    _load();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final qr = widget.active ? _qr : null;
+
+    final Widget child;
+    if (_failed && qr == null) {
+      child = _error();
+    } else if (qr == null) {
+      child = Center(
+        key: const ValueKey('loading'),
+        child: CircularProgressIndicator.adaptive(
+          valueColor: AlwaysStoppedAnimation(AppColors.skyPassForegroundMuted),
+        ),
+      );
+    } else {
+      child = PrettyQrView(
+        key: ValueKey(_qrValue),
+        qrImage: qr,
+        decoration: const PrettyQrDecoration(
+          shape: PrettyQrSmoothSymbol(color: AppColors.skyPassForeground),
+        ),
+      );
+    }
+
     return Container(
       padding: AppPaddings.skyPassQr,
       decoration: BoxDecoration(
         color: AppColors.onAccent,
         borderRadius: BorderRadius.circular(AppRadiuses.innerTile),
       ),
-      child: CustomPaint(size: Size.infinite, painter: _MockQrPainter(data)),
-    );
-  }
-}
-
-class _MockQrPainter extends CustomPainter {
-  _MockQrPainter(this.data);
-
-  final String data;
-
-  /// Kenardaki modül sayısı. Gerçek bir QR'ın orta boy sürümüne yakın
-  /// sıklıkta görünsün diye seçildi.
-  static const int _moduleCount = 25;
-
-  /// Köşelerdeki hizalama karesinin kenarı (gerçek QR'da da 7).
-  static const int _finderSize = 7;
-
-  /// Modül köşelerinin yuvarlaklığı; kartın geri kalanı yuvarlak hatlı.
-  static const double _moduleRadiusFactor = 0.25;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final module = size.shortestSide / _moduleCount;
-    final paint = Paint()..color = AppColors.skyPassForeground;
-
-    // Tohum veriden geliyor: aynı kart her açılışta aynı deseni çiziyor.
-    final random = Random(data.hashCode);
-
-    for (var row = 0; row < _moduleCount; row++) {
-      for (var col = 0; col < _moduleCount; col++) {
-        final filled = random.nextBool();
-        if (!filled || _isFinderArea(row, col)) continue;
-        _paintModule(canvas, paint, module, row, col);
-      }
-    }
-
-    _paintFinders(canvas, paint, module);
-  }
-
-  /// Hizalama karelerinin ve etraflarındaki bir modülük boşluğun alanı;
-  /// oraya rastgele modül düşerse kare okunmaz hâle gelir.
-  bool _isFinderArea(int row, int col) {
-    const int farEdge = _moduleCount - _finderSize - 1;
-    final bool nearTop = row <= _finderSize;
-    final bool nearLeft = col <= _finderSize;
-    final bool nearRight = col >= farEdge;
-    final bool nearBottom = row >= farEdge;
-
-    return (nearTop && nearLeft) ||
-        (nearTop && nearRight) ||
-        (nearBottom && nearLeft);
-  }
-
-  void _paintModule(
-    Canvas canvas,
-    Paint paint,
-    double module,
-    int row,
-    int col,
-  ) {
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(col * module, row * module, module, module),
-        Radius.circular(module * _moduleRadiusFactor),
-      ),
-      paint,
+      child: AnimatedSwitcher(duration: _fadeDuration, child: child),
     );
   }
 
-  void _paintFinders(Canvas canvas, Paint paint, double module) {
-    const double farEdge = (_moduleCount - _finderSize) * 1.0;
-
-    for (final origin in const [
-      Offset(0, 0),
-      Offset(farEdge, 0),
-      Offset(0, farEdge),
-    ]) {
-      _paintFinder(canvas, paint, module, origin);
-    }
-  }
-
-  /// İç içe üç kare: dolu 7×7, üstüne oyulan beyaz 5×5, ortada dolu 3×3.
-  void _paintFinder(Canvas canvas, Paint paint, double module, Offset origin) {
-    void square(double inset, Color color) {
-      final side = (_finderSize - inset * 2) * module;
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(
-            (origin.dx + inset) * module,
-            (origin.dy + inset) * module,
-            side,
-            side,
+  /// Kartın kendi dokunuşu (çevirme) burada yeniden denemeye dönüşüyor.
+  Widget _error() {
+    return GestureDetector(
+      key: const ValueKey('error'),
+      onTap: _retry,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AppIcon(
+            AppIcons.refresh,
+            size: AppSizes.iconMedium,
+            color: AppColors.skyPassForegroundMuted,
           ),
-          Radius.circular(module * 0.8),
-        ),
-        Paint()..color = color,
-      );
-    }
-
-    square(0, paint.color);
-    square(1, AppColors.onAccent);
-    square(2, paint.color);
+          const SizedBox(height: AppSizes.smallSpace),
+          Text(
+            'Kod alınamadı',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 11,
+              color: AppColors.skyPassForegroundMuted,
+            ),
+          ),
+        ],
+      ),
+    );
   }
-
-  @override
-  bool shouldRepaint(_MockQrPainter oldDelegate) => oldDelegate.data != data;
 }
