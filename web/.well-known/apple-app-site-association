@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["TEAM_ID.com.yildizskylab.app"],
+        "appIDs": ["4XC9R339XQ.com.yildizskylab.skyapp"],
         "components": [
           { "/": "/news/*", "comment": "Paylaşılan haberler" },
           { "/": "/events/*", "comment": "Paylaşılan etkinlikler" }
