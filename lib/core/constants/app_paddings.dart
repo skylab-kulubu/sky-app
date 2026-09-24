@@ -64,6 +64,9 @@ class AppPaddings {
   static const accountNote = EdgeInsets.only(left: 4, right: 4, top: 20);
 
   /// Hesap sayfasındaki ekip rozeti.
+  /// Sheet başlığı: solda kapatma butonu, ortada başlık.
+  static const sheetHeader = EdgeInsets.fromLTRB(4, 8, 4, 8);
+
   static const teamChip = EdgeInsets.symmetric(horizontal: 12, vertical: 6);
 
   /// Giriş sayfasının içeriği; sayfada tek bir sütun olduğu için ana

@@ -12,6 +12,10 @@ import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/services/links_service.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
+import 'package:sky_app/core/models/link_item.dart';
+import 'package:sky_app/core/services/handoff_service.dart';
+import 'package:sky_app/core/services/webview_service.dart';
+import 'package:sky_app/core/widgets/handoff_sheet.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/bottom_scrim.dart';
 import 'package:sky_app/core/widgets/color_glow.dart';
@@ -312,6 +316,20 @@ class _EventDetailPageState extends EventDetailPagemodel {
           _sectionHeader(context, 'Konum'),
           const SizedBox(height: AppSizes.bigSpace),
           _infoBlock(context, icon: AppIcons.location, title: event.location),
+        ],
+        if (event.formUrl.isNotEmpty) ...[
+          _sectionHeader(context, 'Başvuru Formu'),
+          const SizedBox(height: AppSizes.bigSpace),
+          GestureDetector(
+            onTap: onFormTap,
+            behavior: HitTestBehavior.opaque,
+            child: _infoBlock(
+              context,
+              icon: AppIcons.form,
+              title: 'Formu Aç',
+              subtitle: formSubtitle,
+            ),
+          ),
         ],
         _sectionHeader(context, 'Etkinlik Hakkında'),
         const SizedBox(height: AppSizes.bigSpace),

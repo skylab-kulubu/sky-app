@@ -19,7 +19,6 @@ import 'package:sky_app/features/notification/presentation/pages/notification_pa
 import 'package:sky_app/features/profile/presentation/pages/certificates/certificates_page.dart';
 import 'package:sky_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:sky_app/core/pages/webview_page.dart';
-import 'package:sky_app/features/settings/presentation/pages/account/account_page.dart';
 import 'package:sky_app/features/settings/presentation/pages/contact/contact_page.dart';
 import 'package:sky_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:sky_app/features/team/presentation/pages/team_page.dart';
@@ -57,10 +56,6 @@ class RouterManager {
         path: '/settings',
         builder: (context, state) => const SettingsPage(),
         routes: [
-          GoRoute(
-            path: 'account',
-            builder: (context, state) => const AccountPage(),
-          ),
           GoRoute(
             path: 'contact',
             builder: (context, state) => const ContactPage(),

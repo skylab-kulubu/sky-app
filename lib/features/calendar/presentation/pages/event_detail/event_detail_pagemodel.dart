@@ -165,6 +165,33 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     await SharePlus.instance.share(ShareParams(text: lines.join('\n')));
   }
 
+  /// SKYFORMS adresindeki formlar uygulama içinde, girişli açılıyor (web
+  /// handoff); başka bir adresteki form (Google Forms gibi) tarayıcıda.
+  String? get _formsPath =>
+      HandoffService.pathOf(HandoffTarget.forms, event.formUrl);
+
+  String get formSubtitle =>
+      _formsPath != null ? 'SKY LAB hesabınla açılır' : 'Tarayıcıda açılır';
+
+  Future<void> onFormTap() async {
+    final path = _formsPath;
+    if (path != null) {
+      await HandoffSheet.show(context, target: HandoffTarget.forms, path: path);
+      return;
+    }
+    if (!mounted) return;
+    await WebviewService.openLink(
+      context,
+      LinkItem(
+        name: 'Başvuru Formu',
+        description: '',
+        icon: AppIcons.form,
+        color: AppColors.purple,
+        url: event.formUrl,
+      ),
+    );
+  }
+
   /// Katılım kaydı geri alınamadığı için önce onay soruluyor.
   Future<void> onJoinPressed() async {
     final confirmed = await _askConfirmation();

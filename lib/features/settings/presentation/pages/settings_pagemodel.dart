@@ -6,7 +6,10 @@ abstract class SettingsPagemodel extends State<SettingsPage> {
     if (mounted) context.go('/auth');
   }
 
-  void onAccountTap() => context.push('/settings/account');
+  /// Hesap bilgileri, güvenlik, oturumlar ve kulüp profili Hesap
+  /// Merkezi'nde; uygulama onu kendi WebView'inde açıyor.
+  void onAccountTap() =>
+      HandoffSheet.show(context, target: HandoffTarget.accountCenter);
 
   void onSupportTap() => context.push('/settings/contact');
 

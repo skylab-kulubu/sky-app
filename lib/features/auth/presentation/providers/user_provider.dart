@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:sky_app/core/services/api_client.dart';
+import 'package:sky_app/core/services/handoff_service.dart';
 import 'package:sky_app/features/auth/data/models/user.dart';
 import 'package:sky_app/features/auth/data/services/auth_service.dart';
 
@@ -60,6 +61,9 @@ class UserProvider extends ChangeNotifier {
 
   Future<void> logout() async {
     await _authService.logout();
+    // Sitelerdeki oturum WebView'de kalmasın; sıradaki kullanıcı öncekinin
+    // hesabını görmemeli (web handoff sözleşmesi 6).
+    await HandoffService.clearWebSession();
     _user = null;
     _status = AuthStatus.unauthenticated;
     notifyListeners();

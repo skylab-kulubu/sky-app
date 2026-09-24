@@ -19,6 +19,10 @@ class AppSizes {
   /// satır oradaki sıradan bir ayar değil kullanıcının kendisi.
   static const accountTileAvatar = 48.0;
 
+  /// Sheet başlığındaki kapatma butonunun genişliği; başlığın tam ortada
+  /// kalması için karşı tarafa aynı boşluk bırakılıyor.
+  static const sheetHeaderAction = 48.0;
+
   /// Hesap sayfasının başındaki büyük avatar.
   static const accountAvatar = 88.0;
 
