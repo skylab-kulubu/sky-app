@@ -91,6 +91,13 @@ class _SettingsPageState extends SettingsPagemodel {
                 trailingIcon: AppIcons.externalLink,
                 onTap: onWebsiteTap,
               ),
+              SettingsTile(
+                icon: LinksService.legal.icon,
+                iconColor: LinksService.legal.color,
+                title: LinksService.legal.name,
+                trailingIcon: AppIcons.externalLink,
+                onTap: onLegalTap,
+              ),
             ],
           ),
           const SizedBox(height: 24),
@@ -126,8 +133,8 @@ class _SettingsPageState extends SettingsPagemodel {
             ),
           ),
           SvgPicture.asset(
-            AppAssets.mobilab,
-            height: AppSizes.iconMedium,
+            AppAssets.mobilabWordmark,
+            height: AppSizes.iconSmall,
             colorFilter: ColorFilter.mode(
               context.textTertiary,
               BlendMode.srcIn,

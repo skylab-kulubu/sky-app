@@ -98,6 +98,7 @@ class AppIcons {
   static const String support = 'envelope';
   static const String logout = 'logout6';
   static const String phoneChat = 'phoneChat';
+  static const String legal = 'documentText';
 
   // Hata durumları
   static const String wifiOff = 'wifiOff';

@@ -15,5 +15,9 @@ abstract class SettingsPagemodel extends State<SettingsPage> {
 
   void onWebsiteTap() => WebviewService.openLink(context, LinksService.website);
 
+  /// Tarayıcı sayfası olarak açılıyor; Gizlilik Politikası ve KVKK metni
+  /// oradan seçiliyor.
+  void onLegalTap() => WebviewService.openLink(context, LinksService.legal);
+
   void onAppearanceTap() => ThemeModeSheet.show(context);
 }

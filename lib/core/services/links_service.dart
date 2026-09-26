@@ -23,6 +23,17 @@ class LinksService {
     url: 'https://arge.yildizskylab.com/',
   );
 
+  /// Gizlilik politikası ve KVKK aydınlatma metni. Flutter web derlemesiyle
+  /// birlikte yayınlanan statik sayfalar (`web/legal/`); mağaza kayıtları da
+  /// gizlilik politikasına buradan bağlanıyor.
+  static const LinkItem legal = LinkItem(
+    name: 'Yasal Metinler',
+    description: 'Gizlilik politikası ve KVKK aydınlatma metni',
+    icon: AppIcons.legal,
+    color: AppColors.orange,
+    url: '$appBaseUrl/legal/',
+  );
+
   /// Paylaşılan içerik bağlantılarının kökü. Android App Links ve iOS
   /// Universal Links bu domaini doğruluyor (`web/.well-known/`); uygulama
   /// yüklüyse link uygulamada, değilse web sürümünde açılıyor.
