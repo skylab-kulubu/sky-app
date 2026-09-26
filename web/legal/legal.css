@@ -1,0 +1,260 @@
+/* Yasal metin sayfaları: tanıtım sayfasıyla aynı font, renkler ve sayfa
+   genişliği (site/index.html ve lib/core/constants/app_colors.dart). Metin
+   sütunu okunaklı kalsın diye dar; geniş ekranda solunda içindekiler. */
+/* Flutter web derlemesinin içinden sunuluyor (sky-app/web/legal →
+   build/web/legal); Poppins, uygulamanın kendi font dosyalarından geliyor.
+   Bulunamazsa sistem fontuna düşüyor. Açılış sayfasındaki kopya:
+   site/legal (yayın günü tek kaynak oraya taşınacak). */
+@font-face { font-family: "Poppins"; src: url("/assets/assets/fonts/Poppins/Poppins-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Poppins"; src: url("/assets/assets/fonts/Poppins/Poppins-Medium.ttf") format("truetype"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Poppins"; src: url("/assets/assets/fonts/Poppins/Poppins-SemiBold.ttf") format("truetype"); font-weight: 600; font-display: swap; }
+
+:root {
+  color-scheme: light dark;
+  --plum: #8b5fa3;
+  --lilac: #e0c8e5;
+
+  /* Açık tema */
+  --bg: #ffffff;
+  --tile: #f2f2f7;
+  --text: #1a1a1a;
+  --text-2: #6b6b6b;
+  --text-3: #9a9a9a;
+  --divider: #e3e3e8;
+  --accent: var(--plum);
+
+  --radius-group: 20px;
+  --gutter: clamp(16px, 5vw, 48px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --tile: #1b1a1a;
+    --text: #ffffff;
+    --text-2: #888888;
+    --text-3: #666666;
+    --divider: #333333;
+    --accent: var(--lilac);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+/* Kısa sayfada da alt bilgi ekranın altında dursun (tanıtım sayfası gibi). */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); }
+
+body > .wrap { flex: 1; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+
+.wrap {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right));
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: max(20px, env(safe-area-inset-top)) 20px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 18px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.brand svg { width: 30px; height: 30px; }
+
+/* "Developed by" imzası; tanıtım sayfasındakiyle aynı. */
+.by { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+
+.by i {
+  width: 76px;
+  height: 24px;
+  background: currentColor;
+  -webkit-mask: url("/legal/mobilab.svg") no-repeat center / contain;
+  mask: url("/legal/mobilab.svg") no-repeat center / contain;
+}
+
+main { padding-block: 8px 56px; }
+
+/* Metin sayfası: başlık tam genişlikte, altında içindekiler + metin. */
+.doc {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  column-gap: 64px;
+  align-items: start;
+}
+
+.doc-head { grid-column: 1 / -1; }
+
+.doc article { max-width: 760px; }
+
+.toc {
+  position: sticky;
+  top: 24px;
+  padding-top: 4px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.toc p { margin: 0 0 10px; font-size: 13px; font-weight: 500; color: var(--text-3); }
+
+.toc ol { list-style: none; margin: 0; padding: 0; }
+
+.toc li { margin-bottom: 10px; }
+
+.toc a { color: var(--text-2); text-decoration: none; }
+
+.toc a:hover { color: var(--text); }
+
+/* Başlığa atlarken üst kenara yapışmasın. */
+h2 { scroll-margin-top: 24px; }
+
+@media (max-width: 900px) {
+  .doc { display: block; }
+  .toc { display: none; }
+}
+
+h1 {
+  margin: 8px 0 4px;
+  font-size: clamp(28px, 5vw, 40px);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.updated { margin: 0 0 32px; font-size: 14px; color: var(--text-3); }
+
+h2 {
+  margin: 36px 0 8px;
+  font-size: clamp(19px, 2.4vw, 22px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+h3 { margin: 24px 0 4px; font-size: 17px; font-weight: 600; }
+
+p, li { color: var(--text-2); }
+
+p { margin: 0 0 14px; }
+
+ul { margin: 0 0 14px; padding-inline-start: 22px; }
+
+li { margin-bottom: 6px; }
+
+strong { color: var(--text); font-weight: 600; }
+
+/* Özet kutuları ve iletişim bloğu; uygulamadaki TileGroup'un karşılığı. */
+.tile {
+  margin: 0 0 14px;
+  padding: 18px 20px;
+  background: var(--tile);
+  border-radius: var(--radius-group);
+}
+
+.tile :last-child { margin-bottom: 0; }
+
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 760px;
+}
+
+/* Kutusuz satırlar, aralarında tek ince çizgi; bütün satır tıklanabiliyor
+   (bağlantının ::after'ı satırı kaplıyor); sağdaki ok üzerine gelince
+   belirginleşiyor. */
+.links li {
+  position: relative;
+  margin: 0;
+  padding: 20px 48px 20px 0;
+}
+
+/* Çizgi yalnızca iki satırın arasında; üstte ve altta yok. */
+.links li + li { border-top: 1px solid var(--divider); }
+
+.links li::after {
+  content: "→";
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: var(--text-3);
+  transition: color 0.2s ease;
+}
+
+.links li:hover::after { color: var(--text); }
+
+.links a { font-size: 18px; font-weight: 600; text-decoration: none; color: var(--text); }
+
+.links a::after { content: ""; position: absolute; inset: 0; }
+
+.links p { margin: 2px 0 0; font-size: 15px; }
+
+footer {
+  border-top: 1px solid var(--divider);
+  padding-block: 16px max(16px, env(safe-area-inset-bottom));
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 32px;
+}
+
+.foot nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; }
+
+.foot nav a { text-decoration: none; color: inherit; }
+
+.foot nav a:hover { color: var(--text); }
+
+.social { gap: 16px !important; }
+
+.social a { display: inline-flex; color: var(--text-3); }
+
+.social a:hover { color: var(--text); }
+
+.social svg { width: 20px; height: 20px; }
+
+/* Dar ekranda uzun kulüp adı gizleniyor (tanıtım sayfasıyla aynı eşik). */
+@media (max-width: 860px) {
+  .foot nav span { display: none; }
+  .foot nav { gap: 6px 16px; font-size: 13px; }
+}
+
+/* Telefonda imza tanıtım sayfasındaki gibi küçülüyor. */
+@media (max-width: 560px) {
+  .by { gap: 6px; font-size: 14px; }
+  .by i { width: 64px; height: 20px; }
+}
