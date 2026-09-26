@@ -17,6 +17,10 @@ class AppIcons {
   static const String shuffle = 'shuffle';
   static const String infoSquare = 'infoSquare';
 
+  // Yönetim menüsü (navbar'ın yanındaki yuvarlak buton ve satırları)
+  static const String adminMenu = 'commandSquare';
+  static const String createNews = 'noteAdd';
+
   // Actions
   static const String close = 'xmark';
   static const String closeCircle = 'closeCircle';

@@ -1,21 +1,29 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_assets.dart';
-import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
-import 'package:sky_app/core/constants/app_paddings.dart';
-import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
 import 'package:sky_app/core/widgets/app_bar_search_field.dart';
 import 'package:sky_app/core/widgets/bottom_scrim.dart';
 import 'package:sky_app/core/widgets/club_menu_sheet.dart';
+import 'package:sky_app/core/widgets/expandable_nav_bar.dart';
 import 'package:sky_app/core/widgets/nav_item.dart';
 import 'package:sky_app/core/widgets/user_avatar.dart';
+import 'package:sky_app/core/models/nav_menu_action.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/features/calendar/data/services/door_service.dart';
+import 'package:sky_app/features/calendar/presentation/pages/door_scanner/door_scanner_page.dart';
+import 'package:sky_app/features/calendar/presentation/pages/event_create/event_create_page.dart';
+import 'package:sky_app/features/calendar/presentation/pages/event_detail/event_detail_page.dart';
+import 'package:sky_app/features/home/presentation/pages/news_edit/news_edit_page.dart';
+import 'package:sky_app/features/team/presentation/pages/team_edit/team_edit_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/team/presentation/providers/team_provider.dart';
 
@@ -39,77 +47,59 @@ class _ShellPageState extends ShellPagemodel {
     return Scaffold(
       extendBody: true,
       appBar: appBar(context),
-      body: Stack(children: [widget.child, const BottomScrim()]),
-      bottomNavigationBar: navBar(currentLocation, context),
+      body: Stack(
+        children: [
+          widget.child,
+          const BottomScrim(),
+          Positioned.fill(child: navBar(currentLocation, context)),
+        ],
+      ),
+      // Asıl navbar gövdedeki Stack'te: yönetim menüsü açılınca yukarı
+      // uzuyor ve bu yuvadan taşan satırlar dokunma almazdı. Yuvada aynı
+      // yükseklikte boş (dokunmaları geçiren) bir yer tutucu duruyor; böylece
+      // sayfaların alt boşluğu (extendBody) ve SnackBar'ın konumu eskisi gibi
+      // navbar'a göre hesaplanıyor.
+      bottomNavigationBar: SizedBox(height: ExpandableNavBar.slotHeight),
     );
   }
 
+  /// Yetkili işler varsa sekmeler etiketsiz, yanlarında yönetim menüsü.
   Widget navBar(String currentLocation, BuildContext context) {
-    final isDark = context.theme.brightness == Brightness.dark;
+    final actions = adminActions(context);
+    final showLabel = actions.isEmpty;
 
-    return Padding(
-      padding: AppPaddings.navBar,
-      child: Center(
-        // heightFactor olmadan Center tüm yüksekliği doldurur ve
-        // bottomNavigationBar içinde hap ekranın ortasına düşer.
-        heightFactor: 1,
-        // Hap içeriğe oturuyor; dar ekranda taşmak yerine küçülsün diye
-        // FittedBox ile sarmalanıyor.
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Container(
-            padding: AppPaddings.navBarContent,
-            decoration: BoxDecoration(
-              color: context.tileColor.withValues(alpha: 0.95),
-              borderRadius: AppRadiuses.stadiumBorderRadius,
-              // Kenarlık yalnızca açık temada: orada hap ile beyaz zemin
-              // arasındaki fark çok az kalıyor ve sınırı belirginleştiriyor.
-              // Koyu temada hap zaten siyah zeminden ayrıştığı için kenarlık
-              // fazladan bir çizgi gibi duruyor.
-              border: isDark ? null : Border.all(color: context.dividerColor),
-              boxShadow: [
-                BoxShadow(
-                  color: isDark
-                      ? AppColors.navShadowDark
-                      : AppColors.navShadowLight,
-                  blurRadius: 36,
-                  spreadRadius: 2,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                NavItem(
-                  label: 'Ana Sayfa',
-                  isSelected: currentLocation == '/home',
-                  onTap: () => context.go('/home'),
-                  icon: AppIcons.home,
-                ),
-                NavItem(
-                  label: 'Etkinlikler',
-                  isSelected: currentLocation == '/calendar',
-                  onTap: () => context.go('/calendar'),
-                  icon: AppIcons.calendar,
-                ),
-                NavItem(
-                  label: 'Ekipler',
-                  isSelected: currentLocation == '/team',
-                  onTap: () => context.go('/team'),
-                  icon: AppIcons.users2,
-                ),
-                NavItem(
-                  label: 'Profil',
-                  isSelected: currentLocation == '/profile',
-                  onTap: () => context.go('/profile'),
-                  icon: AppIcons.profile,
-                ),
-              ],
-            ),
-          ),
+    return ExpandableNavBar(
+      actions: actions,
+      items: [
+        NavItem(
+          label: 'Ana Sayfa',
+          isSelected: currentLocation == '/home',
+          onTap: () => context.go('/home'),
+          icon: AppIcons.home,
+          showLabel: showLabel,
         ),
-      ),
+        NavItem(
+          label: 'Etkinlikler',
+          isSelected: currentLocation == '/calendar',
+          onTap: () => context.go('/calendar'),
+          icon: AppIcons.calendar,
+          showLabel: showLabel,
+        ),
+        NavItem(
+          label: 'Ekipler',
+          isSelected: currentLocation == '/team',
+          onTap: () => context.go('/team'),
+          icon: AppIcons.users2,
+          showLabel: showLabel,
+        ),
+        NavItem(
+          label: 'Profil',
+          isSelected: currentLocation == '/profile',
+          onTap: () => context.go('/profile'),
+          icon: AppIcons.profile,
+          showLabel: showLabel,
+        ),
+      ],
     );
   }
 
@@ -223,7 +213,7 @@ class _AppBarConfig {
   final String? searchHint;
 
   static const _home = _AppBarConfig(
-    title: 'Sky Lab',
+    title: 'SKY LAB',
     showLogo: true,
     actions: [AppIcons.widget, AppIcons.bell],
   );

@@ -10,6 +10,9 @@ import 'package:sky_app/core/widgets/app_icon.dart';
 /// Seçiliyken ikonun yanında label'ı da gösteren bir hap'a dönüşür; seçili
 /// değilken yalnızca ikon kalır. Geçiş, label'ın yatayda açılıp kapanmasıyla
 /// olur — genişlik elle hesaplanmadığı için metin uzunluğundan bağımsızdır.
+///
+/// [showLabel] kapalıyken seçili öğe de yalnızca ikon kalır; hap'ın zemini
+/// yine belirir ama genişlik değişmez (navbar'ın yanında menü butonu varken).
 class NavItem extends StatelessWidget {
   const NavItem({
     super.key,
@@ -17,6 +20,7 @@ class NavItem extends StatelessWidget {
     required this.onTap,
     required this.label,
     required this.icon,
+    this.showLabel = true,
   });
 
   /// [AppIcons] içindeki ikon adı. Seçiliyken Filled, değilken Outline çizilir.
@@ -24,6 +28,7 @@ class NavItem extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final String label;
+  final bool showLabel;
 
   static const Duration _duration = Duration(milliseconds: 350);
   static const Curve _curve = Curves.easeOutCubic;
@@ -55,11 +60,13 @@ class NavItem extends StatelessWidget {
         highlightColor: Colors.transparent,
         splashColor: Colors.transparent,
         child: Padding(
-          padding: EdgeInsets.lerp(
-            AppPaddings.navItem,
-            AppPaddings.navItemSelected,
-            t,
-          )!,
+          padding: showLabel
+              ? EdgeInsets.lerp(
+                  AppPaddings.navItem,
+                  AppPaddings.navItemSelected,
+                  t,
+                )!
+              : AppPaddings.navItem,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -73,7 +80,7 @@ class NavItem extends StatelessWidget {
                   t,
                 ),
               ),
-              _label(context, t),
+              if (showLabel) _label(context, t),
             ],
           ),
         ),

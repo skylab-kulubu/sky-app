@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:sky_app/features/auth/data/models/user.dart';
@@ -11,10 +9,7 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
-import 'package:sky_app/features/calendar/data/services/door_service.dart';
-import 'package:sky_app/features/calendar/presentation/pages/door_scanner/door_scanner_page.dart';
 import 'package:sky_app/features/calendar/presentation/pages/session_check_in/session_check_in_page.dart';
-import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
 import 'package:sky_app/features/profile/data/services/nfc_service.dart';
 import 'package:sky_app/features/profile/presentation/widgets/activity_list.dart';
 import 'package:sky_app/features/profile/presentation/widgets/nfc_scan_overlay.dart';
@@ -38,11 +33,6 @@ class _ProfilePageState extends State<ProfilePage> {
   /// "QR'ı Göster" butonu kartı bununla çeviriyor.
   final SkyPassCardController _cardController = SkyPassCardController();
 
-  /// Core'a göre giriş alınabilecek yaklaşan bir etkinlik var mı
-  /// (`/v1/door/events`). Grubunda `team_door_scan` açık ekiplerin üyeleri
-  /// yalnızca buradan anlaşılıyor; token'da görünmüyor.
-  bool _hasDoorEvents = false;
-
   /// Eşleme sürerken ve kart yerine dönerken "Öğrenci Kartını Eşle" butonu
   /// yerinde kalıyor; profil arkada yenilense de geçiş kart dönünce oluyor.
   bool _isLinkRevealPending = false;
@@ -52,23 +42,6 @@ class _ProfilePageState extends State<ProfilePage> {
   static const Duration _cardReturnDuration = Duration(milliseconds: 500);
 
   static const Duration _buttonFadeDuration = Duration(milliseconds: 450);
-
-  @override
-  void initState() {
-    super.initState();
-    _checkDoorEvents();
-  }
-
-  Future<void> _checkDoorEvents() async {
-    try {
-      final events = await DoorService().fetchDoorEvents();
-      if (!mounted) return;
-      setState(() => _hasDoorEvents = events.any((e) => e.isUpcoming));
-    } catch (e) {
-      // Yerel yetki kuralı yine çalışıyor; sessizce geçiliyor.
-      log('Kapı etkinlikleri alınamadı: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,22 +87,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   /// QR kartın arka yüzünde; "QR'ı Göster" ayrı bir sayfa açmıyor, kartı
   /// çeviriyor. Karta dokunmakla aynı iş, keşfedilmesi kolay olsun diye.
-  ///
-  /// Yaklaşan bir etkinlikte kapı yetkisi olan kullanıcıda (YK/DK/ADMIN,
-  /// sahip ekibin lideri, kapı görevlisi) bu buton "Giriş Al" oluyor ve
-  /// kapı okuyucusunu açıyor; kendi kodunu görmek için karta dokunması yeter.
+  /// Kapıda giriş alma navbar'ın yanındaki yönetim menüsünde.
   Widget _quickActions(BuildContext context, User user, String subtitle) {
-    // Yerel kural (token'daki gruplar + etkinlik listesi) anında sonuç
-    // veriyor; core'un listesi gelince team_door_scan üyeleri de ekleniyor.
-    final canScan =
-        _hasDoorEvents ||
-        context.watch<EventProvider>().upcomingEvents.any(
-          (event) => user.canCheckIn(
-            ownerTeam: event.ownerTeam,
-            doorStaffIds: event.doorStaffIds,
-          ),
-        );
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -166,17 +125,11 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         Expanded(
-          child: canScan
-              ? QuickActionButton(
-                  icon: AppIcons.checkIn,
-                  label: 'Giriş Al',
-                  onTap: () => DoorScannerPage.open(context),
-                )
-              : QuickActionButton(
-                  icon: AppIcons.qr,
-                  label: "QR'ı Göster",
-                  onTap: _cardController.flip,
-                ),
+          child: QuickActionButton(
+            icon: AppIcons.qr,
+            label: "QR'ı Göster",
+            onTap: _cardController.flip,
+          ),
         ),
       ],
     );

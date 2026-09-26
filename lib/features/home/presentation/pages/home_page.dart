@@ -13,7 +13,6 @@ import 'package:sky_app/features/home/presentation/widgets/upcoming_event_tile.d
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
-import 'package:sky_app/features/home/presentation/pages/news_edit/news_edit_page.dart';
 import 'package:sky_app/features/home/presentation/providers/news_provider.dart';
 import 'package:sky_app/features/home/presentation/widgets/news_tile.dart';
 
@@ -51,7 +50,6 @@ class _HomePageState extends HomePagemodel {
     }
 
     return Scaffold(
-      floatingActionButton: _createNewsButton(context),
       body: EventsRefreshIndicator(
         child: SingleChildScrollView(
           // İçerik ekranı doldurmasa da aşağı çekilebilsin.
@@ -171,22 +169,6 @@ class _HomePageState extends HomePagemodel {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  /// Haber oluşturma; yalnızca `cms:access` rolü olana. Yüzen navbar'ın
-  /// üstünde.
-  Widget? _createNewsButton(BuildContext context) {
-    final canCreate =
-        context.watch<UserProvider?>()?.user?.canManageNews ?? false;
-    if (!canCreate) return null;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSizes.navBarClearance),
-      child: FloatingActionButton(
-        onPressed: onCreateNews,
-        child: AppIcon(AppIcons.add, color: context.textPrimary),
       ),
     );
   }
