@@ -58,8 +58,12 @@ class EventCreateService {
   }
 
   /// Kapak görselini yükler ve medya id'sini döner.
+  ///
+  /// Amaç `event_cover`: core görseli yeniden kodluyor, kart ve sayfa
+  /// boyutlarını üretiyor. Etkinliğe bağlanmayan yükleme 24 saat sonra
+  /// düşüyor, kaydedilen kapak core'un kaydına bağlı olduğu için kalıyor.
   Future<String> uploadCover(XFile image) async =>
-      (await _media.uploadImage(image)).id;
+      (await _media.uploadImage(image, purpose: 'event_cover')).id;
 
   /// Etkinliği oluşturur; [seasonId] verilirse sezona da bağlar ve son
   /// hâlini döner.

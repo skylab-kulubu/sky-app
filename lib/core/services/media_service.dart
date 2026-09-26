@@ -35,15 +35,24 @@ class MediaService {
   }
 
   /// Görseli yükler. Alan adı `file`.
-  Future<UploadedImage> uploadImage(XFile image) async {
+  ///
+  /// [purpose] core'un medya amacı (`config/media-purposes.json`): verilirse
+  /// core görseli yeniden kodluyor, boyutlarını üretiyor ve kuralları o
+  /// amaca göre uyguluyor. Amaçsız yüklenen görseller `legacy` sayılıyor.
+  Future<UploadedImage> uploadImage(XFile image, {String? purpose}) async {
     final form = FormData.fromMap({
       'file': await MultipartFile.fromFile(image.path, filename: image.name),
+      'purpose': ?purpose,
     });
 
-    final body = CoreApi.object(
-      await CoreApi.post('/media', body: form),
-      what: 'yüklenen görsel',
-    );
+    final Object? raw;
+    try {
+      raw = await CoreApi.post('/media', body: form);
+    } on ApiException catch (error) {
+      throw _describe(error);
+    }
+
+    final body = CoreApi.object(raw, what: 'yüklenen görsel');
     final id = body['id'];
     final url = body['url'];
     if (id is! String || id.isEmpty || url is! String || url.isEmpty) {
@@ -53,6 +62,26 @@ class MediaService {
       );
     }
     return UploadedImage(id: id, url: _absolute(url));
+  }
+
+  /// Core'un medya hata kodlarını (`application/problem+json` `code`)
+  /// Türkçeleştirir; tanımadığımız kodlarda hata olduğu gibi kalıyor.
+  static ApiException _describe(ApiException error) {
+    final text = switch (error.statusCode) {
+      413 => 'Görsel çok büyük. Daha küçük bir görsel seç.',
+      415 => 'Bu dosya türü yüklenemiyor. JPEG, PNG, WebP ya da GIF dene.',
+      429 => 'Çok fazla yükleme yaptın. Biraz bekleyip tekrar dene.',
+      503 => 'Sunucu şu an yoğun. Birazdan tekrar dene.',
+      _ => null,
+    };
+    if (text == null) return error;
+    return ApiException(
+      error.type,
+      statusCode: error.statusCode,
+      message: error.message,
+      serverMessage: error.serverMessage,
+      userText: text,
+    );
   }
 
   /// Core mutlak adres dönüyor; göreli (`images/…`) gelirse CDN'e bağlanıyor.

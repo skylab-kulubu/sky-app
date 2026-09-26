@@ -38,6 +38,7 @@ class ApiException implements Exception {
     this.statusCode,
     this.message,
     this.serverMessage,
+    this.userText,
   });
 
   factory ApiException.fromDio(DioException error) {
@@ -85,21 +86,28 @@ class ApiException implements Exception {
   /// değil loglara. Kullanıcı metni [userMessage].
   final String? serverMessage;
 
+  /// Duruma özel Türkçe açıklama; verilirse [userMessage] bunu döner.
+  /// Sunucunun bir hata kodunu anlamlandırabildiğimiz yerlerde (medya
+  /// yükleme gibi) kullanılıyor.
+  final String? userText;
+
   /// Hata kullanıcının oturumundan değil bağlantıdan kaynaklanıyorsa true.
   /// Oturumun korunup korunmayacağına bu ayrım karar veriyor.
   bool get isConnectivityIssue =>
       type == ApiErrorType.network || type == ApiErrorType.timeout;
 
   /// Hata ekranlarında gösterilen açıklama.
-  String get userMessage => switch (type) {
-    ApiErrorType.network => 'İnternet bağlantısı kurulamadı.',
-    ApiErrorType.timeout => 'Sunucu zamanında yanıt vermedi.',
-    ApiErrorType.auth => 'Oturumun doğrulanamadı.',
-    ApiErrorType.notFound => 'Aradığın kayıt bulunamadı.',
-    ApiErrorType.server => 'Sunucuda bir sorun oluştu.',
-    ApiErrorType.cancelled => 'İstek iptal edildi.',
-    ApiErrorType.unknown => 'Beklenmeyen bir hata oluştu.',
-  };
+  String get userMessage =>
+      userText ??
+      switch (type) {
+        ApiErrorType.network => 'İnternet bağlantısı kurulamadı.',
+        ApiErrorType.timeout => 'Sunucu zamanında yanıt vermedi.',
+        ApiErrorType.auth => 'Oturumun doğrulanamadı.',
+        ApiErrorType.notFound => 'Aradığın kayıt bulunamadı.',
+        ApiErrorType.server => 'Sunucuda bir sorun oluştu.',
+        ApiErrorType.cancelled => 'İstek iptal edildi.',
+        ApiErrorType.unknown => 'Beklenmeyen bir hata oluştu.',
+      };
 
   static ApiErrorType _fromStatusCode(int? statusCode) {
     if (statusCode == null) return ApiErrorType.unknown;
