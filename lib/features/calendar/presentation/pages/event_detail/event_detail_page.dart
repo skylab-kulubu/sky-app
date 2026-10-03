@@ -269,7 +269,10 @@ class _EventDetailPageState extends EventDetailPagemodel {
           eventId: event.id,
           child: ClipRRect(
             borderRadius: AppRadiuses.cardBorderRadius,
-            child: CoverImage(imageUrl: event.coverImageUrl),
+            child: CoverImage(
+              imageUrl: event.coverPageUrl,
+              placeholderUrl: event.coverCardUrl,
+            ),
           ),
         ),
         builder: (context, child) {

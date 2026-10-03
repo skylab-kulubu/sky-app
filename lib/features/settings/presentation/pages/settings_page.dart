@@ -52,7 +52,7 @@ class _SettingsPageState extends SettingsPagemodel {
             AccountTile(
               name: user.name,
               username: user.usernameDisplay,
-              imageUrl: user.profilePictureUrl,
+              imageUrl: user.avatarUrl,
               onTap: onAccountTap,
             ),
           const SectionHeader('Tercihler'),

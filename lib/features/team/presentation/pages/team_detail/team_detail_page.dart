@@ -397,7 +397,7 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
             children: [
               UserAvatar(
                 name: member.name,
-                imageUrl: member.profilePictureUrl,
+                imageUrl: member.avatarUrl,
                 size: _memberAvatarSize,
               ),
               const SizedBox(width: AppSizes.bigSpace),

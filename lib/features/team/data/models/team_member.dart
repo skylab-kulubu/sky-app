@@ -1,3 +1,5 @@
+import 'package:sky_app/core/models/image_sizes.dart';
+
 /// Ekibin herkese açık üyesi (core `/v1/teams/{team}/members`).
 class TeamMember {
   const TeamMember({
@@ -7,11 +9,16 @@ class TeamMember {
     required this.linkedin,
     required this.department,
     required this.isLeader,
+    this.profilePictureSizes = ImageSizes.none,
   });
 
   final String firstName;
   final String lastName;
   final String profilePictureUrl;
+  final ImageSizes profilePictureSizes;
+
+  /// Avatar küçük çiziliyor; `card` boyutu yetiyor.
+  String get avatarUrl => profilePictureSizes.cardOr(profilePictureUrl);
 
   /// Kayıtta şemasız gelebiliyor (`linkedin.com/in/...`); [linkedinUrl]
   /// tamamlanmış hâlini veriyor.
@@ -27,6 +34,7 @@ class TeamMember {
       linkedin: (json['linkedin'] as String? ?? '').trim(),
       department: (json['department'] as String? ?? '').trim(),
       isLeader: json['leader'] == true,
+      profilePictureSizes: ImageSizes.fromJson(json['profilePictureSizes']),
     );
   }
 

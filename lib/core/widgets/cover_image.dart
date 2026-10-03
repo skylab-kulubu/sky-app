@@ -10,9 +10,14 @@ import 'package:sky_app/core/widgets/app_icon.dart';
 /// Kaynak hem uygulama içi asset hem uzak URL olabildiği için yolun biçimine
 /// göre doğru yükleyici seçilir; boş ya da hatalı kaynakta nötr bir simge.
 class CoverImage extends StatelessWidget {
-  const CoverImage({super.key, required this.imageUrl});
+  const CoverImage({super.key, required this.imageUrl, this.placeholderUrl});
 
   final String imageUrl;
+
+  /// Asıl görsel inene kadar gösterilen, genelde önbellekte hazır duran
+  /// küçük boyut (listedeki `card`). Detaya geçerken görsel boş zemine
+  /// düşmeden netleşiyor.
+  final String? placeholderUrl;
 
   static const String _assetPrefix = 'assets/';
 
@@ -51,7 +56,7 @@ class CoverImage extends StatelessWidget {
       imageUrl: imageUrl,
       fit: BoxFit.cover,
       memCacheWidth: decodeWidth,
-      placeholder: (context, _) => ColoredBox(color: context.tileColor),
+      placeholder: (context, _) => _placeholder(context, decodeWidth),
       errorBuilder: (context, _, _) => _fallback(context),
     );
   }
@@ -62,6 +67,20 @@ class CoverImage extends StatelessWidget {
     final size = MediaQuery.sizeOf(context).width;
     final ratio = MediaQuery.devicePixelRatioOf(context);
     return (size * ratio).round();
+  }
+
+  Widget _placeholder(BuildContext context, int decodeWidth) {
+    final url = placeholderUrl;
+    if (url == null || url.trim().isEmpty || url == imageUrl) {
+      return ColoredBox(color: context.tileColor);
+    }
+    return CachedNetworkImage(
+      imageUrl: url,
+      fit: BoxFit.cover,
+      memCacheWidth: decodeWidth,
+      placeholder: (context, _) => ColoredBox(color: context.tileColor),
+      errorBuilder: (context, _, _) => ColoredBox(color: context.tileColor),
+    );
   }
 
   /// Görsel yüklenemezse kırık ikon yerine nötr bir simge gösterilir.

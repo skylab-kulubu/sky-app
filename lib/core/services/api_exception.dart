@@ -39,6 +39,9 @@ class ApiException implements Exception {
     this.message,
     this.serverMessage,
     this.userText,
+    this.code,
+    this.retryAfter,
+    this.details = const {},
   });
 
   factory ApiException.fromDio(DioException error) {
@@ -56,11 +59,17 @@ class ApiException implements Exception {
       DioExceptionType.unknown => ApiErrorType.unknown,
     };
 
+    final problem = _problem(error.response?.data);
+    final code = problem['code'];
+
     return ApiException(
       type,
       statusCode: statusCode,
       message: error.message,
-      serverMessage: _problemText(error.response?.data),
+      serverMessage: _problemText(problem),
+      code: code is String && code.isNotEmpty ? code : null,
+      retryAfter: _retryAfter(error.response, problem),
+      details: problem,
     );
   }
 
@@ -91,6 +100,19 @@ class ApiException implements Exception {
   /// yükleme gibi) kullanılıyor.
   final String? userText;
 
+  /// problem+json'daki sabit hata kodu (`media_too_large` gibi). Core'un
+  /// bazı uçları veriyor; varsa dallanma önce buna, sonra [statusCode]'a
+  /// bakmalı. Kullanıcıya gösterilmiyor.
+  final String? code;
+
+  /// Ne kadar beklendikten sonra yeniden denenebileceği: `Retry-After`
+  /// başlığı, yoksa gövdedeki `retryAfterSeconds`.
+  final Duration? retryAfter;
+
+  /// problem+json gövdesinin tamamı; koda özel ek alanlar (`maxBytes`,
+  /// `limit` …) buradan okunuyor. Gövde yoksa boş.
+  final Map<String, Object?> details;
+
   /// Hata kullanıcının oturumundan değil bağlantıdan kaynaklanıyorsa true.
   /// Oturumun korunup korunmayacağına bu ayrım karar veriyor.
   bool get isConnectivityIssue =>
@@ -117,27 +139,44 @@ class ApiException implements Exception {
     return ApiErrorType.unknown;
   }
 
-  /// problem+json gövdesinden açıklamayı çıkarır; başka biçimde `null`.
-  static String? _problemText(Object? data) {
+  /// Yanıt gövdesini problem+json nesnesi olarak çözer; başka biçimde boş.
+  static Map<String, Object?> _problem(Object? data) {
     Object? body = data;
     if (body is String && body.isNotEmpty) {
       try {
         body = jsonDecode(body);
       } catch (_) {
-        return null;
+        return const {};
       }
     }
-    if (body is! Map) return null;
+    if (body is! Map) return const {};
+    return {for (final entry in body.entries) '${entry.key}': entry.value};
+  }
 
-    final detail = body['detail'];
+  /// Gövdeden açıklama (`detail`, yoksa `title`); yoksa `null`.
+  static String? _problemText(Map<String, Object?> problem) {
+    final detail = problem['detail'];
     if (detail is String && detail.isNotEmpty) return detail;
-    final title = body['title'];
+    final title = problem['title'];
     return title is String && title.isNotEmpty ? title : null;
+  }
+
+  /// `Retry-After` saniye olarak geliyor; tarih biçimi kullanılmıyor.
+  static Duration? _retryAfter(
+    Response<dynamic>? response,
+    Map<String, Object?> problem,
+  ) {
+    final header = int.tryParse(
+      response?.headers.value('retry-after')?.trim() ?? '',
+    );
+    final seconds = header ?? (problem['retryAfterSeconds'] as num?)?.toInt();
+    return seconds == null || seconds < 0 ? null : Duration(seconds: seconds);
   }
 
   @override
   String toString() =>
       'ApiException($type'
       '${statusCode == null ? '' : ', $statusCode'}'
+      '${code == null ? '' : ', $code'}'
       '${serverMessage == null ? '' : ', $serverMessage'})';
 }

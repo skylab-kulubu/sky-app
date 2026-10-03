@@ -46,7 +46,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
 
   /// Düzenlenen etkinliğin mevcut kapağı; yeni görsel seçilmediyse
   /// önizlemede bu görünüyor.
-  String get currentCoverUrl => _editing?.coverImageUrl ?? '';
+  String get currentCoverUrl => _editing?.coverPageUrl ?? '';
 
   List<Season> seasons = const [];
   Season? season;

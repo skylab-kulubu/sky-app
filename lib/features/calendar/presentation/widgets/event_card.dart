@@ -110,7 +110,7 @@ class _EventCardState extends State<EventCard> {
         eventId: event.id,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppRadiuses.innerTile),
-          child: CoverImage(imageUrl: event.coverImageUrl),
+          child: CoverImage(imageUrl: event.coverCardUrl),
         ),
       ),
     );

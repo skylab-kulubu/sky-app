@@ -1,3 +1,5 @@
+import 'package:sky_app/core/models/image_sizes.dart';
+
 class User {
   final String id;
   final String name;
@@ -39,7 +41,11 @@ class User {
   final String schoolEmail;
   final String faculty;
   final String profilePictureUrl;
+  final ImageSizes profilePictureSizes;
   final String linkedin;
+
+  /// Avatar küçük çiziliyor; `card` boyutu yetiyor.
+  String get avatarUrl => profilePictureSizes.cardOr(profilePictureUrl);
 
   /// Öğrenci kartı SkyPass'e eşlenmiş mi (core `studentCardLinked`). Kartın
   /// numarası gizli, yalnızca bu bilgi geliyor.
@@ -60,6 +66,7 @@ class User {
     this.schoolEmail = '',
     this.faculty = '',
     this.profilePictureUrl = '',
+    this.profilePictureSizes = ImageSizes.none,
     this.linkedin = '',
     this.studentCardLinked = false,
     this.groups = const [],
@@ -110,6 +117,7 @@ class User {
       schoolEmail: data['schoolEmail'] ?? '',
       faculty: data['faculty'] ?? '',
       profilePictureUrl: data['profilePictureUrl'] ?? '',
+      profilePictureSizes: ImageSizes.fromJson(data['profilePictureSizes']),
       linkedin: data['linkedin'] ?? '',
       studentCardLinked: data['studentCardLinked'] == true,
     );
@@ -141,6 +149,8 @@ class User {
       schoolEmail: pick(profile.schoolEmail, schoolEmail),
       faculty: pick(profile.faculty, faculty),
       profilePictureUrl: pick(profile.profilePictureUrl, profilePictureUrl),
+      // JWT'de karşılığı yok; profil API'si neyse o.
+      profilePictureSizes: profile.profilePictureSizes,
       linkedin: pick(profile.linkedin, linkedin),
       // JWT'de karşılığı yok; profil API'si neyse o.
       studentCardLinked: profile.studentCardLinked,

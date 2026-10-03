@@ -1,5 +1,6 @@
 import 'dart:ui' show Color;
 
+import 'package:sky_app/core/models/image_sizes.dart';
 import 'package:sky_app/core/extensions/date_time_extensions.dart';
 
 class EventModel {
@@ -47,6 +48,7 @@ class EventModel {
     this.attendanceRatio,
     this.doorStaffIds = const [],
     this.coverColors = const [],
+    this.coverImageSizes = ImageSizes.none,
   });
 
   /// Etkinliğin LinkedIn gönderisi; düzenleme formu için.
@@ -81,6 +83,15 @@ class EventModel {
   /// cihazda hesaplanıyor.
   final List<Color> coverColors;
 
+  /// Kapağın küçük boyutları; listede [coverCardUrl], detayda
+  /// [coverPageUrl]. Renk paleti ve kimlik için asıl adres
+  /// ([coverImageUrl]) kullanılıyor.
+  final ImageSizes coverImageSizes;
+
+  String get coverCardUrl => coverImageSizes.cardOr(coverImageUrl);
+
+  String get coverPageUrl => coverImageSizes.pageOr(coverImageUrl);
+
   /// Core `EventResponse`'u (`/v1/events`).
   factory EventModel.fromJson(Map<String, dynamic> json) {
     return EventModel(
@@ -110,6 +121,7 @@ class EventModel {
         for (final hex in json['coverColors'] as List<dynamic>? ?? const [])
           ?_parseHex(hex),
       ],
+      coverImageSizes: ImageSizes.fromJson(json['coverImageSizes']),
     );
   }
 

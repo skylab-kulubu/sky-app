@@ -71,7 +71,7 @@ class _UpcomingEventTileState extends State<UpcomingEventTile> {
         child: SizedBox(
           width: AppSizes.thumbnail,
           height: AppSizes.thumbnail,
-          child: CoverImage(imageUrl: event.coverImageUrl),
+          child: CoverImage(imageUrl: event.coverCardUrl),
         ),
       ),
     );

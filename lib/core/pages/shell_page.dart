@@ -179,7 +179,7 @@ class _ShellPageState extends ShellPagemodel {
               final user = context.watch<UserProvider>().user;
               return UserAvatar(
                 name: user?.name ?? '',
-                imageUrl: user?.profilePictureUrl,
+                imageUrl: user?.avatarUrl,
               );
             },
           ),
