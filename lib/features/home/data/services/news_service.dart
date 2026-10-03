@@ -12,17 +12,22 @@ import 'package:sky_app/features/home/data/models/news_item.dart';
 /// kullanıcılar bütün haberleri oluşturup düzenleyebiliyor. Silme
 /// endpoint'i yok.
 ///
-/// Koleksiyon adı büyük harfle (`News`); yanıtlar `{data: ...}` zarfında
-/// değil.
+/// Koleksiyon anahtarı küçük harf (`news`; 28 Eylül'de CMS inscribed'a
+/// geçti, `News` artık 404). Yanıtlar `{data: ...}` zarfında değil.
 class NewsService {
   final Dio _dio = ApiClient.instance.dio;
 
-  static const String _path = '/api/cms/collections/News';
+  static const String _path = '/api/cms/collections/news';
   static const int _pageLimit = 100;
 
   Future<List<NewsItem>> fetchNews() async {
     final body = await _request(
-      () => _dio.get<dynamic>(_path, queryParameters: {'limit': _pageLimit}),
+      // Varsayılan sıra slug'a göre alfabetik; en yeniler önce gelsin, 100'ü
+      // aşınca da yeniler kesilmesin. Tanımsız parametre CMS'te 400 alıyor.
+      () => _dio.get<dynamic>(
+        _path,
+        queryParameters: {'limit': _pageLimit, 'sort': 'createdAt:desc'},
+      ),
     );
     final items = body['items'];
     if (items is! List) {

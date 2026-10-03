@@ -17,11 +17,11 @@ class TeamService {
 
   /// SkyCMS'teki ekipler. Giriş gerektirmiyor.
   ///
-  /// Koleksiyon adı büyük harfle başlamalı (`Teams`); küçük harfle CMS 400
-  /// dönüyor. Yanıt zarfsız: `{items, total, offset, limit}`.
+  /// Koleksiyon anahtarı küçük harf (`teams`; CMS inscribed'a geçtiğinden
+  /// beri `Teams` 404). Yanıt zarfsız: `{items, total, offset, limit}`.
   Future<List<Team>> fetchTeams() async {
     final body = await _getJson(
-      '/api/cms/collections/Teams',
+      '/api/cms/collections/teams',
       query: {'limit': _pageLimit},
     );
 
@@ -46,7 +46,7 @@ class TeamService {
   /// sürümle başlanırsa kayıt 409 alır. Token'la yapılan istek CMS'te
   /// önbelleğe alınmıyor.
   Future<Team> fetchTeam(String slug) async {
-    final body = await _getJson('/api/cms/collections/Teams/$slug');
+    final body = await _getJson('/api/cms/collections/teams/$slug');
     return Team.fromJson(body);
   }
 
@@ -59,7 +59,7 @@ class TeamService {
     final Response<dynamic> response;
     try {
       response = await _dio.put<dynamic>(
-        '/api/cms/collections/Teams/${team.slug}',
+        '/api/cms/collections/teams/${team.slug}',
         data: {'data': team.toCmsData(), 'version': team.version},
       );
     } catch (e) {
