@@ -408,24 +408,63 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Başvurunun açık olup olmadığı; katılım butonunun sayfa içindeki
-  /// karşılığı, kullanıcının aşağı inmeden görmesi için.
+  /// Etkinliğin başvuruya göre durumu; katılım butonunun sayfa içindeki
+  /// karşılığı, kullanıcının aşağı inmeden görmesi için. İptal edilen
+  /// etkinlikte sebep de altında yazıyor.
   Widget _statusRow(BuildContext context) {
-    final open = event.active;
+    final (icon, color, text) = switch (event.phase) {
+      EventPhase.open => (
+        AppIcons.checkCircle,
+        AppColors.green,
+        'Başvurular açık',
+      ),
+      EventPhase.closed => (
+        AppIcons.clock,
+        AppColors.orange,
+        'Başvurular kapalı',
+      ),
+      EventPhase.ended => (
+        AppIcons.clock,
+        AppColors.onCoverMuted,
+        'Etkinlik sona erdi',
+      ),
+      EventPhase.draft => (
+        AppIcons.edit,
+        AppColors.orange,
+        'Taslak, henüz yayınlanmadı',
+      ),
+      EventPhase.cancelled => (
+        AppIcons.closeCircle,
+        AppColors.red,
+        'Etkinlik iptal edildi',
+      ),
+    };
+    final reason = event.isCancelled ? event.cancelReason.trim() : '';
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppIcon(
-          open ? AppIcons.checkCircle : AppIcons.clock,
-          size: AppSizes.iconMedium,
-          color: open ? AppColors.green : AppColors.orange,
-        ),
+        AppIcon(icon, size: AppSizes.iconMedium, color: color),
         const SizedBox(width: AppSizes.bigSpace),
-        Text(
-          open ? 'Başvurular açık' : 'Başvurular henüz açılmadı',
-          style: context.textTheme.bodyLarge?.copyWith(
-            color: open ? AppColors.green : AppColors.orange,
-            fontWeight: FontWeight.w500,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                text,
+                style: context.textTheme.bodyLarge?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              if (reason.isNotEmpty)
+                Text(
+                  reason,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.onCoverMuted,
+                  ),
+                ),
+            ],
           ),
         ),
       ],
@@ -619,7 +658,7 @@ class _EventDetailPageState extends EventDetailPagemodel {
   /// Renkleri açıkça veriliyor: butonun varsayılanları temaya bağlı, sayfa
   /// ise temadan bağımsız koyu.
   Widget _joinBar(BuildContext context) {
-    final enabled = event.active;
+    final enabled = event.phase == EventPhase.open;
 
     return SafeArea(
       minimum: AppPaddings.mainPaddingAll,
@@ -634,7 +673,7 @@ class _EventDetailPageState extends EventDetailPagemodel {
         textColor: enabled
             ? AppColors.skyPassForeground
             : AppColors.onCoverFaint,
-        // Başvuruya kapalı etkinlikte buton pasif kalıyor.
+        // Başvuru alınmayan etkinlikte (bitmiş, iptal, taslak) buton pasif.
         onPressed: enabled ? onJoinPressed : null,
       ),
     );

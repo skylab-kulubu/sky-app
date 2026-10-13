@@ -14,7 +14,6 @@ class EventDraft {
     required this.ownerTeam,
     required this.startDate,
     required this.endDate,
-    required this.active,
     required this.description,
     required this.formUrl,
     required this.linkedin,
@@ -27,7 +26,6 @@ class EventDraft {
   final String ownerTeam;
   final DateTime startDate;
   final DateTime endDate;
-  final bool active;
   final String description;
   final String formUrl;
   final String linkedin;
@@ -129,7 +127,6 @@ class EventCreateService {
     'ownerTeam': draft.ownerTeam,
     'startDate': draft.startDate.toApiString(),
     'endDate': draft.endDate.toApiString(),
-    'active': draft.active,
     'description': draft.description,
     'formUrl': draft.formUrl,
     'linkedin': draft.linkedin,

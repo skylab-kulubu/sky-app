@@ -14,7 +14,6 @@ import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/services/media_service.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/cover_picker.dart';
-import 'package:sky_app/core/widgets/icon_circle.dart';
 import 'package:sky_app/core/widgets/section_header.dart';
 import 'package:sky_app/core/widgets/settings_tile.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
@@ -195,7 +194,6 @@ class _EventCreatePageState extends EventCreatePagemodel {
           value: capacity > 0 ? '$capacity kişi' : 'Sınırsız',
           onTap: onEditCapacity,
         ),
-        _activeRow(context),
         // Program ayrı sayfada; yalnızca var olan etkinlikte (günler
         // etkinliğe bağlanıyor).
         if (isEditing)
@@ -206,31 +204,6 @@ class _EventCreatePageState extends EventCreatePagemodel {
             onTap: onEditSchedule,
           ),
       ],
-    );
-  }
-
-  Widget _activeRow(BuildContext context) {
-    return Padding(
-      padding: AppPaddings.settingsTile,
-      child: Row(
-        children: [
-          IconCircle(icon: AppIcons.ticket, color: AppColors.green),
-          const SizedBox(width: AppSizes.bigSpace),
-          Expanded(
-            child: Text(
-              'Başvurular açık',
-              style: context.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
-          Switch.adaptive(
-            value: isActive,
-            activeTrackColor: context.accentColor,
-            onChanged: onActiveChanged,
-          ),
-        ],
-      ),
     );
   }
 }

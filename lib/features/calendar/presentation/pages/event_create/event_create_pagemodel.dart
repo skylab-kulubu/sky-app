@@ -53,7 +53,6 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
   late bool isLoadingSeasons = canChooseSeason;
 
   int capacity = 0;
-  bool isActive = true;
   bool isSaving = false;
   bool isDeleting = false;
 
@@ -69,7 +68,6 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       descriptionController.text = event.description;
       formUrlController.text = event.formUrl;
       linkedinController.text = event.linkedin;
-      isActive = event.active;
       capacity = event.capacity;
       final start = event.startDateTime;
       final end = event.endDateTime;
@@ -132,8 +130,6 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       endDate.isAfter(startDate);
 
   void onFormChanged() => setState(() {});
-
-  void onActiveChanged(bool value) => setState(() => isActive = value);
 
   Future<void> onPickCover() async {
     try {
@@ -274,7 +270,6 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
         ownerTeam: ownerTeam,
         startDate: startDate,
         endDate: endDate,
-        active: isActive,
         description: descriptionController.text.trim(),
         formUrl: formUrlController.text.trim(),
         linkedin: linkedinController.text.trim(),
@@ -356,6 +351,9 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       setState(() => isDeleting = false);
       _showMessage(switch (error.statusCode) {
         403 => 'Bu etkinliği silme yetkin yok.',
+        // Core yayınlanmış ya da bileti olan etkinliği sildirmiyor
+        // (`event_not_draft`, `event_has_tickets`).
+        409 => 'Bu etkinlik artık silinemiyor.',
         _ => error.userMessage,
       });
     }

@@ -3,6 +3,24 @@ import 'dart:ui' show Color;
 import 'package:sky_app/core/models/image_sizes.dart';
 import 'package:sky_app/core/extensions/date_time_extensions.dart';
 
+/// Etkinliğin başvuruya göre durumu (bkz. [EventModel.phase]).
+enum EventPhase {
+  /// Yayında ve bitmemiş: başvuru alınıyor.
+  open,
+
+  /// Yayında, bitmemiş ama başvuru kapalı (core'a elle kapatma gelince).
+  closed,
+
+  /// Etkinlik bitti.
+  ended,
+
+  /// Henüz yayınlanmamış; yalnızca düzenleyebilenler görüyor.
+  draft,
+
+  /// İptal edildi; görünür kalıyor.
+  cancelled,
+}
+
 class EventModel {
   final String id;
   final String name;
@@ -49,6 +67,8 @@ class EventModel {
     this.doorStaffIds = const [],
     this.coverColors = const [],
     this.coverImageSizes = ImageSizes.none,
+    this.status = '',
+    this.cancelReason = '',
   });
 
   /// Etkinliğin LinkedIn gönderisi; düzenleme formu için.
@@ -88,6 +108,40 @@ class EventModel {
   /// ([coverImageUrl]) kullanılıyor.
   final ImageSizes coverImageSizes;
 
+  /// Core'un etkinlik durumu (ADR 0066): `draft`, `published`,
+  /// `cancelled`. Alan gelmezse (eski yanıt) yayında sayılıyor.
+  final String status;
+
+  /// İptal edilen etkinlikte core'un verdiği sebep; yoksa boş.
+  final String cancelReason;
+
+  bool get isDraft => status == 'draft';
+
+  bool get isCancelled => status == 'cancelled';
+
+  /// Etkinlik bitti mi; core'un `active` hesabındaki kuralın aynısı: bitiş
+  /// `endDate`, yoksa başlangıçtan [_undatedEndsAfter] sonra. Tarihsiz
+  /// etkinlik hiç bitmez.
+  bool get hasEnded {
+    final end = endDateTime ?? startDateTime?.add(_undatedEndsAfter);
+    return end != null && !end.isAfter(DateTime.now());
+  }
+
+  static const Duration _undatedEndsAfter = Duration(hours: 24);
+
+  /// Başvuru açısından etkinliğin durumu; detay sayfasındaki durum satırı
+  /// ve katılım butonu buna göre yazılıyor.
+  ///
+  /// [active] artık elle ayarlanmıyor, core hesaplıyor (yayında ve
+  /// bitmemiş). Kapalı olmasının nedenini ayırt etmek için durum ve tarih
+  /// ayrıca okunuyor.
+  EventPhase get phase {
+    if (isCancelled) return EventPhase.cancelled;
+    if (isDraft) return EventPhase.draft;
+    if (active) return EventPhase.open;
+    return hasEnded ? EventPhase.ended : EventPhase.closed;
+  }
+
   String get coverCardUrl => coverImageSizes.cardOr(coverImageUrl);
 
   String get coverPageUrl => coverImageSizes.pageOr(coverImageUrl);
@@ -122,6 +176,8 @@ class EventModel {
           ?_parseHex(hex),
       ],
       coverImageSizes: ImageSizes.fromJson(json['coverImageSizes']),
+      status: json['status'] as String? ?? '',
+      cancelReason: json['cancelReason'] as String? ?? '',
     );
   }
 

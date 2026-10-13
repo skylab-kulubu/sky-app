@@ -145,7 +145,13 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     setState(() => backdropTints = tints);
   }
 
-  String get joinButtonLabel => event.active ? 'Katıl' : 'Başvuru Kapalı';
+  String get joinButtonLabel => switch (event.phase) {
+    EventPhase.open => 'Katıl',
+    EventPhase.closed => 'Başvuru Kapalı',
+    EventPhase.ended => 'Etkinlik Bitti',
+    EventPhase.draft => 'Yayında Değil',
+    EventPhase.cancelled => 'İptal Edildi',
+  };
 
   /// Etkinliği sistem paylaşım sayfasıyla paylaşır.
   ///
