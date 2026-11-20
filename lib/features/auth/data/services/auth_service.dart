@@ -12,10 +12,8 @@ import 'package:sky_app/core/services/core_api.dart';
 import 'package:sky_app/features/auth/data/models/user.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Keycloak ile konuşan oturum servisi.
-///
-/// Tek örnek: hem `UserProvider` hem de [ApiClient]'ın token kaynağı aynı
-/// nesneyi kullanıyor, böylece yenileme tek yerden yürüyor.
+/// Keycloak ile konuşan oturum servisi. Tek örnek: `UserProvider` ve
+/// [ApiClient] aynı nesneyi kullanıyor, yenileme tek yerden yürüyor.
 class AuthService implements TokenProvider {
   AuthService._();
 
@@ -26,9 +24,9 @@ class AuthService implements TokenProvider {
   final FlutterAppAuth _appAuth = FlutterAppAuth();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
-  /// Keycloak istekleri [ApiClient]'tan geçmiyor: yenileme isteğinin kendisi
-  /// 401 alsaydı interceptor tekrar yenilemeye girerdi. Timeout'lar yine de
-  /// gerekli — yoksa yanıt vermeyen sunucu splash'i süresiz kilitliyor.
+  /// Keycloak istekleri [ApiClient]'tan geçmiyor: yenileme isteği 401 alırsa
+  /// interceptor tekrar yenilemeye girerdi. Timeout'lar şart; yanıt vermeyen
+  /// sunucu splash'i kilitliyordu.
   final Dio _authDio = Dio(
     BaseOptions(
       connectTimeout: ApiClient.connectTimeout,
@@ -81,15 +79,12 @@ class AuthService implements TokenProvider {
     return await launchUrl(authUri, webOnlyWindowName: '_self');
   }
 
-  /// Giriş ve çıkışın açıldığı tarayıcı. Yalnızca iOS'u etkiliyor; Android
-  /// her durumda varsayılan tarayıcının Custom Tabs'ını kullanıyor.
+  /// Giriş ve çıkışın açıldığı tarayıcı (yalnız iOS; Android hep varsayılan
+  /// tarayıcının Custom Tabs'ı).
   ///
-  /// iOS'ta varsayılan `ASWebAuthenticationSession` Keycloak çerezini
-  /// Safari'ye yazıyor. Kulüp siteleri ise uygulama içinde
-  /// `SFSafariViewController` ile açılıyor ve onun uygulamaya özel ayrı bir
-  /// deposu var; çerezi göremiyor, otomatik giriş olmuyordu. Giriş de aynı
-  /// yerde yapılınca siteler oturumu buluyor. Çıkış da aynı yerden yapılmalı,
-  /// yoksa çerez kalır ve siteler çıkış yapmış kullanıcıyı içeri alır.
+  /// `ASWebAuthenticationSession` çerezi Safari'ye yazıyor, kulüp siteleri ise
+  /// `SFSafariViewController`'da ve onun ayrı deposu var; otomatik giriş
+  /// olmuyordu. Çıkış da aynı yerden yapılmalı, yoksa çerez kalır.
   static const ExternalUserAgent _externalUserAgent =
       ExternalUserAgent.sfSafariViewController;
 
@@ -212,12 +207,9 @@ class AuthService implements TokenProvider {
     }
   }
 
-  /// Yetkilendirme hatasının kalıcı mı geçici mi olduğunu ayırır.
-  ///
-  /// Kesin ret sayılanlar OAuth 2.0'ın tanımladığı hata kodları; ağ, timeout
-  /// ve 5xx geçici kabul edilip oturum korunuyor. Tanımadığımız bir hatada da
-  /// oturum korunuyor: gerçekten geçersizse bir sonraki istek zaten 401
-  /// döndürüp kullanıcıyı giriş ekranına düşürecek.
+  /// Yetki hatasının kalıcı mı geçici mi olduğunu ayırır. Kesin ret yalnızca
+  /// OAuth 2.0 hata kodları; ağ, timeout, 5xx ve tanınmayan hatada oturum
+  /// korunuyor (gerçekten geçersizse sonraki istek 401 alır).
   RefreshOutcome _classifyAuthFailure(Object error) {
     if (error is DioException) {
       final apiError = ApiException.fromDio(error);
@@ -292,10 +284,8 @@ class AuthService implements TokenProvider {
     }
   }
 
-  /// Yerel oturumu siler; Keycloak'a hiç gitmez.
-  ///
-  /// Çevrimdışıyken kullanıcıyı giriş ekranına döndürmek için gerekli:
-  /// [logout] tarayıcı açtığı için bağlantısız çalışmıyor.
+  /// Yerel oturumu siler, Keycloak'a gitmez: çevrimdışıyken girişe dönmek için
+  /// ([logout] tarayıcı açtığı için bağlantısız çalışmıyor).
   Future<void> clearSession() => _storage.deleteAll();
 
   Future<void> _saveTokens(String? access, String? refresh, String? id) async {
@@ -307,11 +297,9 @@ class AuthService implements TokenProvider {
   @override
   Future<String?> readAccessToken() => _storage.read(key: _accessTokenKey);
 
-  /// Oturumdaki kullanıcıyı kurar.
-  ///
-  /// Roller yalnızca JWT'de olduğu için temel nesne token'dan kuruluyor;
-  /// profil API'si erişilebilirse üzerine uygulanıyor. API'ye ulaşılamaması
-  /// oturumu geçersiz kılmaz, sadece ek alanlar boş kalır.
+  /// Oturumdaki kullanıcıyı kurar: roller yalnız JWT'de olduğu için temel nesne
+  /// token'dan, profil API'si erişilebilirse üzerine. API'ye ulaşılamaması
+  /// oturumu geçersiz kılmıyor.
   Future<User?> getUser() async {
     final token = await readAccessToken();
     if (token == null) return null;

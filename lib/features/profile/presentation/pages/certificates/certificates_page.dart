@@ -21,9 +21,8 @@ import 'package:sky_app/features/profile/presentation/widgets/certificate_tile.d
 
 part 'certificates_pagemodel.dart';
 
-/// Kullanıcının katılım sertifikaları. Core sertifikayı etkinliğin katılım
-/// kuralına göre veriyor. Geçerli ve iptal edilmiş sertifikalar birlikte
-/// listeleniyor; dokununca PDF, doğrulama ve paylaşma işlemleri açılıyor.
+/// Katılım sertifikaları; geçerli ve iptal edilmişler birlikte. Dokununca
+/// PDF, doğrulama ve paylaşma.
 class CertificatesPage extends StatefulWidget {
   const CertificatesPage({super.key});
 

@@ -22,11 +22,8 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends AuthPagemodel {
-  /// Zemindeki renk parıltılarının yerleşimi.
-  ///
-  /// Hepsi üst yarıda toplanıyor: parıltı logonun çevresinde yoğunlaşıp
-  /// aşağı doğru sönüyor. Alt yarıya yayıldığında metin ve buton renkli bir
-  /// bulutun üstünde kalıyor, sayfa dengesini kaybediyordu.
+  /// Parıltılar üst yarıda: alta yayılınca metin ve buton renkli bir bulutun
+  /// üstünde kalıyordu.
   static const List<GlowSpot> _glowSpots = [
     (center: Alignment(-0.95, -0.85), radius: 0.85, opacity: 0.30),
     (center: Alignment(0.9, -0.6), radius: 0.8, opacity: 0.26),
@@ -34,11 +31,8 @@ class _AuthPageState extends AuthPagemodel {
     (center: Alignment(0.85, 0.1), radius: 0.7, opacity: 0.16),
   ];
 
-  /// Koyu temada parıltının kısıldığı oran.
-  ///
-  /// Aynı opaklık siyah zeminde renkleri hızla doyuruyor ve sayfa kirli bir
-  /// renk bulutuna dönüyor; beyaz zeminde ise pastel bir yıkama olarak
-  /// kalıyor.
+  /// Koyu temada parıltının kısıldığı oran; aynı opaklık siyah zeminde renkleri
+  /// hızla doyuruyor.
   static const double _darkGlowScale = 0.35;
 
   double _glowIntensity(BuildContext context) =>
@@ -68,9 +62,7 @@ class _AuthPageState extends AuthPagemodel {
                 children: [
                   const Spacer(flex: 4),
                   _logo(context),
-                  // Esnek boşluk logo ile metnin arasında: başlık bloğu
-                  // butonun hemen üstünde duruyor, ikisi bir grup gibi
-                  // okunuyor.
+                  // Esnek boşluk logo ile metin arasında; başlık ve buton bir grup gibi okunuyor.
                   const Spacer(flex: 2),
                   _heading(context),
                   const SizedBox(height: AppSizes.sectionSpace),
@@ -85,11 +77,8 @@ class _AuthPageState extends AuthPagemodel {
     );
   }
 
-  /// Parıltının alt yarıda tamamen sönmesini sağlayan örtü.
-  ///
-  /// Lekeler üst yarıda toplanmış olsa da kenarları aşağı sızıyor; bu örtü
-  /// sayfanın alt bölgesini düz zemin rengine indiriyor, böylece başlık ve
-  /// buton sakin bir zeminde duruyor.
+  /// Parıltının kenarları aşağı sızıyor; bu örtü alt bölgeyi düz zemine
+  /// indiriyor, başlık ve buton sakin bir zeminde duruyor.
   Widget _glowFade(BuildContext context) {
     return Positioned.fill(
       child: IgnorePointer(
@@ -109,8 +98,6 @@ class _AuthPageState extends AuthPagemodel {
     );
   }
 
-  /// Kendini çizen logo. Zeminde dev bir doku olarak durmak yerine sayfanın
-  /// odağı: ortada, sınırlı boyutta ve marka renginde.
   Widget _logo(BuildContext context) {
     return SizedBox.square(
       dimension: AppSizes.authLogo,
@@ -118,9 +105,8 @@ class _AuthPageState extends AuthPagemodel {
     );
   }
 
-  /// İki satırlık başlık: üstte kulübün adı, altında ne olduğu. İkinci satır
-  /// birincinin soluk bir alt yazısı değil, onunla aynı ağırlıkta ve marka
-  /// renginde — cümleyi ikisi birlikte tamamlıyor.
+  /// İki satırlık başlık; ikinci satır alt yazı değil, aynı ağırlıkta ve marka
+  /// renginde.
   Widget _heading(BuildContext context) {
     return Column(
       children: [
@@ -146,11 +132,9 @@ class _AuthPageState extends AuthPagemodel {
     );
   }
 
-  /// Metni gökkuşağı geçişiyle boyar.
-  ///
-  /// [ShaderMask] geçişi metnin kendi kutusuna göre kuruyor, yani satır
-  /// sayısı değişse de renkler metne oturuyor. Verilen metin rengi shader
-  /// tarafından eziliyor ama opak olmalı: maske metnin alfasını kullanıyor.
+  /// Metni gökkuşağı geçişiyle boyar. [ShaderMask] geçişi metnin kutusuna göre
+  /// kurduğu için satır sayısı değişse de oturuyor. Metin rengi opak olmalı:
+  /// maske metnin alfasını kullanıyor.
   Widget _gradientText(
     BuildContext context,
     String text, {

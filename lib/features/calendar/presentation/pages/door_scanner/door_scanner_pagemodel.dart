@@ -1,6 +1,5 @@
 part of 'door_scanner_page.dart';
 
-/// Girişin nasıl alındığı: SkyPass QR'ı kamerayla ya da öğrenci kartı NFC ile.
 enum DoorMode { qr, card }
 
 abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
@@ -19,8 +18,7 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
 
   late final User? _user = context.read<UserProvider>().user;
 
-  /// Giriş alınabilecek, bitmemiş etkinlikler. Liste core'dan
-  /// (`/v1/door/events`); yetkiyi core hesaplıyor.
+  /// Giriş alınabilecek, bitmemiş etkinlikler (`/v1/door/events`).
   List<EventModel> events = const [];
   bool isLoadingEvents = true;
   ApiException? eventsError;
@@ -36,12 +34,10 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
   /// Seçili oturumda alınan toplam giriş; bilinmiyorsa `null`.
   int? sessionTotal;
 
-  /// Varsayılan öğrenci kartı: kapıda en hızlı yol, kamera izni de
-  /// istemiyor. QR'a geçilince kamera açılıyor. Öğrenci kartı kapalıyken
-  /// ([AppFeatures.studentCard]) yalnız QR.
+  /// Varsayılan öğrenci kartı: kapıda en hızlı yol ve kamera izni istemiyor.
+  /// Kart kapalıyken ([AppFeatures.studentCard]) yalnız QR.
   DoorMode mode = AppFeatures.studentCard ? DoorMode.card : DoorMode.qr;
 
-  /// NFC okuma ya da kartla giriş isteği sürüyor.
   bool isReadingCard = false;
 
   final NfcService _nfc = NfcService();
@@ -99,7 +95,6 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
 
   String get eventLabel => event?.name ?? 'Seç';
 
-  /// Oturum satırının alt yazısı: saat ve alınan giriş sayısı.
   String? get sessionSubtitle {
     final parts = [
       if (selected?.session.timeRange.isNotEmpty ?? false)
@@ -165,7 +160,6 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
     return _user?.canEditEvent(current.ownerTeam) ?? false;
   }
 
-  /// Programı açar; dönünce oturumları yeniden yükler.
   Future<void> onEditSchedule() async {
     final current = event;
     if (current == null) return;
@@ -216,7 +210,6 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
     _loadTotal();
   }
 
-  /// Seçili oturumdaki giriş sayısı; alınamazsa gösterilmiyor.
   Future<void> _loadTotal() async {
     final sessionId = selected?.session.id;
     if (sessionId == null) return;
@@ -229,8 +222,8 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
     }
   }
 
-  /// QR ile kart arasında geçer. Kart modunda kamera kapatılıyor; QR'a
-  /// dönünce okuyucu widget'ı kamerayı yeniden başlatıyor.
+  /// Kart modunda kamera kapatılıyor; QR'a dönünce okuyucu widget'ı yeniden
+  /// başlatıyor.
   Future<void> onModeChanged(DoorMode value) async {
     if (value == mode || isReadingCard) return;
     if (value == DoorMode.card) await scanner.stop();
@@ -295,8 +288,7 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
     }
   }
 
-  /// Kameranın gördüğü kod. Bir istek sürerken ya da aynı kod az önce
-  /// okunduysa yok sayılıyor.
+  /// Bir istek sürerken ya da aynı kod az önce okunduysa yok sayılıyor.
   Future<void> onDetect(BarcodeCapture capture) async {
     final raw = capture.barcodes.firstOrNull?.rawValue;
     final session = selected?.session;
@@ -331,8 +323,8 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
     }
   }
 
-  /// Başarılı girişte kimin girdiği görünüyor; görevli karşısındakinin o kişi
-  /// olduğunu teyit edebilsin. Sayaç da güncelleniyor.
+  /// Girenin adı görünüyor; görevli karşısındakinin o kişi olduğunu teyit
+  /// edebilsin.
   void _showSuccess(DoorCheckIn done) {
     if (done.total != null) setState(() => sessionTotal = done.total);
     _show(ScanResult(ScanResultKind.success, 'Giriş alındı', done.personName));

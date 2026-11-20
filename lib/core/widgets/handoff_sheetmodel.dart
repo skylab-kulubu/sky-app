@@ -95,10 +95,8 @@ abstract class HandoffSheetmodel extends State<HandoffSheet> {
     }
   }
 
-  /// Devir başarısız olursa WebView sabit bir hata sayfasına gidiyor
-  /// (yeni sözleşme) ya da Hesap Merkezi'nin giriş ekranına düşüyor (eski
-  /// uç). İkisinde de kullanıcı çıkmaza giriyor; kendi hata ekranımızı
-  /// gösterip yeniden denemesini sağlıyoruz.
+  /// Devir başarısız olunca WebView hata sayfasına ya da Hesap Merkezi'nin giriş
+  /// ekranına düşüyor; çıkmaz yerine kendi hata ekranımız ve yeniden dene.
   void _onUrlChange(String? url) {
     final uri = url == null ? null : Uri.tryParse(url);
     if (uri == null) return;

@@ -7,7 +7,6 @@ import 'package:sky_app/core/constants/app_paddings.dart';
 /// widget'lar bunlara `context` üzerinden erişir (bkz. context_extensions).
 /// [AppColors] yalnızca temadan bağımsız marka/vurgu renklerini tutar.
 
-//light theme
 ThemeData lightTheme = ThemeData(
   useMaterial3: true,
   fontFamily: 'Poppins',
@@ -54,9 +53,8 @@ ThemeData lightTheme = ThemeData(
     foregroundColor: AppColors.lightTextPrimary,
   ),
   progressIndicatorTheme: const ProgressIndicatorThemeData(
-    // Aşağı çekerek yenileme göstergesinin zemini. Varsayılanı canvasColor,
-    // yani sayfa zemininin ta kendisi; gösterge zeminde kayboluyor.
-    // Halkanın rengi ayrıca verilmiyor, varsayılan colorScheme.primary.
+    // Yenileme göstergesinin zemini; varsayılanı sayfa zemini olduğu için
+    // gösterge kayboluyordu.
     refreshBackgroundColor: AppColors.lightTileHigh,
   ),
   textTheme: const TextTheme(
@@ -69,7 +67,6 @@ ThemeData lightTheme = ThemeData(
   ),
 );
 
-//dark theme
 ThemeData darkTheme = ThemeData(
   useMaterial3: true,
   fontFamily: 'Poppins',

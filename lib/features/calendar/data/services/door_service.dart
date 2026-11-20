@@ -5,7 +5,6 @@ import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/data/models/event_session.dart';
 import 'package:sky_app/features/calendar/data/services/schedule_service.dart';
 
-/// Kapıdaki bir girişin sonucu: kimin girdiği ve oturumdaki toplam giriş.
 class DoorCheckIn {
   const DoorCheckIn({required this.personName, required this.total});
 
@@ -16,14 +15,12 @@ class DoorCheckIn {
   final int? total;
 }
 
-/// Kapıda giriş almanın ağ işleri (core): görevlinin etkinlikleri,
-/// oturumlar, SkyPass/öğrenci kartıyla giriş ve oturumun giriş kaydı.
+/// Kapıda giriş almanın ağ işleri: görevlinin etkinlikleri, oturumlar,
+/// SkyPass/kartla giriş ve oturumun giriş kaydı.
 class DoorService {
   final ScheduleService _schedule = ScheduleService();
 
-  /// Kullanıcının kapıda giriş alabildiği etkinlikler
-  /// (`GET /v1/door/events`). Yetkiyi core hesaplıyor; grubunda
-  /// `team_door_scan` açık ekiplerin üyeleri de dahil.
+  /// `GET /v1/door/events`: yetkiyi core hesaplıyor (`team_door_scan` dahil).
   Future<List<EventModel>> fetchDoorEvents() async {
     final body = await CoreApi.get('/door/events');
     return CoreApi.list(
@@ -32,8 +29,7 @@ class DoorService {
     ).map(EventModel.fromJson).where((e) => e.id.isNotEmpty).toList();
   }
 
-  /// Etkinliğin iptal edilmemiş bütün oturumları, günleriyle birlikte;
-  /// programdaki sırayla.
+  /// Etkinliğin iptal edilmemiş oturumları, programdaki sırayla.
   Future<List<({EventDay day, EventSession session})>> fetchSessions(
     String eventId,
   ) async {
@@ -45,12 +41,9 @@ class DoorService {
     ];
   }
 
-  /// SkyPass QR'ı (`{token}`) ya da öğrenci kartıyla (`{uid}`) oturuma
-  /// giriş; ardından girenin adını oturumun giriş kaydından alıyor.
-  ///
-  /// Hatalar `ApiException`: 409 zaten girmiş, 404 bu etkinlikte kaydı yok
-  /// (kartta: kart eşli değil de olabilir), 401 kodun süresi dolmuş ya da
-  /// imza geçersiz, 403 giriş alma yetkisi yok.
+  /// SkyPass QR'ı (`{token}`) ya da öğrenci kartıyla (`{uid}`) giriş; girenin
+  /// adı giriş kaydından. 409 zaten girmiş, 404 kaydı yok (kartta: eşli
+  /// değil de olabilir), 401 kod geçersiz, 403 yetki yok.
   Future<DoorCheckIn> checkIn(
     String sessionId, {
     String? token,
@@ -66,10 +59,9 @@ class DoorService {
     return _describe(sessionId, created['id'] as String? ?? '');
   }
 
-  /// Oturumun son girişlerinde bu girişi bulup adı döndürür. SkyPass kodu
-  /// kişinin adını taşımıyor, kart sorgusu ise yalnızca YK/DK/ADMIN'e açık;
-  /// giriş kaydı (`GET /v1/sessions/{id}/check-ins`) her görevliye açık.
-  /// Alınamazsa adsız dönüyor, giriş yine de alınmış sayılıyor.
+  /// Adı oturumun giriş kaydından bulur: SkyPass kodu adı taşımıyor, kart
+  /// sorgusu YK/DK/ADMIN'e özel, giriş kaydı her görevliye açık. Alınamazsa
+  /// adsız; giriş yine de alınmış sayılıyor.
   Future<DoorCheckIn> _describe(String sessionId, String checkInId) async {
     try {
       final activity = await sessionActivity(sessionId);
@@ -101,9 +93,8 @@ class DoorService {
     );
   }
 
-  /// QR'dan okunan değer SkyPass kodu mu: ES256 imzalı, konusu (`sub`)
-  /// kullanıcı id'si olan bir belirteç. Asıl doğrulama sunucuda; bu yalnızca
-  /// alakasız QR'ları (web adresi, bilet vb.) sunucuya göndermemek için.
+  /// SkyPass kodu mu: ES256 imzalı, `sub`'u kullanıcı id'si. Asıl doğrulama
+  /// sunucuda; bu yalnız alakasız QR'ları göndermemek için.
   static bool isSkyPassToken(String raw) {
     final parts = raw.trim().split('.');
     if (parts.length != 3) return false;

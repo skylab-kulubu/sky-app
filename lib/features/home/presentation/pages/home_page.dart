@@ -29,9 +29,8 @@ class _HomePageState extends HomePagemodel {
   @override
   void initState() {
     super.initState();
-    // Yaklaşan etkinlikler bölümü de aynı provider'dan besleniyor; sayfa
-    // kendi verisini istiyor. Çağrı idempotent, Etkinlikler sekmesiyle
-    // yarışması sorun değil.
+    // Yaklaşan etkinlikler de aynı provider'dan; çağrı idempotent, Etkinlikler
+    // sekmesiyle yarışması sorun değil.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       unawaited(context.read<EventProvider>().ensureLoaded());
@@ -83,8 +82,6 @@ class _HomePageState extends HomePagemodel {
     );
   }
 
-  /// Haberler SkyCMS'ten; yüklenirken gösterge, boşken ve hata olduğunda
-  /// yaklaşan etkinlik bölümüyle aynı düzende bilgi satırı.
   Widget _newsList() {
     final provider = context.watch<NewsProvider>();
 
@@ -173,8 +170,6 @@ class _HomePageState extends HomePagemodel {
     );
   }
 
-  /// Yaklaşan etkinlikler; hiç yoksa sayfa boş görünmesin diye bilgi kartı,
-  /// yüklenemediyse tekrar denenebilen hata satırı.
   Widget _upcomingEvents(BuildContext context) {
     final provider = context.watch<EventProvider>();
 
@@ -208,8 +203,8 @@ class _HomePageState extends HomePagemodel {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // İkon, tile'lardaki görselle aynı genişlikte bir alana ortalanıyor;
-          // böylece metinler alttaki haber başlıklarıyla aynı hizada başlıyor.
+          // İkon görsel genişliğinde bir alana ortalanıyor; metinler haber
+          // başlıklarıyla aynı hizada başlıyor.
           SizedBox(
             width: AppSizes.thumbnail,
             child: Center(
@@ -247,8 +242,7 @@ class _HomePageState extends HomePagemodel {
     );
   }
 
-  /// Etkinlikler yüklenemedi. Boş durumla aynı satır düzeninde duruyor ki
-  /// haber başlıklarıyla hizası bozulmasın.
+  /// Boş durumla aynı satır düzeninde; haber başlıklarıyla hiza bozulmasın.
   Widget _eventsError(
     BuildContext context,
     ApiException error,

@@ -131,35 +131,33 @@ class RouterManager {
     ],
   );
 
-  /// Bağlantının hedefi; giriş ya da splash sürerken saklanıyor, oturum
-  /// doğrulanınca oraya gidiliyor. Yoksa link soğuk açılışta `/home`'a
-  /// düşüp kayboluyordu.
+  /// Bağlantının hedefi; splash ya da giriş sürerken saklanıp oturum
+  /// doğrulanınca açılıyor. Yoksa link soğuk açılışta `/home`'a düşüyordu.
   String? _pendingLocation;
 
   /// Dışarıya paylaşılan kısa yollar ve uygulama içindeki karşılıkları.
   static final RegExp _newsLink = RegExp(r'^/news/([^/]+)/?$');
   static final RegExp _eventLink = RegExp(r'^/events/([^/]+)/?$');
 
-  /// Hedefi saklanabilecek içerik yolları.
   static bool _isContentPath(String path) =>
       path.startsWith('/home/news/') || path.startsWith('/calendar/events/');
 
   String? _redirect(GoRouterState state) {
     final path = state.uri.path;
 
-    // 1. Paylaşılan bağlantı → sekmenin altındaki iç içe rota.
+    // Paylaşılan bağlantı → sekmenin altındaki iç içe rota.
     final news = _newsLink.firstMatch(path);
     if (news != null) return '/home/news/${news.group(1)}';
     final event = _eventLink.firstMatch(path);
     if (event != null) return '/calendar/events/${event.group(1)}';
 
-    // 2. Oturum durumuna göre yönlendirme; içerik hedefi araya giriyorsa sakla.
+    // Oturum durumuna göre yönlendirme; içerik hedefi araya giriyorsa sakla.
     final target = redirectLogic(userProvider, state);
     if (target != null && _isContentPath(path)) {
       _pendingLocation = state.uri.toString();
     }
 
-    // 3. Oturum doğrulandı: saklanan hedef varsa ana sayfa yerine oraya.
+    // Oturum doğrulandı: saklanan hedef varsa ana sayfa yerine oraya.
     if (target == '/home' && _pendingLocation != null) {
       final pending = _pendingLocation;
       _pendingLocation = null;
@@ -173,10 +171,8 @@ class RouterManager {
     final bool isSplashRoute = state.matchedLocation == '/';
 
     switch (userProvider.status) {
-      // Oturum kontrolü sürüyor ya da sunucuya ulaşılamıyor; ikisinde de
-      // splash'te kalınıyor. Çevrimdışıyken `/auth`'a atmak, aslında geçerli
-      // olabilecek oturumu kaybettirmek olurdu — splash tekrar denemeyi
-      // sunuyor.
+      // Oturum kontrolü sürüyor ya da sunucuya ulaşılamıyor: splash'te kalınıyor.
+      // Çevrimdışıyken `/auth`'a atmak geçerli olabilecek oturumu kaybettirirdi.
       case AuthStatus.loading:
       case AuthStatus.offline:
         return isSplashRoute ? null : '/';

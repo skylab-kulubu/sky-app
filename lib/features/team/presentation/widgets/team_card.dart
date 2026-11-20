@@ -9,12 +9,8 @@ import 'package:sky_app/features/team/presentation/pages/team_detail/team_detail
 import 'package:sky_app/features/team/presentation/widgets/team_logo.dart';
 import 'package:sky_app/features/team/presentation/widgets/team_logo_hero.dart';
 
-/// Ekip carousel'indeki büyük kart: üstte logo, altında ad, en altta
-/// "Detayları Gör".
-///
-/// Zemin, köşeler ve iç boşluklar `EventCard` ile aynı. Kartın yüksekliği
-/// carousel'den geliyor; logo alanı kalan boşluğu dolduruyor, ad ve buton
-/// kendi boylarında kalıyor.
+/// Carousel'deki büyük kart: logo, ad, "Detayları Gör". Zemin ve köşeler
+/// `EventCard` ile aynı; logo alanı kalan boşluğu dolduruyor.
 class TeamCard extends StatelessWidget {
   const TeamCard({super.key, required this.team});
 
@@ -69,9 +65,7 @@ class TeamCard extends StatelessWidget {
     );
   }
 
-  /// Kısa açıklama, [_descriptionLines] satırda kesilir. Satır sayısı sabit
-  /// tutuluyor (kısa açıklamada da aynı yeri kaplıyor) ki kartlar arasında logo
-  /// alanı ve buton hizası kaymasın.
+  /// Satır sayısı sabit ki kartlar arasında logo ve buton hizası kaymasın.
   Widget _description(BuildContext context) {
     final style = context.textTheme.bodyMedium?.copyWith(
       color: context.textSecondary,
@@ -96,8 +90,7 @@ class TeamCard extends StatelessWidget {
     );
   }
 
-  /// Logo, kartın içinde bir tık yükseltilmiş zeminde. Hero bu alanı
-  /// detay sayfasının kapağına taşıyor.
+  /// Logo bir tık yükseltilmiş zeminde; Hero bu alanı detayın kapağına taşıyor.
   Widget _logoArea(BuildContext context) {
     return TeamLogoHero(
       slug: team.slug,

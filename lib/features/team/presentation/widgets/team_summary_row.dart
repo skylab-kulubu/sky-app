@@ -4,16 +4,9 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/team/data/models/team.dart';
 import 'package:sky_app/features/team/presentation/widgets/team_tag_chip.dart';
 
-/// Ekipler sekmesinin başlığının altındaki tek satır: soluk etiket ve
-/// yanında ekip hapları. Zemini yok; carousel'den yer çalmasın diye kart
-/// yerine düz satır.
-///
-/// - Kullanıcı bir ya da daha fazla ekipteyse: "Ekibin" ve ekipleri. Haplar
-///   dokunulmaz; ekibe gitmek için AppBar'da ayrı buton var.
-/// - Hiçbir ekipte değilse: "Alımı açık" ve üye alan ekipler; hapa dokununca
-///   carousel o ekibe kayar. Alım yapan ekip yoksa yalnızca bunu yazar.
-///
-/// Haplar sığmazsa satır yatayda kayıyor, alt satıra taşmıyor.
+/// Ekipler başlığının altındaki satır: kullanıcı bir ekipteyse "Ekibin" ve
+/// ekipleri; değilse "Alımı açık" ve üye alan ekipler (dokununca carousel
+/// kayıyor). Sığmazsa yatayda kayıyor.
 class TeamSummaryRow extends StatelessWidget {
   const TeamSummaryRow({
     super.key,

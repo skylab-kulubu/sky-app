@@ -20,14 +20,9 @@ import 'package:sky_app/features/auth/presentation/providers/user_provider.dart'
 
 part 'handoff_sheetmodel.dart';
 
-/// Bir SKY LAB sitesini (Hesap Merkezi, SKYFORMS) uygulama içinde, tam boy
-/// bir sheet'te açar.
-///
-/// Sheet açılırken [HandoffService] kısa ömürlü bir devir bağlantısı alıyor
-/// ve WebView yalnızca onu, kanıt başlığıyla yüklüyor; kullanıcı ikinci kez
-/// giriş yapmıyor. Sistem tarayıcısı (Custom Tabs / SFSafariViewController)
-/// bilerek kullanılmıyor: sözleşme birinci taraf, adres çubuksuz WebView
-/// istiyor (`mobile-web-handoff-contract.md`).
+/// Bir SKY LAB sitesini (Hesap Merkezi, SKYFORMS) uygulama içinde tam boy bir
+/// sheet'te, girişli açar ([HandoffService]). Sistem tarayıcısı bilerek
+/// kullanılmıyor: sözleşme adres çubuksuz, birinci taraf bir WebView istiyor.
 class HandoffSheet extends StatefulWidget {
   const HandoffSheet({super.key, required this.target, this.path = '/'});
 

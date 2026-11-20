@@ -74,17 +74,10 @@ class _SkyButtonState extends State<SkyButton>
     );
   }
 
-  /// Dokunma işleniyor mu; pasif ve yükleniyor durumlarında hem basma
-  /// animasyonu hem de geri çağrı devre dışı.
   bool get _isEnabled => widget.onPressed != null && !widget.isLoading;
 
-  /// Zemin üzerindeki metin ve ripple rengi. Vurgu zemini temaya göre açık
-  /// lila ile koyu mor arasında yer değiştirdiği için kontrast rengi de
-  /// temadan okunur.
-  ///
-  /// Açıkça verilen renk pasif durumda da geçerli: butonu temadan bağımsız
-  /// bir zeminin üstüne koyan sayfalar (etkinlik detayı) iki durumu da
-  /// kendisi belirliyor.
+  /// Metin ve ripple rengi; vurgu temaya göre değiştiği için temadan okunuyor.
+  /// Açıkça verilen renk pasifte de geçerli (etkinlik detayı).
   Color _foreground(BuildContext context) {
     if (widget.textColor != null) return widget.textColor!;
     if (widget.onPressed == null) return context.textTertiary;

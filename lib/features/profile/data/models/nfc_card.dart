@@ -1,7 +1,4 @@
-/// Yıldız Teknik Üniversitesi (YTÜ) Öğrenci Kartı veri modeli.
-///
-/// YTÜ Kampüs Kartları: Mifare Classic 1K, ISO 14443-3A, 4-Byte (8 HEX
-/// karakter) UID kullanır.
+/// YTÜ öğrenci kartı: Mifare Classic 1K, ISO 14443-3A, 4 baytlık (8 HEX) UID.
 class NfcCard {
   final String rawUid;
   final DateTime scannedAt;
@@ -28,25 +25,12 @@ class NfcCard {
     return buffer.toString();
   }
 
-  /// UID Byte uzunluğu (YTÜ kartları için 4 Byte).
   int get byteLength => normalizedHex.length ~/ 2;
 
-  /// Okumadan geriye kullanılabilir bir UID çıkıp çıkmadığı.
-  ///
-  /// Kartın gerçekten bir YTÜ kartı olduğu istemcide **doğrulanamaz**.
-  /// Kimlik doğrulaması yapmadan okunabilen tek anlamlı veri UID; kartın
-  /// kime ait olduğunu söylemiyor ve piyasadaki her Mifare Classic 1K
-  /// kart (otel, toplu taşıma, kargo etiketi) aynı formatta. UID'nin bir
-  /// öğrenciye ait olup olmadığı ancak sunucuda, kayıtla eşleştirilerek
-  /// anlaşılır. Ki bu da imkansız :)
-  ///
-  /// Paketin diğer alanları da elemiyor: ATQA/SAK yalnızca Android'de
-  /// doluyor, kart tipi ve standardı ise iki platformda ayrışıyor —
-  /// CoreNFC'nin `NFCMiFareFamily` enum'unda Classic olmadığı için iOS bir
-  /// YTÜ kartına `unknown` diyor.
-  ///
-  /// Geriye kalan tek gerçek kontrol UID'nin okunabilmiş olması:
-  /// `FlutterNfcKit.poll` kimliği çözemediğinde `id` alanını `"unknown"`
-  /// döndürüyor, o da [normalizedHex] süzgecinden boş geçiyor.
+  /// Okumadan kullanılabilir bir UID çıktı mı. Kartın gerçekten YTÜ kartı
+  /// olduğu istemcide doğrulanamıyor: UID kimin olduğunu söylemiyor, ATQA/SAK
+  /// yalnız Android'de dolu ve iOS Classic'i tanımıyor. Tek kontrol UID'nin
+  /// okunabilmesi; `poll` çözemediğinde `id` `"unknown"` dönüyor ve
+  /// [normalizedHex] onu boşaltıyor.
   bool get hasReadableUid => normalizedHex.isNotEmpty;
 }

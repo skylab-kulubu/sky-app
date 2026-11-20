@@ -4,11 +4,8 @@ class AppAssets {
   /// YTÜ yıldızı (dış hat). SkyPass'te öğrenci kartı eşlendiğinin işareti.
   static const String ytuStar = 'assets/images/ytu-star.svg';
 
-  /// MOBILAB kelime logosu (M ikonu ve yazı); ayarların altındaki
-  /// "Developed by" künyesi. Açılış sayfasındakiyle aynı dosya.
+  /// MOBILAB kelime logosu; ayarlardaki "Developed by" künyesi.
   static const String mobilabWordmark = 'assets/images/mobilab_wordmark.svg';
-
-  //Teams
 
   // Ekip logoları. Kaynak: skylab-kulubu/skylab-assets → logos/arge.
   // Kenar boşlukları kırpılıp en fazla 600 piksele indirildi.

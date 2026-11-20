@@ -11,12 +11,8 @@ import 'package:sky_app/core/widgets/section_header.dart';
 import 'package:sky_app/core/widgets/settings_tile.dart';
 import 'package:sky_app/core/widgets/tile_group.dart';
 
-/// Home appbar'ındaki menü butonundan açılan kulüp menüsü.
-///
-/// [LinksService.groups] başlıklar altında, ayarlar sayfasıyla aynı satır
-/// düzeninde listeleniyor: ikon dairesi, ad ve ne işe yaradığını anlatan
-/// kısa açıklama. Bağlantılar tarayıcı sheet'inde açılıyor
-/// ([WebviewService.openLink]).
+/// Home appbar'ındaki menüden açılan kulüp menüsü: [LinksService.groups]
+/// başlıklar altında, bağlantılar tarayıcı sheet'inde.
 class ClubMenuSheet extends StatelessWidget {
   const ClubMenuSheet({
     super.key,
@@ -45,11 +41,8 @@ class ClubMenuSheet extends StatelessWidget {
         borderRadius: AppRadiuses.sheetBorderRadius,
       ),
       isScrollControlled: true,
-      // Liste kayan bir alan olduğu için aşağı sürükleme kaydırmaya gidiyor
-      // ve sheet yalnızca tutma çubuğundan kapanabiliyordu.
-      // DraggableScrollableSheet, liste en üstteyken aşağı çekilen hareketi
-      // sheet'e aktarıyor; en küçük yüksekliğe inince sheet kapanıyor
-      // (`shouldCloseOnMinExtent`).
+      // Liste en üstteyken aşağı çekiş sheet'e geçiyor ve en küçük yükseklikte
+      // kapanıyor; yoksa sheet yalnız tutma çubuğundan kapanıyordu.
       builder: (_) => DraggableScrollableSheet(
         expand: false,
         initialChildSize: _maxHeightFactor,

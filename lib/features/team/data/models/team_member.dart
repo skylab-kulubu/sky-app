@@ -20,8 +20,7 @@ class TeamMember {
   /// Avatar küçük çiziliyor; `card` boyutu yetiyor.
   String get avatarUrl => profilePictureSizes.cardOr(profilePictureUrl);
 
-  /// Kayıtta şemasız gelebiliyor (`linkedin.com/in/...`); [linkedinUrl]
-  /// tamamlanmış hâlini veriyor.
+  /// Şemasız gelebiliyor (`linkedin.com/in/...`); tam hâli [linkedinUrl].
   final String linkedin;
   final String department;
   final bool isLeader;

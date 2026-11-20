@@ -7,13 +7,10 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/sky_text_field.dart';
 
-/// Etiket listesi düzenleyici: yazıp "+"ya ya da klavyedeki onaya basınca
-/// etiket eklenir, hapın çarpısıyla silinir. Aynı etiket iki kez eklenmez.
-///
-/// Metin alanının controller'ı dışarıdan veriliyor: alanda yazılı kalıp
-/// henüz eklenmemiş metin, form kaydedilirken [withPending] ile listeye
-/// katılıyor. Yalnızca onay tuşuyla eklendiğinde yazılıp doğrudan
-/// "Kaydet"e basılan etiketler sessizce kayboluyordu.
+/// Etiket listesi düzenleyici: "+" ya da klavye onayıyla eklenir, çarpıyla
+/// silinir, aynısı iki kez eklenmez. Alanda kalan metin kaydederken
+/// [withPending] ile listeye katılıyor; yoksa yazılıp eklenmeyen etiket
+/// kayboluyordu.
 class SkyTagEditor extends StatelessWidget {
   const SkyTagEditor({
     super.key,

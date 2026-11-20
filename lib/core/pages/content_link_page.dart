@@ -8,12 +8,9 @@ import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
 
-/// Paylaşılan bağlantıyla (`/news/<slug>`, `/events/<id>`) açılan içeriği
-/// yükleyip detay sayfasını gösterir.
-///
-/// Link soğuk açılışta gelebildiği için liste yüklenmesi beklenmiyor; içerik
-/// doğrudan tek kayıt endpoint'inden çekiliyor. Yüklenirken gösterge,
-/// bulunamazsa (silinmiş/yanlış link) bilgi, başka hatada tekrar dene.
+/// Paylaşılan bağlantıyla (`/news/<slug>`, `/events/<id>`) açılan içeriği tek
+/// kayıt ucundan yükleyip detayını gösterir. Link soğuk açılışta gelebildiği
+/// için liste yüklenmesi beklenmiyor.
 class ContentLinkPage<T> extends StatefulWidget {
   const ContentLinkPage({
     super.key,

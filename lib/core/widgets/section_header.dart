@@ -10,9 +10,8 @@ class SectionHeader extends StatelessWidget {
 
   final String title;
 
-  /// Sayfanın ilk öğesi mi. Üst boşluk bölümleri birbirinden ayırmak için;
-  /// listenin en başında sayfa kenar boşluğunun üstüne binip başlığı
-  /// appbar'dan fazla uzaklaştırıyordu.
+  /// Sayfanın ilk öğesi mi; ilk başlıkta üst boşluk sayfa boşluğuna binip
+  /// başlığı appbar'dan uzaklaştırıyordu.
   final bool isFirst;
 
   @override

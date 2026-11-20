@@ -37,10 +37,8 @@ class CoverImage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (_isEmpty) return _fallback(context);
 
-    // Etkinlik afişleri çoğu zaman 2000 piksel ve üzeri geliyor; hiçbir yerde
-    // ekran genişliğinden büyük çizilmiyorlar. Çözünürlük sınırlanmazsa hem
-    // bellek hem de her karede ölçekleme maliyeti boşuna büyüyor — bu, kart
-    // ile detay arasındaki geçişte fark ediliyor.
+    // Afişler çoğu zaman 2000 px üstü; ekrandan büyük çözmek bellek ve ölçekleme
+    // maliyetini boşuna büyütüyor (kart → detay geçişinde hissediliyor).
     final decodeWidth = _decodeWidth(context);
 
     if (_isAsset) {

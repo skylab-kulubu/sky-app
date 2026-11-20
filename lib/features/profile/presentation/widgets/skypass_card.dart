@@ -16,15 +16,10 @@ import 'package:sky_app/features/profile/data/models/skypass_token.dart';
 import 'package:sky_app/features/profile/data/services/skypass_service.dart';
 import 'package:sky_app/features/profile/presentation/widgets/tilt_builder.dart';
 
-/// [SkyPassCard]'ı karta dokunmadan çevirmek için.
+/// [SkyPassCard]'ı dışarıdan çevirmek için; dönüş durumu kartta.
 ///
-/// Kart kendi animasyonunu yönettiği için dönüş durumu burada tutulmuyor;
-/// controller yalnızca "çevir" isteğini karta iletiyor.
-///
-/// Tek değil birden çok kart bağlanabiliyor: profildeki kart [Hero] içinde ve
-/// uçuş sırasında aynı widget'tan geçici bir kopya kuruluyor. Tek bağlantı
-/// olsaydı kopya asıl kartın yerini alır, uçuş bitip kopya kalkınca buton
-/// hiçbir kartı çeviremez hâle gelirdi.
+/// Birden çok kart bağlanabiliyor: [Hero] uçuşunda geçici bir kopya kuruluyor,
+/// tek bağlantı olsaydı kopya kalkınca buton hiçbir kartı çeviremezdi.
 class SkyPassCardController {
   final Set<VoidCallback> _flipCallbacks = {};
 
@@ -40,11 +35,8 @@ class SkyPassCardController {
   void _detach(VoidCallback onFlip) => _flipCallbacks.remove(onFlip);
 }
 
-/// Kulüp üyelik kartı. Banka kartı oranında (85.6 × 53.98 mm) çizilir.
-///
-/// İki yüzü var: ön yüzde kimlik bilgileri, arkasında üyelik QR'ı. Karta
-/// dokunulunca Y ekseninde dönerek diğer yüze geçer; [controller] verilirse
-/// kart dışarıdan da çevrilebilir (profildeki "QR'ı Göster").
+/// Kulüp üyelik kartı, banka kartı oranında (85.6 × 53.98 mm). Önde kimlik,
+/// arkada kapı QR'ı; dokununca Y ekseninde dönüyor.
 class SkyPassCard extends StatefulWidget {
   const SkyPassCard({
     super.key,
@@ -63,7 +55,6 @@ class SkyPassCard extends StatefulWidget {
   /// Bölüm ya da ekip bilgisi; boşsa satır çizilmez.
   final String subtitle;
 
-  /// Ön yüzde büyük YTÜ yıldızı: öğrenci kartı SkyPass'e eşlenmiş.
   final bool showStudentCardMark;
 
   @override
@@ -76,13 +67,12 @@ class _SkyPassCardState extends State<SkyPassCard>
 
   static const Duration _flipDuration = Duration(milliseconds: 520);
 
-  /// Dönüşe derinlik veren perspektif katsayısı. Bunsuz kart düz bir
-  /// dikdörtgen gibi yassılıp genişler, kâğıt dönme hissi oluşmaz. Yükseldikçe
-  /// yakın kenar hızla büyüyor ve kart altındaki içeriğin üstüne taşıyor.
+  /// Dönüşe derinlik veren perspektif; yükseldikçe yakın kenar içeriğin üstüne
+  /// taşıyor.
   static const double _perspective = 0.0008;
 
-  /// Dönüşün ortasında karta uygulanan küçülme. Perspektif yakın kenarı
-  /// büyüttüğü için kart tam yandayken kutusundan taşıyordu; bu onu dengeliyor.
+  /// Perspektif yakın kenarı büyüttüğü için kart yandayken kutusundan
+  /// taşıyordu; bu küçülme dengeliyor.
   static const double _flipShrink = 0.08;
 
   late final AnimationController _controller = AnimationController(
@@ -132,9 +122,8 @@ class _SkyPassCardState extends State<SkyPassCard>
       onTap: _flip,
       child: AspectRatio(
         aspectRatio: _cardAspectRatio,
-        // Eğim ile çevirme tek matriste birleşiyor. İki ayrı Transform iç içe
-        // geçtiğinde perspektif katsayıları çarpılıyor ve kart dönerken
-        // katlanarak büyüyordu.
+        // Eğim ve çevirme tek matriste: iç içe iki Transform'da perspektif
+        // çarpılıp kart katlanarak büyüyordu.
         child: TiltBuilder(
           builder: (context, tilt) => AnimatedBuilder(
             animation: _turn,
@@ -148,9 +137,8 @@ class _SkyPassCardState extends State<SkyPassCard>
                   // Derinlik (z) ölçeklenmiyor; yalnızca ekrandaki boyut
                   // küçülüyor, perspektifin kendisi olduğu gibi kalıyor.
                   ..scaleByDouble(_scaleAt(angle), _scaleAt(angle), 1, 1)
-                  // Eğimin öne/arkaya bileşeni dönüşten sonra, ekran
-                  // düzleminde uygulanıyor; yoksa kart arka yüzdeyken
-                  // yukarı-aşağı ters tepki verirdi.
+                  // Öne/arkaya eğim dönüşten sonra uygulanıyor; yoksa arka yüzde ters tepki
+                  // verirdi.
                   ..rotateX(tilt.dy)
                   ..rotateY(angle + tilt.dx),
                 child: angle < pi / 2 ? _front() : _mirrored(_back()),
@@ -165,8 +153,7 @@ class _SkyPassCardState extends State<SkyPassCard>
   /// Kart tam yandayken (π/2) en çok küçülür, iki uçta 1'e döner.
   double _scaleAt(double angle) => 1 - sin(angle) * _flipShrink;
 
-  /// Arka yüz, dönen kartın ters tarafında çizildiği için kendi içinde bir kez
-  /// daha çevrilir; yoksa ayna görüntüsü olarak görünür.
+  /// Arka yüz bir kez daha çevriliyor; yoksa ayna görüntüsü görünürdü.
   Widget _mirrored(Widget child) {
     return Transform(
       alignment: Alignment.center,
@@ -202,16 +189,13 @@ class _SkyPassCardState extends State<SkyPassCard>
     );
   }
 
-  /// Oranlar kartın boyutuna göre: yıldız kart genişliğinin %80'i, tepesi
-  /// kart yüksekliğinin üçte birinde; alt kısmı kartın dışına taşıp
-  /// kırpılıyor. Yazıların arkasında kalıyor ve okunurluğu bozmasın diye
-  /// yarı saydam.
+  /// Yıldız kart genişliğinin %90'ı, tepesi yüksekliğin üçte birinde; alt
+  /// kısmı taşıp kırpılıyor. Yazıların arkasında kaldığı için yarı saydam.
   static const double _markWidthFactor = 0.9;
   static const double _markTopFactor = 0.25;
   static const double _markAspect = 58 / 56;
   static const double _markOpacity = 0.2;
 
-  /// Yıldız açılıp kapanırken geçen süre; eşleme anında yavaşça beliriyor.
   static const Duration _markFadeDuration = Duration(milliseconds: 900);
 
   Widget _studentCardMark() {
@@ -227,8 +211,7 @@ class _SkyPassCardState extends State<SkyPassCard>
                 top: constraints.maxHeight * _markTopFactor,
                 width: width,
                 height: width * _markAspect,
-                // Hep ağaçta; görünürlük opaklıkla. İlk çizimde animasyon
-                // yok, sonradan açılınca (eşleme anı) yavaşça beliriyor.
+                // Hep ağaçta; ilk çizimde animasyon yok, eşleme anında yavaşça beliriyor.
                 child: AnimatedOpacity(
                   opacity: widget.showStudentCardMark ? 1 : 0,
                   duration: _markFadeDuration,
@@ -261,8 +244,8 @@ class _SkyPassCardState extends State<SkyPassCard>
 
   Widget _back() {
     return _surface(
-      // stretch olmadan QR kendi içerik boyutuna düşer; kartın yüksekliğini
-      // kaplaması gerekiyor ki kare oranı yükseklikten hesaplansın.
+      // stretch olmadan QR kendi boyuna düşüyor; kare oranı yükseklikten
+      // hesaplansın.
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -398,19 +381,13 @@ class _SkyPassCardState extends State<SkyPassCard>
   );
 }
 
-/// SkyPass'in arka yüzündeki kapı kodu.
-///
-/// Core'un imzaladığı kısa ömürlü belirteci ([SkyPassService.token]) QR
-/// olarak çiziyor ve süresi dolmadan yeniliyor. Kod arka yüz göründüğü anda
-/// istenmeye başlıyor ama QR ancak [active] olunca (kartın dönüşü bitince)
-/// kurulup yumuşakça beliriyor; o zamana kadar yükleniyor göstergesi var.
-/// Kart ön yüze dönünce widget kalkıyor, zamanlayıcı da duruyor. Kod
-/// alınamazsa (bağlantı yok) dokununca yeniden deneniyor.
+/// SkyPass'in arka yüzündeki kapı kodu: [SkyPassService.token]'ı QR olarak
+/// çiziyor ve dolmadan yeniliyor. QR [active] olunca (dönüş bitince)
+/// kuruluyor; kod alınamazsa dokununca yeniden deneniyor.
 class SkyPassQr extends StatefulWidget {
   const SkyPassQr({super.key, required this.owner, required this.active});
 
-  /// Kartın sahibi (SKY numarası); önbellekteki kodun başkasına ait
-  /// olmadığını anlamak için.
+  /// Kartın sahibi (SKY numarası); önbellekteki kod başkasının olmasın.
   final String owner;
 
   /// Kart yüzü tam görünüyor mu; değilse QR çizilmiyor.
@@ -472,8 +449,8 @@ class _SkyPassQrState extends State<SkyPassQr> {
     }
   }
 
-  /// QR matrisini bir sonraki karede kurar; dönüş ya da açılış karesine
-  /// denk gelmesin.
+  /// QR matrisini bir sonraki karede kurar; dönüş ya da açılış karesine denk
+  /// gelmesin.
   void _prepareQr() {
     final token = _token;
     if (!widget.active || token == null || token.value == _qrValue) return;

@@ -7,9 +7,7 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/user_avatar.dart';
 
-/// Ayarların en üstündeki hesap satırı: avatar + ad + kullanıcı adı.
-///
-/// Dokununca Hesap Merkezi uygulama içinde açılıyor.
+/// Ayarların en üstündeki hesap satırı; dokununca Hesap Merkezi açılıyor.
 class AccountTile extends StatelessWidget {
   const AccountTile({
     super.key,

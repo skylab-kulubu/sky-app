@@ -16,8 +16,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   usePathUrlStrategy();
 
-  // ApiClient `core` altında ve oturumu bilmiyor; token kaynağı burada,
-  // tek bağlama noktasında veriliyor.
+  // ApiClient oturumu bilmiyor; token kaynağı tek bağlama noktasında burada.
   ApiClient.instance.attachTokenProvider(AuthService());
 
   timeago.setLocaleMessages('tr', timeago.TrMessages());

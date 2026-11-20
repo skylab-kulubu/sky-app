@@ -8,10 +8,8 @@ import 'package:sky_app/features/home/data/models/news_item.dart';
 import 'package:sky_app/features/home/presentation/pages/news_detail/news_detail_page.dart';
 import 'package:sky_app/core/widgets/cover_image.dart';
 
-/// Haber listesindeki tek satır: solda kare görsel, sağda başlık ve iki
-/// satır açıklama. Kart zemini yok, sayfa zemini üzerinde düz durur.
-///
-/// Dokununca Material "container transform" ile detay sayfasına dönüşür.
+/// Haber satırı: solda kare görsel, sağda başlık ve iki satır açıklama;
+/// dokununca container transform ile detaya dönüşüyor.
 class NewsTile extends StatelessWidget {
   const NewsTile({super.key, required this.item});
 
@@ -25,16 +23,13 @@ class NewsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OpenContainer(
-      // Ana sayfa shell'in içinde; kök navigator olmadan detay sayfası
-      // navbar'ın altında açılırdı.
+      // Shell'in içinde; kök navigator olmadan detay navbar'ın altında açılırdı.
       useRootNavigator: true,
       transitionDuration: _transitionDuration,
-      // Etkinlik kartındaki `fade`'in aksine burada fadeThrough: tile küçük
-      // olduğu için kutu çok kısa mesafede büyüyor ve iki içeriğin üst üste
-      // binmesi karışık görünüyor. Sıralı geçiş bu ölçekte daha temiz.
+      // fadeThrough: tile küçük, kutu kısa mesafede büyüdüğü için iki içeriğin
+      // üst üste binmesi karışık görünüyordu.
       transitionType: ContainerTransitionType.fadeThrough,
-      // Varsayılanlar beyaz zemin ve yükseltidir; tile sayfa zemini üzerinde
-      // düz durduğu için ikisi de sıfırlanıyor.
+      // Varsayılan beyaz zemin ve yükselti; tile sayfa zemininde düz duruyor.
       closedColor: context.backgroundColor,
       openColor: context.backgroundColor,
       middleColor: context.backgroundColor,
@@ -79,8 +74,7 @@ class NewsTile extends StatelessWidget {
       children: [
         Text(
           item.title,
-          // Tek satır: iki satıra taşan bir başlık o tile'ı diğerlerinden
-          // uzun yapıp listenin ritmini bozuyordu.
+          // Tek satır: iki satıra taşan başlık listenin ritmini bozuyordu.
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: context.textTheme.titleMedium?.copyWith(

@@ -54,11 +54,9 @@ class _ShellPageState extends ShellPagemodel {
           Positioned.fill(child: navBar(currentLocation, context)),
         ],
       ),
-      // Asıl navbar gövdedeki Stack'te: yönetim menüsü açılınca yukarı
-      // uzuyor ve bu yuvadan taşan satırlar dokunma almazdı. Yuvada aynı
-      // yükseklikte boş (dokunmaları geçiren) bir yer tutucu duruyor; böylece
-      // sayfaların alt boşluğu (extendBody) ve SnackBar'ın konumu eskisi gibi
-      // navbar'a göre hesaplanıyor.
+      // Asıl navbar gövdedeki Stack'te: menü yukarı uzayınca bu yuvadan taşan
+      // satırlar dokunma almazdı. Yer tutucu, extendBody ve SnackBar konumu
+      // navbar'a göre hesaplansın diye.
       bottomNavigationBar: SizedBox(height: ExpandableNavBar.slotHeight),
     );
   }
@@ -136,9 +134,8 @@ class _ShellPageState extends ShellPagemodel {
     );
   }
 
-  /// Sekmenin sabit butonlarına duruma bağlı olanlar ekleniyor: Ekipler
-  /// sekmesinde "ekibime git", yalnızca kullanıcı carousel'deki bir ekipte
-  /// ise.
+  /// Ekipler sekmesine "ekibime git" yalnızca kullanıcı carousel'deki bir
+  /// ekipteyse ekleniyor.
   List<String> _actionsFor(_AppBarConfig config) {
     if (!identical(config, _AppBarConfig._team)) return config.actions;
 
@@ -191,7 +188,6 @@ class _ShellPageState extends ShellPagemodel {
   }
 }
 
-/// Shell sekmelerinin her biri için appbar içeriği.
 class _AppBarConfig {
   const _AppBarConfig({
     required this.title,
@@ -205,7 +201,6 @@ class _AppBarConfig {
   final List<String> actions;
   final bool showLogo;
 
-  /// Başlığın soluna kullanıcı avatarı çizilir.
   final bool showAvatar;
 
   /// Verilirse sekmede arama var: [AppIcons.search] butonu başlığın yerinde

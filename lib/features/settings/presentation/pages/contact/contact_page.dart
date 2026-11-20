@@ -13,11 +13,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 part 'contact_pagemodel.dart';
 
-/// Destek ve kulübün sosyal medya hesapları.
-///
-/// Satırların hepsi uygulamanın dışına çıkıyor (mail uygulaması, tarayıcı,
-/// Instagram/LinkedIn uygulaması); bu yüzden sağlarında ok değil
-/// [AppIcons.externalLink] var.
+/// Destek ve kulübün sosyal medya hesapları. Hepsi uygulama dışına çıktığı
+/// için sağlarında [AppIcons.externalLink] var.
 class ContactPage extends StatefulWidget {
   const ContactPage({super.key});
 

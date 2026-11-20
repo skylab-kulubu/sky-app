@@ -7,10 +7,8 @@ import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/features/notification/data/models/notification_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-/// Bildirim satırına dokununca açılan içerik sheet'i.
-///
-/// İçerik uzun düz metin olduğu için dialog yerine sheet: metin ekranın
-/// tamamına yakınını kullanabiliyor ve uzun içerik kendi içinde kayıyor.
+/// Bildirim içeriği; uzun düz metin olduğu için dialog değil, kendi içinde
+/// kayan bir sheet.
 class NotificationDetailSheet extends StatelessWidget {
   const NotificationDetailSheet({super.key, required this.item});
 

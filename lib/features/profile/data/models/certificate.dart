@@ -1,15 +1,11 @@
 import 'package:sky_app/core/extensions/date_time_extensions.dart';
 
-/// Sertifikanın durumu. Bilinmeyen (ileride eklenecek) durumlar hiçbir zaman
-/// geçerli gösterilmiyor.
+/// Sertifikanın durumu; bilinmeyen durum hiçbir zaman geçerli gösterilmiyor.
 enum CertificateStatus { valid, revoked, unknown }
 
-/// Kullanıcıya verilmiş sertifika (core `GET /v1/certificates/me`,
-/// `docs/mobile-certificates-v2.md`).
-///
-/// Uygulama şablon ya da üretimle ilgilenmiyor; yalnızca listeliyor ve
-/// core'un verdiği adresleri açıyor. Adresler kurulmuyor, olduğu gibi
-/// kullanılıyor.
+/// Kullanıcıya verilmiş sertifika (`GET /v1/certificates/me`,
+/// `docs/mobile-certificates-v2.md`). Adresler kurulmuyor, core'dan olduğu
+/// gibi kullanılıyor.
 class Certificate {
   const Certificate({
     required this.serial,
@@ -87,14 +83,12 @@ class Certificate {
     'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık',
   ];
 
-  /// "24 Eylül 2026"; tarih yoksa boş.
   String get issuedLabel {
     final date = issuedAt;
     if (date == null) return '';
     return '${date.day} ${_months[date.month - 1]} ${date.year}';
   }
 
-  /// Listede adın altındaki satır: "SKY LAB  •  24 Eylül 2026".
   String get subtitle =>
       [issuerLabel, issuedLabel].where((part) => part.isNotEmpty).join('  •  ');
 }

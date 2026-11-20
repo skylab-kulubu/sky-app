@@ -20,8 +20,7 @@ class TeamProvider extends ChangeNotifier {
   bool get isInitialized => _isInitialized;
   bool get isLoading => _isLoading;
 
-  /// Son yüklemenin hatası; başarılıysa null. Yenileme hatası eldeki listeyi
-  /// silmiyor.
+  /// Son yüklemenin hatası; yenileme hatası eldeki listeyi silmiyor.
   ApiException? get error => _error;
 
   Team? teamBySlug(String slug) {
@@ -31,9 +30,7 @@ class TeamProvider extends ChangeNotifier {
     return null;
   }
 
-  /// Kullanıcının üyesi olduğu, carousel'de bulunan ekipler. [groupNames]
-  /// `User.teams`: token'daki grup yollarından çıkan ekip adları
-  /// (`MOBILAB`); lider alt grubundakiler de ekibin üyesi sayılıyor.
+  /// Kullanıcının carousel'deki ekipleri; [groupNames] `User.teams`.
   List<Team> teamsOf(Iterable<String> groupNames) {
     final names = groupNames.toSet();
     return [
@@ -44,10 +41,8 @@ class TeamProvider extends ChangeNotifier {
 
   int _myTeamRequests = 0;
 
-  /// AppBar'daki "ekibime git" butonunun basılma sayısı. Buton shell'de,
-  /// carousel sayfada; sayfa bu sayacın arttığını görünce kendi ekibine
-  /// kayıyor. Sayaç (bir kerelik bayrak değil) sayesinde art arda basışların
-  /// her biri ayrı bir istek.
+  /// "Ekibime git" basılma sayısı: buton shell'de, carousel sayfada. Bayrak
+  /// değil sayaç, art arda basışların her biri ayrı istek.
   int get myTeamRequests => _myTeamRequests;
 
   void requestMyTeam() {
@@ -55,8 +50,8 @@ class TeamProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Düzenlenip kaydedilen ekibi listede günceller; carousel ve açık detay
-  /// sayfası yeniden istek atmadan yeni hâli gösteriyor.
+  /// Kaydedilen ekibi listede günceller; carousel ve açık detay yeni istek
+  /// atmadan yeni hâli gösteriyor.
   void replaceTeam(Team updated) {
     _teams = [
       for (final team in _teams) team.slug == updated.slug ? updated : team,
@@ -70,7 +65,6 @@ class TeamProvider extends ChangeNotifier {
     await _load();
   }
 
-  /// Elde ne olursa olsun yeniden yükler; hata ekranındaki "Tekrar Dene".
   Future<void> refresh() => _load();
 
   Future<void> _load() => _inFlight ??= _run();
@@ -86,8 +80,8 @@ class TeamProvider extends ChangeNotifier {
       log('Ekipler yüklenemedi: $e');
       error = e;
     } finally {
-      // `finally`: beklenmedik bir hata (ör. yanıtta tip uyuşmazlığı) da
-      // yükleme bayrağını kapatıyor; yoksa sayfa bir daha hiç yenilenemezdi.
+      // `finally`: beklenmedik hata da yükleme bayrağını kapatsın, yoksa sayfa bir
+      // daha yenilenemezdi.
       _error = error;
       _isLoading = false;
       _isInitialized = true;

@@ -16,14 +16,8 @@ import 'package:sky_app/features/home/presentation/providers/news_provider.dart'
 
 part 'news_detail_pagemodel.dart';
 
-/// Haberin tam metnini gösteren sayfa.
-///
-/// Yerleşim etkinlik detayıyla aynı: üstte geri ve paylaş hap'ları, altında
-/// kaydırıldıkça büzülen kare kapak. Farkı zemin; burada kapak renkleri
-/// kullanılmıyor, sayfa temanın düz koyu ya da açık zemininde duruyor.
-///
-/// Listedeki tile'dan container transform ile açılır; kök navigator'a
-/// push edildiği için navbar'ın altında kalmaz, ekranı tamamen kaplar.
+/// Haberin tam metni. Yerleşim etkinlik detayıyla aynı (üstte hap'lar, büzülen
+/// kare kapak) ama kapak renkleri yok, sayfa temanın düz zemininde.
 class NewsDetailPage extends StatefulWidget {
   const NewsDetailPage({super.key, required this.item});
 
@@ -36,7 +30,6 @@ class NewsDetailPage extends StatefulWidget {
 class _NewsDetailPageState extends NewsDetailPagemodel {
   static const double _descriptionLineHeight = 1.6;
 
-  /// Başlık iki satıra taştığında satırlar birbirine yapışmasın diye.
   static const double _titleLineHeight = 1.25;
 
   /// Çubuktaki başlığın belirmeye başladığı kaydırma mesafesi (kapağın
@@ -62,8 +55,6 @@ class _NewsDetailPageState extends NewsDetailPagemodel {
     );
   }
 
-  /// Üstteki sabit başlık çubuğu: geri, sayfadaki başlık buraya ulaşınca
-  /// beliren ortalanmış başlık ve paylaş.
   Widget _topHeader(BuildContext context) {
     const gap = SizedBox(width: AppSizes.midSpace);
 
@@ -127,15 +118,13 @@ class _NewsDetailPageState extends NewsDetailPagemodel {
     );
   }
 
-  /// Kapak yalnızca haberin görseli varsa; yoksa yeri de ayrılmıyor, başlık
-  /// en üstten başlıyor.
+  /// Kapak yalnızca görsel varsa; yoksa başlık en üstten başlıyor.
   double _coverSize(BuildContext context) => item.heroImage.isEmpty
       ? 0
       : MediaQuery.sizeOf(context).width -
             (AppPaddings.mainPaddingHorizontal.left * 2);
 
-  /// Kapak görseli kaydırıldıkça üst iki köşesi ve yeri sabit kalır, yüksekliği
-  /// büzülerek küçülür.
+  /// Kaydırıldıkça kapağın yeri sabit kalıyor, yüksekliği büzülüyor.
   Widget _pinnedCover(BuildContext context) {
     final coverSize = _coverSize(context);
     if (coverSize == 0) return const SizedBox.shrink();

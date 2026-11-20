@@ -1,10 +1,7 @@
 import 'package:sky_app/core/extensions/date_time_extensions.dart';
 
-/// Kapıda okutulan imzalı SkyPass kodu (core `POST /v1/skypass/qr`).
-///
-/// İçerik sunucunun imzaladığı kısa ömürlü bir belirteç; kapı görevlisi
-/// imzayı doğruluyor. Süresi dolan kod geçmiyor, bu yüzden kart onu
-/// dolmadan yeniliyor. Eski `SKYPASS:<no>:<ad>` biçimi artık reddediliyor.
+/// Kapıda okutulan imzalı SkyPass kodu (`POST /v1/skypass/qr`); kısa ömürlü,
+/// kart onu dolmadan yeniliyor.
 class SkyPassToken {
   const SkyPassToken({required this.value, required this.expiresAt});
 
@@ -15,7 +12,6 @@ class SkyPassToken {
     );
   }
 
-  /// QR'a yazılan değer.
   final String value;
   final DateTime expiresAt;
 

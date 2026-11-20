@@ -29,8 +29,7 @@ class IconCircle extends StatelessWidget {
   /// yerine HSL parlaklığı düşürülüyor.
   static const double _darken = 0.8;
 
-  /// İkon dairenin yarısı kadar. Ayarlar (18/36) ve bildirim (22/44)
-  /// satırlarında oran zaten böyleydi; büyüyen daire ikonu da büyütüyor.
+  /// İkon dairenin yarısı kadar.
   static const double _iconRatio = 2;
 
   Color get _background {

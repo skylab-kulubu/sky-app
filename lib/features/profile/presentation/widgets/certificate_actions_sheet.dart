@@ -9,11 +9,9 @@ import 'package:sky_app/core/widgets/settings_tile.dart';
 import 'package:sky_app/core/widgets/tile_group.dart';
 import 'package:sky_app/features/profile/data/models/certificate.dart';
 
-/// Sertifikaya dokununca açılan işlemler.
 enum CertificateAction { openPdf, verify, share }
 
-/// Sertifikanın işlemleri: PDF (yalnızca geçerlide), doğrulama sayfası ve
-/// paylaşma. Adresi olmayan işlem listelenmiyor. Seçileni döner.
+/// PDF (yalnız geçerlide), doğrulama ve paylaşma; adresi olmayan işlem yok.
 class CertificateActionsSheet extends StatelessWidget {
   const CertificateActionsSheet({super.key, required this.certificate});
 

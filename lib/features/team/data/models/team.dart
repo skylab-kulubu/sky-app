@@ -1,13 +1,9 @@
 import 'package:sky_app/core/constants/app_assets.dart';
 import 'package:sky_app/core/services/links_service.dart';
 
-/// SkyCMS'teki bir AR-GE ekibi (`Teams` koleksiyonu).
-///
-/// Alımdan yalnızca açık/kapalı bilgisi ([isRecruiting]) kullanılıyor;
-/// başvuru adresi CMS'teki `applyUrl` değil, kulübün kısa link servisi
-/// ([applyUrl]). `leads` ve `memberCount` CMS'te henüz doldurulmadığı için
-/// yok; üyeler core'dan ayrıca geliyor (bkz.
-/// `TeamService.fetchMembers`).
+/// SkyCMS'teki bir AR-GE ekibi (`teams`). Alımdan yalnız açık/kapalı
+/// kullanılıyor; başvuru adresi CMS'teki `applyUrl` değil kısa link
+/// ([applyUrl]). Üyeler core'dan ayrıca geliyor.
 class Team {
   const Team({
     required this.slug,
@@ -20,27 +16,23 @@ class Team {
     this.data = const {},
   });
 
-  /// CMS'teki anahtar, küçük harf (`mobilab`). Core ve Keycloak ekip adını
-  /// büyük harf kullanıyor; [key] onu veriyor.
+  /// CMS anahtarı, küçük harf (`mobilab`); core ve Keycloak adı [key].
   final String slug;
 
   final String description;
 
-  /// Zengin metin alanı; CMS düz metin olarak saklıyor, biçimi editöre
-  /// bağlı. Gösterirken [longDescriptionText] kullanılmalı.
+  /// Zengin metin; gösterirken [longDescriptionText] kullanılmalı.
   final String longDescription;
 
   final List<String> topics;
   final List<String> stack;
   final List<TeamWork> works;
 
-  /// CMS kaydının sürümü. Kaydederken gönderiliyor; arada biri değiştirdiyse
-  /// CMS 409 dönüyor ve üzerine yazılmıyor.
+  /// Kayıtta gönderiliyor; arada biri değiştirdiyse CMS 409 dönüyor.
   final int version;
 
-  /// Kaydın ham `data` alanı. Uygulamanın göstermediği alanlar (alım
-  /// bilgileri) kaydederken buradan aynen geri gönderiliyor; gönderilmezse
-  /// CMS onları siliyor, `recruiting` zorunlu olduğu için kaydı da reddediyor.
+  /// Ham `data`. Gösterilmeyen alım alanları buradan aynen geri gönderiliyor;
+  /// gönderilmezse CMS siliyor, `recruiting` zorunlu olduğu için reddediyor.
   final Map<String, dynamic> data;
 
   factory Team.fromJson(Map<String, dynamic> json) {
@@ -62,12 +54,8 @@ class Team {
     );
   }
 
-  /// CMS'e gönderilecek `data`: düzenlenen alanlar ve olduğu gibi korunan
-  /// alım alanları.
-  ///
-  /// Yalnızca şemadaki yazılabilir alanlar gönderiliyor. CMS bilinmeyen alan
-  /// görünce kaydı reddediyor; salt okunur `leads` ve `memberCount` da
-  /// gönderilmiyor.
+  /// CMS'e gidecek `data`: yalnız şemadaki yazılabilir alanlar (bilinmeyen alan
+  /// reddediliyor), alım alanları olduğu gibi.
   Map<String, dynamic> toCmsData() {
     return {
       'desc': description,
@@ -97,38 +85,30 @@ class Team {
       stack: stack ?? this.stack,
       works: works ?? this.works,
       version: version,
-      // Alım durumu ham veride tutuluyor; değiştiyse kopyada güncelleniyor.
       data: isRecruiting == null ? data : {...data, 'recruiting': isRecruiting},
     );
   }
 
-  /// Ekibin görünen adı. CMS'te ayrı bir ad alanı yok; kulüpte ekipler
-  /// büyük harfle yazılıyor (MOBILAB, WEBLAB).
+  /// CMS'te ad alanı yok; kulüpte ekipler büyük harfle yazılıyor.
   String get name => slug.toUpperCase();
 
   /// Keycloak grup adı; core'da `/v1/teams/{key}/members`, token'da
   /// `User.teams` bununla eşleşiyor.
   String get key => slug.toUpperCase();
 
-  /// Ekip şu an üye alıyor mu (CMS'te `recruiting`).
   bool get isRecruiting => data['recruiting'] == true;
 
-  /// Başvuru formuna yönlenen kısa link: `skyl.app/<slug>`. Kısa linkler
-  /// kulüpte ekip adıyla tanımlanıyor; CMS'teki uzun form adresi yerine bu
-  /// kullanılıyor ki form değişince uygulamaya dokunmak gerekmesin.
+  /// Başvuru formuna giden kısa link (`skyl.app/<slug>`); form değişince
+  /// uygulamaya dokunmak gerekmesin.
   String get applyUrl => '${LinksService.shortLinkBase}/$slug';
 
-  /// Detay sayfasındaki metin: uzun açıklama varsa o, yoksa kısa açıklama.
   String get aboutText {
     final long = longDescriptionText;
     return long.isNotEmpty ? long : description;
   }
 
-  /// Zengin metinden etiketleri ayıklanmış düz metin.
-  ///
-  /// Editörün HTML mi Markdown mı ürettiği belli değil; HTML gelirse
-  /// etiketler ekranda görünmesin diye paragraf/satır sonları korunup
-  /// geri kalan etiketler siliniyor.
+  /// Etiketleri ayıklanmış düz metin; editör HTML üretirse paragraf sonları
+  /// korunup etiketler siliniyor.
   String get longDescriptionText {
     if (longDescription.trim().isEmpty) return '';
 
@@ -143,11 +123,10 @@ class Team {
         .trim();
   }
 
-  /// Renkli logo; bilinmeyen bir ekipte `null`.
   String? get logo => _logos[slug];
 
-  /// Açık temada renkli logo yerine kullanılacak tek renkli sürüm. Yalnızca
-  /// renkli logosunda beyaz öğe olan ekiplerde var; diğerlerinde `null`.
+  /// Açık temada kullanılan tek renkli sürüm; yalnız logosunda beyaz öğe olan
+  /// ekiplerde.
   String? get lightThemeLogo => _lightThemeLogos[slug];
 
   static const Map<String, String> _logos = {
@@ -174,7 +153,6 @@ class Team {
           .toList(growable: false);
 }
 
-/// Ekibin öne çıkardığı bir çalışma.
 class TeamWork {
   const TeamWork({
     required this.title,
@@ -186,7 +164,6 @@ class TeamWork {
   final String title;
   final String description;
 
-  /// Görsel adresi; girilmemişse boş.
   final String image;
   final List<String> tags;
 

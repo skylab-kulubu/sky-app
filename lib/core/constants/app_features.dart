@@ -1,9 +1,6 @@
 /// Sürüme göre açılıp kapanan özellikler.
 class AppFeatures {
-  /// Öğrenci kartı (NFC): profilde "Öğrenci Kartını Eşle" ve kapıda
-  /// "Öğrenci Kartı" ile giriş. Kartın okunması için üniversitenin Bilgi
-  /// İşlem Daire Başkanlığı'na başvuruldu; onay gelene kadar kapalı
-  /// (v0.1). Kapalıyken profilde yerinde "QR Okut" duruyor, kapı ekranı
-  /// yalnız QR okutuyor.
+  /// Öğrenci kartı (NFC): profilde eşleme, kapıda kartla giriş. Üniversitenin
+  /// BİDB onayı gelene kadar kapalı (v0.1).
   static const bool studentCard = false;
 }

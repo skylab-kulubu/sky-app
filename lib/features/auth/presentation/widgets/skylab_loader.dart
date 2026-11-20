@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sky_app/core/widgets/svg_animation_widget.dart';
 import 'package:sky_app/features/auth/presentation/widgets/skylab_animation_logo.dart';
 
-// ── Loader path groups (stagger order) ────────────────────────────────────────
+// Yükleyicinin path grupları, kademe sırasıyla.
 
 const List<List<String>> _skylabLoaderGroups = [
   ['p20f79d00'],
@@ -21,8 +21,6 @@ final ShimmerLoopRecipe _skylabLoaderRecipe = ShimmerLoopRecipe(
   groups: _skylabLoaderGroups,
   scaleOrigin: const Offset(293, 277),
 );
-
-// ── SkylabLoader widget ───────────────────────────────────────────────────────
 
 class SkylabLoader extends StatelessWidget {
   const SkylabLoader({super.key, this.size = 64, this.color = Colors.white});

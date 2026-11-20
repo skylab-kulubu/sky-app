@@ -24,10 +24,8 @@ import 'package:sky_app/features/team/presentation/widgets/team_work_sheet.dart'
 
 part 'team_edit_pagemodel.dart';
 
-/// Ekip liderinin, ekibinin CMS kaydını düzenlediği sayfa.
-///
-/// Açılışta kayıt token'la taze çekiliyor (sürüm numarası için). Alım
-/// alanları formda yok ama kayıtta korunuyor (bkz. `Team.toCmsData`).
+/// Ekip liderinin CMS kaydını düzenlediği sayfa. Kayıt açılışta token'la
+/// taze çekiliyor; alım alanları korunuyor (`Team.toCmsData`).
 class TeamEditPage extends StatefulWidget {
   const TeamEditPage({super.key, required this.slug});
 
@@ -47,9 +45,8 @@ class TeamEditPage extends StatefulWidget {
 class _TeamEditPageState extends TeamEditPagemodel {
   @override
   Widget build(BuildContext context) {
-    // Kayıt sürerken çıkılamıyor: çıkılırsa kayıt yine tamamlanıyor ama
-    // sonucu listeye yansıtacak sayfa kalmıyor. Kaydedilmemiş değişiklikte
-    // çıkış onaya bağlı.
+    // Kayıt sürerken çıkılamıyor (sonucu yansıtacak sayfa kalmazdı);
+    // kaydedilmemiş değişiklikte çıkış onaya bağlı.
     return PopScope(
       canPop: !hasChanges && !isSaving,
       onPopInvokedWithResult: (didPop, _) {
@@ -119,9 +116,8 @@ class _TeamEditPageState extends TeamEditPagemodel {
     );
   }
 
-  /// Alım anahtarı. Açıkken ekip detayındaki "Ekibe Katıl" kısa linki
-  /// açıyor; kısa linkin SKYLAPP'te tanımlı olması gerektiği için adres
-  /// altında gösteriliyor.
+  /// Açıkken "Ekibe Katıl" kısa linki açıyor; link SKYLAPP'te tanımlı olmalı,
+  /// adres o yüzden altında.
   Widget _recruiting(BuildContext context) {
     final team = original!;
 

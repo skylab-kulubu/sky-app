@@ -7,12 +7,8 @@ import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/notification/data/models/notification_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-/// Bildirim listesindeki tek satır: solda yuvarlak ikon, sağda başlık,
-/// kısa zaman etiketi ve iki satır açıklama. Kart zemini ve ayraç yok;
-/// haber satırları gibi sayfa zemini üzerinde düz durur.
-///
-/// Okunmamış bildirim, sol dairenin vurgu rengi ve başlığın yanındaki
-/// noktadan anlaşılır; okunmuşlar nötr kalır.
+/// Bildirim satırı: solda yuvarlak ikon, sağda başlık, zaman ve iki satır
+/// açıklama. Okunmamışta daire vurgu renginde ve başlığın yanında nokta var.
 class NotificationTile extends StatelessWidget {
   const NotificationTile({super.key, required this.item, this.onTap});
 
@@ -83,8 +79,7 @@ class NotificationTile extends StatelessWidget {
     );
   }
 
-  /// Başlık ve zaman aynı satırda. Başlık tek satır: iki satıra taşan bir
-  /// başlık o satırı diğerlerinden uzun yapıp listenin ritmini bozuyor.
+  /// Başlık tek satır: taşan başlık listenin ritmini bozuyordu.
   Widget _titleRow(BuildContext context) {
     return Row(
       children: [

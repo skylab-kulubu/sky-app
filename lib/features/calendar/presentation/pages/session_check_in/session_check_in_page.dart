@@ -21,13 +21,12 @@ import 'package:sky_app/features/profile/presentation/providers/activity_provide
 
 part 'session_check_in_pagemodel.dart';
 
-/// Katılımcının oturum QR'ını (perdede gösterilen) okutup kendi yoklamasını
-/// vermesi: `POST /v1/sessions/{id}/check-in/me`. Sertifika bu girişlere
-/// göre hesaplanıyor.
+/// Katılımcının perdedeki oturum QR'ını okutup kendi yoklamasını vermesi
+/// (`POST /v1/sessions/{id}/check-in/me`); sertifika bu girişlere göre.
 class SessionCheckInPage extends StatefulWidget {
   const SessionCheckInPage({super.key});
 
-  /// Tam ekran açar (navbar'ın altında kalmasın diye kök navigator'da).
+  /// Kök navigator'da tam ekran açar.
   static Future<void> open(BuildContext context) {
     return Navigator.of(
       context,
@@ -49,8 +48,8 @@ class _SessionCheckInPageState extends SessionCheckInPagemodel {
 
   @override
   Widget build(BuildContext context) {
-    // Kamera ekranı iki temada da koyu; açık temada koyu başlık görüntünün
-    // üstünde okunmuyordu.
+    // Kamera ekranı iki temada da koyu; açık temada başlık görüntünün üstünde
+    // okunmuyordu.
     return Theme(
       data: darkTheme,
       child: Scaffold(

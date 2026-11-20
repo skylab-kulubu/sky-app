@@ -22,12 +22,9 @@ import 'package:sky_app/features/calendar/presentation/pages/event_schedule/sche
 
 part 'event_schedule_pagemodel.dart';
 
-/// Etkinlik programını düzenleme: günler ve her günün oturumları. Günün
-/// satırına dokununca gün, oturuma dokununca oturum formu açılıyor.
-///
-/// Etkinliği düzenleyebilen herkes açabiliyor; silme yalnızca liderlere ve
-/// YK/ADMIN'e ([User.canDeleteEvent]). Yoklama oturum bazında alındığı
-/// için kapı okuyucusu da buradaki oturumları kullanıyor.
+/// Etkinlik programını düzenleme: günler ve oturumları. Silme yalnızca
+/// liderlere ve YK/ADMIN'e ([User.canDeleteEvent]); kapı okuyucusu da bu
+/// oturumları kullanıyor.
 class EventSchedulePage extends StatefulWidget {
   const EventSchedulePage({super.key, required this.event});
 

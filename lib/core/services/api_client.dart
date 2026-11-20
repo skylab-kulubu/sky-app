@@ -1,11 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:sky_app/core/services/api_exception.dart';
 
-/// Oturum yenileme denemesinin sonucu.
-///
-/// `bool` yetmiyordu: "yetkilendirme reddedildi" ile "sunucuya ulaşılamadı"
-/// ayrımı, oturumun silinip silinmeyeceğine ve kullanıcının giriş ekranına
-/// atılıp atılmayacağına karar veriyor.
+/// Oturum yenilemenin sonucu. "Reddedildi" ile "ulaşılamadı" ayrımı, oturumun
+/// silinip kullanıcının girişe atılıp atılmayacağını belirliyor.
 enum RefreshOutcome {
   success,
 
@@ -16,11 +13,9 @@ enum RefreshOutcome {
   networkFailure,
 }
 
-/// Access token'ı okuyabilen ve oturumu yenileyebilen kaynak.
-///
-/// [ApiClient] `core` altında ve oturumun nasıl tutulduğunu bilmiyor;
-/// yalnızca bu iki işi isteyebiliyor. Somut karşılığı `features/auth`
-/// içindeki `AuthService`, bağlama `main.dart`'ta yapılıyor.
+/// Access token'ı okuyup oturumu yenileyebilen kaynak; [ApiClient] oturumun
+/// nasıl tutulduğunu bilmiyor. Somut karşılığı `AuthService`, bağlama
+/// `main.dart`'ta.
 abstract class TokenProvider {
   Future<String?> readAccessToken();
 

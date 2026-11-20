@@ -13,25 +13,19 @@ enum ApiErrorType {
   /// Kimlik doğrulanamadı: token yok, süresi dolmuş ya da yenilenemedi.
   auth,
 
-  /// İstenen kayıt bulunamadı.
   notFound,
 
   /// Sunucu tarafında hata (5xx).
   server,
 
-  /// İstek iptal edildi.
   cancelled,
 
-  /// Yukarıdakilerin hiçbiri.
   unknown,
 }
 
-/// [DioException]'ın sınıflandırılmış hâli.
-///
-/// Çağrı yerlerinin `DioExceptionType`'ı tek tek elemesi yerine tek bir
-/// [type] alanına bakması için var. Asıl ihtiyaç oturum yönetiminde:
-/// "yetkilendirme reddedildi" ile "internet yok" ayrımı, oturumun silinip
-/// silinmeyeceğine karar veriyor.
+/// [DioException]'ın sınıflandırılmış hâli. Asıl ihtiyaç oturum yönetiminde:
+/// "yetki reddedildi" ile "internet yok" ayrımı oturumun silinip
+/// silinmeyeceğini belirliyor.
 class ApiException implements Exception {
   const ApiException(
     this.type, {

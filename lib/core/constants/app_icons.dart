@@ -1,8 +1,5 @@
-/// Reicon ikon adları.
-///
-/// Değerler [AppIcon] widget'ına verilir; widget adı `Reicon.outline` veya
-/// `Reicon.filled` ağırlığından çözer. Yeni ikon eklerken adın pakette
-/// bulunduğundan emin ol: `Reicon.outline.names`.
+/// Reicon ikon adları; [AppIcon] çözüyor. Yeni adın Outline ve Filled
+/// ağırlıklarının ikisinde de bulunduğunu kontrol et.
 class AppIcons {
   // Navigation
   static const String home = 'home';

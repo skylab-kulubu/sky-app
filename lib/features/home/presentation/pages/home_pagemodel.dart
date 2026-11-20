@@ -11,8 +11,8 @@ abstract class HomePagemodel extends State<HomePage> {
 
   static const double _messageLineHeight = 1.35;
 
-  /// Hata satırındaki "Tekrar Dene"nin yerini alan gösterge. Metin
-  /// boyutunda kalıyor ki satırın yüksekliği değişmesin.
+  /// "Tekrar Dene"nin yerini alan gösterge; metin boyunda, satır yüksekliği
+  /// değişmesin.
   static const double _retrySpinner = 16.0;
   static const double _retrySpinnerStroke = 2.0;
 }

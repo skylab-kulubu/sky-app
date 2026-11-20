@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sky_app/core/widgets/svg_animation_widget.dart';
 
-// ── SkyLab SVG path data ──────────────────────────────────────────────────────
-// viewBox 0 0 586 554. Key order matches Framer Motion Object.keys() order.
+// viewBox 0 0 586 554. Anahtar sırası Framer Motion'ın Object.keys() sırası.
 
 const Map<String, String> _skylabRawPaths = {
   'p12f85900':
@@ -55,8 +54,6 @@ final SvgPathLibrary skylabLibrary = SvgPathLibrary(
 final DrawAndFillRecipe _skylabLogoRecipe = DrawAndFillRecipe(
   library: skylabLibrary,
 );
-
-// ── SkylabAnimationLogo widget ─────────────────────────────────────────────────────────
 
 class SkylabAnimationLogo extends StatelessWidget {
   const SkylabAnimationLogo({

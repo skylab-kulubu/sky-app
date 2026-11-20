@@ -38,10 +38,8 @@ abstract class CertificatesPagemodel extends State<CertificatesPage> {
     await _fetchCertificates();
   }
 
-  /// Aşağı çekerek yenileme; gösterge istek bitene kadar dönüyor.
   Future<void> onRefresh() => _fetchCertificates();
 
-  /// İşlemleri gösterir: PDF'i aç (yalnızca geçerli), doğrula, paylaş.
   Future<void> onCertificateTap(Certificate certificate) async {
     final action = await CertificateActionsSheet.show(context, certificate);
     if (action == null || !mounted) return;
@@ -67,8 +65,7 @@ abstract class CertificatesPagemodel extends State<CertificatesPage> {
     }
   }
 
-  /// Adresler core'dan olduğu gibi (yalnızca https) açılıyor; kulüp siteleri
-  /// gibi tarayıcı sayfasında.
+  /// Adresler core'dan olduğu gibi (yalnızca https), tarayıcı sheet'inde.
   void _open(String? url, String title) {
     if (url == null) return;
     WebviewService.openLink(

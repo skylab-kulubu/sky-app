@@ -6,17 +6,14 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
   /// İstek sürerken buton kilitli kalıyor; çift kayıt oluşmasın diye.
   bool isJoining = false;
 
-  /// Kapak görselinden çıkarılan renkler; sayfanın zemini bunlardan
-  /// türetiliyor. Palet çözülene kadar boş, o sürede zemin düz taban rengi.
+  /// Kapaktan çıkarılan renkler; çözülene kadar boş, zemin düz taban.
   List<Color> backdropTints = const [];
 
-  /// Gösterilen etkinlik; düzenlenince yerinde güncelleniyor.
   late EventModel event = widget.event;
 
   final ScheduleService _scheduleService = ScheduleService();
 
-  /// Etkinliğin programı (günler ve oturumlar); herkese gösteriliyor.
-  /// Yüklenemezse bölüm sessizce görünmüyor.
+  /// Programı herkese gösteriliyor; yüklenemezse bölüm görünmüyor.
   List<ScheduleDay> schedule = const [];
 
   bool get hasSchedule => schedule.any((entry) => entry.sessions.isNotEmpty);
@@ -31,20 +28,16 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     }
   }
 
-  /// Programı düzenleme sayfasını açar; değiştiyse bölümü yeniler.
   Future<void> onEditSchedule() async {
     final changed = await EventSchedulePage.open(context, event);
     if (changed && mounted) await _loadSchedule();
   }
 
-  /// Düzenleme butonu yalnızca yetkisi olana (etkinliğin ekibinde lider,
-  /// GECEKODU üyesi ya da YK/ADMIN).
   bool get canEdit =>
       context.watch<UserProvider>().user?.canEditEvent(event.ownerTeam) ??
       false;
 
-  /// Düzenleme sayfasını açar; kaydedildiyse sayfayı yeni hâliyle yeniler,
-  /// silindiyse detaydan çıkar.
+  /// Kaydedildiyse sayfayı yeni hâliyle yeniler, silindiyse detaydan çıkar.
   Future<void> onEditPressed() async {
     final result = await EventCreatePage.edit(context, event);
     if (result == null || !mounted) return;
@@ -81,16 +74,15 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
   void initState() {
     super.initState();
 
-    // Renkler kart göründüğünde hesaplanmaya başlamıştı; çoğu zaman burada
-    // hazır ve zemin ilk karede doğru renkte açılıyor.
+    // Renkler kart göründüğünde hesaplanmaya başladı; çoğu zaman hazır ve zemin
+    // ilk karede doğru renkte.
     backdropTints = EventPaletteService.cached(
       event.coverImageUrl,
       known: event.coverColors,
     );
 
-    // Hazır değilse beklemek gerekiyor ama sayfa açılırken değil: palet
-    // çıkarımı ana iş parçacığında çalıştığı için açılış animasyonunu
-    // takıyor.
+    // Hazır değilse açılış animasyonundan sonra bekleniyor: palet ana iş
+    // parçacığında çalışıp animasyonu takıyor.
     WidgetsBinding.instance.addPostFrameCallback((_) => _afterTransition());
 
     _loadSchedule();
@@ -102,7 +94,6 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     super.dispose();
   }
 
-  /// Renk hesabını açılış animasyonu bittikten sonra başlatır.
   void _afterTransition() {
     if (!mounted || backdropTints.isNotEmpty) return;
 
@@ -126,11 +117,8 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     animation.addStatusListener(onStatus);
   }
 
-  /// Zemin renklerini bekler.
-  ///
-  /// Hesabın kendisi [EventPaletteService]'te; buraya yalnızca sonucu
-  /// almak kalıyor. Kart göründüğünde başlatıldığı için bu çağrı çoğu zaman
-  /// süren bir işe bağlanıyor, yenisini başlatmıyor.
+  /// Zemin renklerini bekler; kart göründüğünde başlayan işe bağlanıyor, yenisini
+  /// başlatmıyor.
   Future<void> _resolveBackdropTint() async {
     final imageUrl = event.coverImageUrl;
     final tints = await EventPaletteService.resolve(
@@ -138,9 +126,8 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
       known: event.coverColors,
     );
 
-    // Görsel indirilemediyse zemin düz taban renginde kalır; sayfanın geri
-    // kalanı bundan etkilenmiyor.
-    // Beklerken kapak değiştiyse (düzenleme) bu sonuç artık eski.
+    // Görsel indirilemediyse zemin düz kalıyor; beklerken kapak değiştiyse sonuç
+    // eski.
     if (!mounted || tints.isEmpty || imageUrl != event.coverImageUrl) return;
     setState(() => backdropTints = tints);
   }
@@ -153,9 +140,7 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     EventPhase.cancelled => 'İptal Edildi',
   };
 
-  /// Etkinliği sistem paylaşım sayfasıyla paylaşır.
-  ///
-  /// Ad, tarih, konum ve uygulamada etkinliği açan bağlantı.
+  /// Ad, tarih, konum ve uygulamada etkinliği açan bağlantıyla paylaşır.
   Future<void> onSharePressed() async {
     final lines = <String>[
       event.name,
@@ -164,15 +149,14 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
         event.formattedTimeRange,
       ].where((part) => part.isNotEmpty).join(' · '),
       event.location,
-      // Uygulamada detayı açan bağlantı (App Links / Universal Links).
       LinksService.eventLink(event.id),
     ].where((line) => line.isNotEmpty);
 
     await SharePlus.instance.share(ShareParams(text: lines.join('\n')));
   }
 
-  /// SKYFORMS adresindeki formlar uygulama içinde, girişli açılıyor (web
-  /// handoff); başka bir adresteki form (Google Forms gibi) tarayıcıda.
+  /// SKYFORMS formları uygulama içinde girişli (web handoff), başka adresteki
+  /// form (Google Forms gibi) tarayıcıda açılıyor.
   String? get _formsPath =>
       HandoffService.pathOf(HandoffTarget.forms, event.formUrl);
 
@@ -211,7 +195,6 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(result.message)));
-    // Yeni bilet profildeki aktivitelerde görünsün.
     if (result.hasTicket) {
       final userId = context.read<UserProvider>().user?.id;
       if (userId != null) {

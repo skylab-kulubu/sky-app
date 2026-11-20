@@ -8,18 +8,12 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/models/nav_menu_action.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 
-/// Shell'in yüzen navbar'ı.
+/// Shell'in yüzen navbar'ı. [actions] boşsa sekmeler etiketli bir hap; doluysa
+/// sekmeler etiketsiz, sağda bir menü butonu ve basınca hap yukarı uzayıp
+/// [actions] kartına dönüşüyor.
 ///
-/// [actions] boşsa yalnızca sekmeler var: seçili sekme etiketini gösteren
-/// bir hap. Doluysa sekmeler etiketsiz verilir ve hap'ın sağına yuvarlak bir
-/// menü butonu gelir. Butona basınca sekme ikonları kaybolurken hap yukarı
-/// doğru uzayıp [actions] satırlarını gösteren bir karta dönüşür; buton
-/// kapatma butonu olur.
-///
-/// Kart navbar'ın yerini aştığı için widget ekranın tamamını kaplamalı
-/// (bir [Stack] içinde `Positioned.fill`): Scaffold'un `bottomNavigationBar`
-/// yuvasında dursaydı yuvanın dışına taşan satırlar dokunma almazdı. Açıkken
-/// dışarıya dokunmak ve geri tuşu menüyü kapatıyor.
+/// Kart yuvadan taştığı için widget ekranı kaplamalı (`Stack` içinde
+/// `Positioned.fill`); `bottomNavigationBar`'da taşan satırlar dokunma almazdı.
 class ExpandableNavBar extends StatefulWidget {
   const ExpandableNavBar({
     super.key,
@@ -70,7 +64,6 @@ class _ExpandableNavBarState extends State<ExpandableNavBar>
     duration: _duration,
   );
 
-  /// Kartın boyu.
   late final Animation<double> _size = CurvedAnimation(
     parent: _controller,
     curve: Curves.easeOutCubic,
@@ -180,7 +173,6 @@ class _ExpandableNavBarState extends State<ExpandableNavBar>
     );
   }
 
-  /// Menü yokken: yalnızca sekmeler.
   Widget _plainBar(BuildContext context) {
     return Container(
       padding: AppPaddings.navBarContent,
@@ -192,12 +184,9 @@ class _ExpandableNavBarState extends State<ExpandableNavBar>
     );
   }
 
-  /// Sekmelerle menü aynı yüzeyde üst üste: biri kısalırken öteki uzuyor.
-  ///
-  /// Menü `heightFactor: t`, sekmeler `1 - t` ile açılıyor; kartın boyu
-  /// böylece iki içeriğin kendi yüksekliği arasında kendiliğinden
-  /// geçiş yapıyor, elle ölçü hesaplanmıyor. Genişlik ikisinin genişinde
-  /// sabit kalıyor ([IntrinsicWidth]).
+  /// Sekmeler ve menü aynı yüzeyde: menü `heightFactor: t`, sekmeler `1 - t`.
+  /// Kart boyu böylece elle ölçü hesaplamadan geçiyor; genişlik
+  /// [IntrinsicWidth] ile sabit.
   Widget _panel(BuildContext context) {
     final menu = _menu(context);
     final items = Row(
@@ -323,10 +312,7 @@ class _ExpandableNavBarState extends State<ExpandableNavBar>
       color: context.tileColor.withValues(alpha: _surfaceOpacity),
       shape: borderRadius == null ? BoxShape.circle : BoxShape.rectangle,
       borderRadius: borderRadius,
-      // Kenarlık yalnızca açık temada: orada hap ile beyaz zemin arasındaki
-      // fark çok az kalıyor ve sınırı belirginleştiriyor. Koyu temada hap
-      // zaten siyah zeminden ayrıştığı için kenarlık fazladan bir çizgi gibi
-      // duruyor.
+      // Kenarlık yalnızca açık temada; koyu temada hap zeminden zaten ayrışıyor.
       border: isDark ? null : Border.all(color: context.dividerColor),
       boxShadow: [
         BoxShadow(

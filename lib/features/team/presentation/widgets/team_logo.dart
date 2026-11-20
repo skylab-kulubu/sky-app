@@ -5,12 +5,9 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/features/team/data/models/team.dart';
 
-/// Ekip logosu; kutusuna oranı bozulmadan sığar.
-///
-/// Logolar koyu zemine göre hazırlanmış: ALGOLAB ve GAMELAB'ın renkli
-/// sürümlerinde beyaz yazı var, açık temada kayboluyor. O ekiplerde açık
-/// temada tek renkli sürüm metin rengine boyanıyor. Logosu olmayan
-/// (sonradan CMS'e eklenmiş) bir ekipte ikon çiziliyor.
+/// Ekip logosu, oranı bozulmadan. ALGOLAB ve GAMELAB'ın renkli logolarındaki
+/// beyaz açık temada kaybolduğu için orada tek renkli sürüm metin rengine
+/// boyanıyor; logosu olmayan ekipte ikon.
 class TeamLogo extends StatelessWidget {
   const TeamLogo({super.key, required this.team});
 

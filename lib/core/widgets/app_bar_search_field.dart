@@ -4,13 +4,8 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
 
-/// AppBar başlığının yerini alan, sağdan sola açılan arama kutusu.
-///
-/// Başlık slotunun tamamını kaplıyor: kapalıyken [title] görünüyor, açılınca
-/// başlık solarak kayboluyor ve kutu, sağındaki arama butonunun hemen
-/// solundan başlayıp başlığın yerine doğru genişliyor. Genişleme bitince
-/// klavye açılıyor; önce açılsaydı kutu daha dar ve imleç kayarken
-/// görünüyordu.
+/// AppBar başlığının yerine sağdan sola açılan arama kutusu. Klavye genişleme
+/// bitince açılıyor; önce açılınca imleç kayarken görünüyordu.
 class AppBarSearchField extends StatelessWidget {
   const AppBarSearchField({
     super.key,
@@ -91,10 +86,8 @@ class AppBarSearchField extends StatelessWidget {
         minWidth: fullWidth,
         maxWidth: fullWidth,
         alignment: Alignment.centerRight,
-        // Kutu yüksekliği sıkı veriyor; metin alanı o yüksekliğe zorlanınca
-        // kendi boyunda çiziliyor ve üste yapışıyordu (`textAlignVertical`
-        // yalnızca `expands` ile işe yarıyor). Center kısıtı gevşetip alanı
-        // doğal boyunda dikeyde ortalıyor.
+        // Sıkı yükseklikte metin alanı üste yapışıyordu (`textAlignVertical`
+        // yalnızca `expands` ile çalışıyor); Center alanı dikeyde ortalıyor.
         child: Center(
           child: TextField(
             controller: controller,

@@ -16,7 +16,6 @@ abstract class SessionCheckInPagemodel extends State<SessionCheckInPage> {
 
   ScanResult? result;
 
-  /// Oturum sorgusu ya da giriş isteği sürüyor.
   bool isBusy = false;
 
   String? _lastRaw;
@@ -30,8 +29,7 @@ abstract class SessionCheckInPagemodel extends State<SessionCheckInPage> {
     super.dispose();
   }
 
-  /// Kameranın gördüğü kod. Bir istek sürerken ya da aynı kod az önce
-  /// okunduysa yok sayılıyor.
+  /// Bir istek sürerken ya da aynı kod az önce okunduysa yok sayılıyor.
   Future<void> onDetect(BarcodeCapture capture) async {
     final raw = capture.barcodes.firstOrNull?.rawValue;
     if (raw == null || raw.isEmpty || isBusy) return;
@@ -65,8 +63,8 @@ abstract class SessionCheckInPagemodel extends State<SessionCheckInPage> {
     }
   }
 
-  /// Önce oturum okunuyor: yoksa ya da iptal edildiyse giriş denenmiyor,
-  /// başarıda da sonuçta oturumun adı gösteriliyor.
+  /// Önce oturum okunuyor: yoksa ya da iptalse giriş denenmiyor; başarıda adı
+  /// gösteriliyor.
   Future<void> _checkIn(String sessionId) async {
     try {
       final session = await _service.fetchSession(sessionId);
@@ -132,7 +130,6 @@ abstract class SessionCheckInPagemodel extends State<SessionCheckInPage> {
     };
   }
 
-  /// Profildeki "Aktivitelerim" yeni katılımı göstersin.
   void _refreshActivities() {
     final userId = context.read<UserProvider>().user?.id;
     if (userId == null) return;

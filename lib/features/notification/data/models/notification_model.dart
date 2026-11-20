@@ -13,7 +13,6 @@ class NotificationModel {
     required this.dateTime,
   });
 
-  /// Bildirim açılınca okundu olarak işaretlemek için kullanılır.
   NotificationModel copyWith({bool? isRead}) {
     return NotificationModel(
       title: title,

@@ -1,11 +1,9 @@
 import 'package:sky_app/core/services/core_api.dart';
 import 'package:sky_app/features/profile/data/models/certificate.dart';
 
-/// Kullanıcının sertifikaları (core `GET /v1/certificates/me`).
 class CertificateService {
-  /// Bütün sertifikalar, yeniden eskiye; iptal edilenler de (geçmiş olarak)
-  /// dahil. Boş liste gerçekten sertifika yok demek; ağ ve çözümleme
-  /// hataları `ApiException` olarak fırlıyor, boş listeye dönüşmüyor.
+  /// Yeniden eskiye, iptal edilenler dahil. Hata boş listeye dönüşmüyor,
+  /// `ApiException` olarak fırlıyor.
   Future<List<Certificate>> getCertificates() async {
     final body = await CoreApi.get('/certificates/me');
     return CoreApi.list(

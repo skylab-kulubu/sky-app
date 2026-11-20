@@ -11,17 +11,13 @@ class WebviewService {
   /// iOS'taki kadar yuvarlak olamıyor, verilebilecek en yuvarlağı bu.
   static const int _sheetCornerRadius = 16;
 
-  /// Bağlantıyı alttan açılan bir tarayıcı sheet'inde açar: Android'de
-  /// Partial Custom Tabs, iOS'ta sayfa sheet'i olarak `SFSafariViewController`.
+  /// Bağlantıyı alttan açılan bir tarayıcı sheet'inde açar: Android'de Partial
+  /// Custom Tabs, iOS'ta `SFSafariViewController`.
   ///
-  /// `webview_flutter` yerine tarayıcı kullanılıyor çünkü girişte oluşan
-  /// Keycloak (e-skylab) çerezini paylaşıyor; kulüp siteleri kullanıcıyı
-  /// yeniden şifre sormadan içeri alıyor. WebView'un kendi ayrı çerez deposu
-  /// var ve oturumu göremiyordu. Bkz. `AuthService._externalUserAgent`.
-  ///
-  /// Android'de sheet Chrome 107+ istiyor; desteklemeyen tarayıcıda aynı
-  /// sekme tam ekran açılıyor. Hiç açılamazsa eski yol, uygulamanın kendi
-  /// webview sayfası.
+  /// WebView değil tarayıcı, çünkü girişteki Keycloak çerezini paylaşıyor ve
+  /// kulüp siteleri yeniden şifre sormuyor (bkz.
+  /// `AuthService._externalUserAgent`). Android'de sheet Chrome 107+ istiyor,
+  /// yoksa tam ekran; hiç açılamazsa uygulamanın webview sayfası.
   static Future<void> openLink(BuildContext context, LinkItem link) async {
     final uri = Uri.parse(link.url);
 
@@ -50,9 +46,8 @@ class WebviewService {
   ) {
     return custom_tabs.CustomTabsOptions.partial(
       configuration: custom_tabs.PartialCustomTabsConfiguration.bottomSheet(
-        // Durum çubuğunun hemen altına kadar; iOS'taki büyük sheet gibi.
-        // Oranla verildiğinde (%90) appbar açıkta kalıyor ve sheet ekranın
-        // bir parçası gibi değil, üstüne yarım binmiş gibi duruyordu.
+        // Durum çubuğunun hemen altına kadar; oranla (%90) verilince appbar açıkta
+        // kalıyordu.
         initialHeight:
             MediaQuery.sizeOf(context).height -
             MediaQuery.paddingOf(context).top,

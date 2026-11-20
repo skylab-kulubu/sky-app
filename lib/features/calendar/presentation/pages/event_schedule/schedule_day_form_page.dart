@@ -18,8 +18,7 @@ import 'package:sky_app/features/calendar/presentation/widgets/confirm_delete_di
 
 part 'schedule_day_form_pagemodel.dart';
 
-/// Program gününü ekler ya da düzenler: ad (isteğe bağlı) ve tarih.
-/// Kaydedilir ya da silinirse `true` ile kapanıyor.
+/// Program gününü ekler ya da düzenler; kaydedilir ya da silinirse `true`.
 class ScheduleDayFormPage extends StatefulWidget {
   const ScheduleDayFormPage({
     super.key,
@@ -31,11 +30,9 @@ class ScheduleDayFormPage extends StatefulWidget {
 
   final String eventId;
 
-  /// Yeni günün önerilen tarihi.
   final DateTime initialDate;
   final bool canDelete;
 
-  /// Düzenlenen gün; yeni gün için `null`.
   final EventDay? day;
 
   static Future<bool> open(

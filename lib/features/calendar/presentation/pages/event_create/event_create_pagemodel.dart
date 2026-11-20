@@ -9,8 +9,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
   final TextEditingController formUrlController = TextEditingController();
   final TextEditingController linkedinController = TextEditingController();
 
-  /// Varsayılan etkinlik süresi; bitiş, başlangıç değişince bu kadar ileri
-  /// kayıyor.
+  /// Varsayılan süre; başlangıç değişince bitiş bu kadar ileri kayıyor.
   static const Duration _defaultDuration = Duration(hours: 2);
 
   XFile? cover;
@@ -23,8 +22,8 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
 
   late final User? _user = context.read<UserProvider>().user;
 
-  /// Seçilebilir sahip ekipler. Düzenlemede etkinliğin mevcut ekibi listede
-  /// yoksa (ör. GECEKODU üyesi) başa ekleniyor ki alan boş kalmasın.
+  /// Düzenlemede etkinliğin ekibi listede yoksa (ör. GECEKODU üyesi) başa
+  /// ekleniyor ki alan boş kalmasın.
   late final List<String> ownerOptions = () {
     final options = _user?.eventOwnerOptions ?? const <String>[];
     final current = _editing?.ownerTeam ?? '';
@@ -36,16 +35,13 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       ? _editing!.ownerTeam
       : (ownerOptions.isEmpty ? null : ownerOptions.first);
 
-  /// Silme yalnızca liderlere ve YK/ADMIN'e; GECEKODU üyeleri silemiyor.
   bool get canDelete =>
       isEditing && (_user?.canDeleteEvent(_editing!.ownerTeam) ?? false);
 
-  /// Sezon satırı yalnızca YK/ADMIN'de görünüyor (DK salt okur);
-  /// diğerlerinde etkinlik sezonsuz oluşuyor.
+  /// Sezon satırı yalnız YK/ADMIN'de; diğerlerinde etkinlik sezonsuz oluşuyor.
   late final bool canChooseSeason = _user?.canWriteAsPrivileged ?? false;
 
-  /// Düzenlenen etkinliğin mevcut kapağı; yeni görsel seçilmediyse
-  /// önizlemede bu görünüyor.
+  /// Yeni görsel seçilmediyse önizlemede mevcut kapak.
   String get currentCoverUrl => _editing?.coverPageUrl ?? '';
 
   List<Season> seasons = const [];
@@ -54,8 +50,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
 
   int capacity = 0;
 
-  /// "Başvurular açık" anahtarı; core'a `registrationClosed` olarak tersi
-  /// gidiyor.
+  /// Core'a tersi `registrationClosed` olarak gidiyor.
   bool registrationOpen = true;
   bool isSaving = false;
   bool isDeleting = false;
@@ -103,8 +98,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       if (!mounted) return;
       setState(() {
         seasons = result;
-        // Düzenlemede etkinliğin sezonu; oluştururken aktif sezon varsa o,
-        // yoksa ilki (çoğu zaman tek aktif sezon var).
+        // Düzenlemede etkinliğin sezonu; oluştururken aktif sezon, yoksa ilki.
         final editingSeasonId = _editing?.seasonId ?? '';
         season =
             result.where((s) => s.id == editingSeasonId).firstOrNull ??
@@ -125,8 +119,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
   }
 
   /// Zorunlular: ad, konum, sahip ekip ve bitişin başlangıçtan sonra olması.
-  /// Sezon isteğe bağlı (bağlamayı YK panelden de yapabiliyor). Tarihler
-  /// varsayılanla dolu geldiği için ayrıca boş kontrolü yok.
+  /// Sezon isteğe bağlı.
   bool get canSubmit =>
       !isBusy &&
       nameController.text.trim().isNotEmpty &&
@@ -142,7 +135,6 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       if (picked == null || !mounted) return;
       setState(() => cover = picked);
     } on PlatformException catch (e) {
-      // Galeri izni reddedildiğinde buraya düşüyor.
       log('Görsel seçilemedi: $e');
       _showMessage('Galeriye erişilemedi. İzinleri kontrol et.');
     }
@@ -160,11 +152,11 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
         '${two(value.hour)}:${two(value.minute)}';
   }
 
-  /// Önce tarih, ardından saat seçtirir. Tarihte vazgeçilirse hiçbir şey
-  /// değişmez; saatte vazgeçilirse seçilen gün eski saatle kalır.
   void onRegistrationOpenChanged(bool value) =>
       setState(() => registrationOpen = value);
 
+  /// Önce tarih, sonra saat seçtirir. Tarihte vazgeçilirse bir şey değişmiyor;
+  /// saatte vazgeçilirse gün eski saatle kalıyor.
   Future<void> onPickDateTime({required bool isStart}) async {
     final current = isStart ? startDate : endDate;
     final now = DateTime.now();
@@ -195,8 +187,8 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
     );
   }
 
-  /// Başlangıç değişince bitiş aynı süreyle kayıyor. Bitiş başlangıcın
-  /// önüne alınırsa "Bitiş" satırı kırmızı olur ve "Oluştur" pasifleşir.
+  /// Başlangıç değişince bitiş aynı süreyle kayıyor. Bitiş başlangıcın önüne
+  /// alınırsa satır kırmızı ve "Oluştur" pasif.
   void _setDateTime({required bool isStart, required DateTime value}) {
     setState(() {
       if (isStart) {
@@ -213,7 +205,6 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
     });
   }
 
-  /// Programı (günler, oturumlar) düzenleme sayfasını açar.
   Future<void> onEditSchedule() async {
     final editing = _editing;
     if (editing == null) return;
@@ -252,7 +243,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
     setState(() => season = seasons[index]);
   }
 
-  /// Kontenjan: boş ya da 0 sınırsız.
+  /// Boş ya da 0 sınırsız.
   Future<void> onEditCapacity() async {
     final result = await EventCapacityDialog.show(
       context,
@@ -310,8 +301,8 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
     }
   }
 
-  /// Günceller; sezon değiştiyse (yalnızca YK/ADMIN) yeni sezona bağlar.
-  /// Bağlama düşerse güncelleme yine geçerli, sezon eski kalıyor.
+  /// Sezon değiştiyse (yalnız YK/ADMIN) yeniden bağlar; bağlama düşerse
+  /// güncelleme yine geçerli, sezon eski kalıyor.
   Future<EventModel> _updateAndAssign(
     EventModel editing,
     EventDraft draft,
@@ -338,8 +329,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
     };
   }
 
-  /// Onaydan sonra siler. Core etkinlikle birlikte biletleri, yoklamaları
-  /// ve sertifikaları da siliyor; onay metni bunu söylüyor.
+  /// Onaydan sonra siler.
   Future<void> onDeletePressed() async {
     final editing = _editing;
     if (editing == null) return;
@@ -360,8 +350,8 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       setState(() => isDeleting = false);
       _showMessage(switch (error.statusCode) {
         403 => 'Bu etkinliği silme yetkin yok.',
-        // Core yayınlanmış ya da bileti olan etkinliği sildirmiyor
-        // (`event_not_draft`, `event_has_tickets`).
+        // Core yayınlanmış ya da bileti olan etkinliği sildirmiyor (`event_not_draft`,
+        // `event_has_tickets`).
         409 => 'Bu etkinlik artık silinemiyor.',
         _ => error.userMessage,
       });

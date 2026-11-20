@@ -8,12 +8,11 @@ import 'package:sky_app/features/team/data/models/team.dart';
 import 'package:sky_app/core/widgets/sky_tag_editor.dart';
 import 'package:sky_app/core/widgets/sky_text_field.dart';
 
-/// Tek bir çalışmayı ekleyen ya da düzenleyen sheet. Kaydedince çalışmanın
-/// yeni hâlini döner; vazgeçilirse `null`.
+/// Çalışmayı ekleyen ya da düzenleyen sheet; yeni hâli döner, vazgeçilirse
+/// `null`.
 class TeamWorkSheet extends StatefulWidget {
   const TeamWorkSheet({super.key, this.work});
 
-  /// Düzenlenen çalışma; yeni eklemede `null`.
   final TeamWork? work;
 
   static Future<TeamWork?> show(BuildContext context, {TeamWork? work}) {

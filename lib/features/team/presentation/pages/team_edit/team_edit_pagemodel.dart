@@ -11,7 +11,6 @@ abstract class TeamEditPagemodel extends State<TeamEditPage> {
   final TextEditingController topicInputController = TextEditingController();
   final TextEditingController stackInputController = TextEditingController();
 
-  /// CMS'ten çekilen hâl; değişiklik kontrolü ve kayıt buna göre.
   Team? original;
   ApiException? loadError;
 
@@ -49,8 +48,7 @@ abstract class TeamEditPagemodel extends State<TeamEditPage> {
       setState(() {
         original = team;
         descriptionController.text = team.description;
-        // Düz metne çevrilmiş hâli; editör HTML ürettiyse etiketler
-        // formda görünmesin. Kaydedince düz metin olarak gidiyor.
+        // Düz metin hâli; editör HTML ürettiyse etiketler formda görünmesin.
         longDescriptionController.text = team.longDescriptionText;
         topics = team.topics;
         stack = team.stack;
@@ -68,16 +66,14 @@ abstract class TeamEditPagemodel extends State<TeamEditPage> {
   Team? get _edited => original?.copyWith(
     description: descriptionController.text.trim(),
     longDescription: longDescriptionController.text.trim(),
-    // Alanda yazılı kalan metin de etiket sayılıyor; kullanıcı onaya
-    // basmadan "Kaydet"e basarsa kaybolmasın.
+    // Alanda kalan metin de etiket; onaya basmadan kaydedilirse kaybolmasın.
     topics: SkyTagEditor.withPending(topics, topicInputController.text),
     stack: SkyTagEditor.withPending(stack, stackInputController.text),
     works: works,
     isRecruiting: isRecruiting,
   );
 
-  /// Kaydedilmemiş değişiklik var mı. Karşılaştırma CMS'e gidecek veri
-  /// üzerinden; alan alan tutmak yerine tek kaynak.
+  /// Karşılaştırma CMS'e gidecek veri üzerinden, tek kaynak.
   bool get hasChanges {
     final original = this.original;
     final edited = _edited;
@@ -93,7 +89,6 @@ abstract class TeamEditPagemodel extends State<TeamEditPage> {
   bool get canSave =>
       hasChanges && descriptionController.text.trim().isNotEmpty && !isSaving;
 
-  /// Metin alanları değiştikçe "Kaydet"in durumu yeniden hesaplansın.
   void onFormChanged() => setState(() {});
 
   void onRecruitingChanged(bool value) => setState(() => isRecruiting = value);
@@ -108,7 +103,6 @@ abstract class TeamEditPagemodel extends State<TeamEditPage> {
     setState(() => works = [...works, work]);
   }
 
-  /// Çalışmaya dokununca: düzenle ya da sil.
   Future<void> onWorkTap(int index) async {
     final action = await _askWorkAction(works[index]);
     if (!mounted || action == null) return;
@@ -135,9 +129,8 @@ abstract class TeamEditPagemodel extends State<TeamEditPage> {
         top: false,
         child: Padding(
           padding: AppPaddings.mainPaddingAll,
-          // Column(min): sheet'in yüksekliği sınırlı olduğunda TileGroup onu
-          // tamamen doldurup iki satırın altında boş bir kart bırakıyordu.
-          // Görünüm sheet'indekiyle aynı düzen: başlık ve satırlar.
+          // Column(min): sınırlı yükseklikte TileGroup sheet'i doldurup altta boş kart
+          // bırakıyordu.
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,8 +188,8 @@ abstract class TeamEditPagemodel extends State<TeamEditPage> {
       );
       Navigator.of(context).pop();
     } catch (e) {
-      // Yetki hatalarında 401 (token CMS'e uygun değil) ile 403 (rol ya da
-      // liderlik yok) ayrımı buradan okunuyor; kullanıcıya ikisi aynı mesaj.
+      // 401 (token CMS'e uygun değil) ile 403 (yetki yok) ayrımı loglarda;
+      // kullanıcıya ikisi aynı.
       log('Ekip kaydedilemedi (${edited.slug}): ${ApiException.from(e)}');
       if (!mounted) return;
       setState(() => isSaving = false);
@@ -210,15 +203,12 @@ abstract class TeamEditPagemodel extends State<TeamEditPage> {
     return switch (error.statusCode) {
       409 =>
         'Ekip bilgileri sen düzenlerken değiştirilmiş. Sayfayı kapatıp tekrar aç.',
-      // Token'ın `skyapp` client'ında `cms:access` yoksa ya da kullanıcı
-      // ekibin `LIDERLER` grubunda değilse CMS 401/403 dönüyor.
       401 || 403 => 'Bu ekibi düzenleme yetkin yok.',
       400 => 'Bilgiler kaydedilemedi; alanları kontrol et.',
       _ => error.userMessage,
     };
   }
 
-  /// Kaydedilmemiş değişiklikle geri dönülürken onay.
   Future<void> onDiscardRequested() async {
     final discard = await showDialog<bool>(
       context: context,
@@ -263,8 +253,7 @@ abstract class TeamEditPagemodel extends State<TeamEditPage> {
       ),
     );
 
-    // `pop` PopScope'a takılmıyor (yalnızca `maybePop` ve sistem geri
-    // hareketi takılıyor); onaydan sonra doğrudan çıkılıyor.
+    // `pop` PopScope'a takılmıyor; onaydan sonra doğrudan çıkılıyor.
     if (discard == true && mounted) Navigator.of(context).pop();
   }
 }

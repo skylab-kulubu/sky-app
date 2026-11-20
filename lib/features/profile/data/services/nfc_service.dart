@@ -1,9 +1,7 @@
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:sky_app/features/profile/data/models/nfc_card.dart';
 
-/// NFC donanım iletişiminden sorumlu servis sınıfı.
-///
-/// Yalnızca ISO 14443-A standardındaki öğrenci kartlarını hedefler.
+/// NFC okuma; yalnızca ISO 14443-A öğrenci kartları.
 class NfcService {
   Future<NFCAvailability> checkAvailability() async {
     return FlutterNfcKit.nfcAvailability;

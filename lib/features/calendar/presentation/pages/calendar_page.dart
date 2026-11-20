@@ -27,13 +27,9 @@ class _CalendarPageState extends CalendarPagemodel {
   @override
   void initState() {
     super.initState();
-    // Sayfa ihtiyacı olan veriyi kendisi istiyor; splash'teki çağrı yalnızca
-    // bir ön yükleme. Yoksa splash'i atlayan her giriş yolunda (taze giriş,
-    // web callback) liste kalıcı olarak boş kalıyordu.
-    //
-    // Kare bitişi bekleniyor: initState hâlâ build fazının içinde ve
-    // yükleme senkron bir `notifyListeners` ile başlıyor — build sırasında
-    // çağrılırsa markNeedsBuild hatası veriyor.
+    // Sayfa verisini kendisi istiyor; splash'teki çağrı yalnız ön yükleme (splash'i
+    // atlayan girişlerde liste boş kalıyordu). Kare bitişi bekleniyor: yükleme
+    // senkron `notifyListeners` ile başlıyor ve build sırasında hata veriyor.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       unawaited(context.read<EventProvider>().ensureLoaded());
@@ -51,11 +47,8 @@ class _CalendarPageState extends CalendarPagemodel {
     );
   }
 
-  /// Sayfanın durumu: ilk yükleme, hata, boş liste, aramada sonuç yok ya da
-  /// listenin kendisi.
-  ///
-  /// Hepsi tek bir [EventsRefreshIndicator]'ın altında kalıyor; yoksa
-  /// durum değiştiğinde gösterge ağaçtan kalkıp jest yarıda kesiliyor.
+  /// Sayfanın durumları; hepsi tek bir [EventsRefreshIndicator]'ın altında, yoksa
+  /// durum değişince jest yarıda kesiliyor.
   Widget _body(BuildContext context, EventProvider eventProvider) {
     if (isBusy(eventProvider)) {
       return _scrollable(
@@ -63,9 +56,8 @@ class _CalendarPageState extends CalendarPagemodel {
       );
     }
 
-    // Hata boş durumdan ayrı: "etkinlik yok" bilgi, "yüklenemedi" ise
-    // kullanıcının tekrar deneyebileceği bir arıza. Elde liste varken
-    // yenileme hatası sayfayı kaplamıyor, SnackBar'a düşüyor.
+    // "Etkinlik yok" bilgi, "yüklenemedi" tekrar denenebilir arıza. Elde liste
+    // varken yenileme hatası SnackBar'a düşüyor.
     final error = eventProvider.error;
     if (error != null && eventProvider.events.isEmpty) {
       return _scrollable(_error(context, error, eventProvider.isLoading));
@@ -79,11 +71,8 @@ class _CalendarPageState extends CalendarPagemodel {
     return _list(events);
   }
 
-  /// Liste dışındaki durumları kaydırılabilir yapar.
-  ///
-  /// [RefreshIndicator] altında kaydırılabilir bir çocuk ister; `Center`
-  /// doğrudan verilirse liste boşken — aşağı çekmenin en çok gerektiği
-  /// durumda — jest hiç başlamıyor.
+  /// Liste dışındaki durumları kaydırılabilir yapar; `Center` doğrudan verilirse
+  /// liste boşken aşağı çekme başlamıyor.
   Widget _scrollable(Widget child) {
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -132,7 +121,6 @@ class _CalendarPageState extends CalendarPagemodel {
 
   Widget _list(List<EventModel> events) {
     return ListView.separated(
-      // Liste ekranı doldurmasa da aşağı çekilebilsin.
       physics: const AlwaysScrollableScrollPhysics(),
       padding: AppPaddings.mainPaddingAll,
       // Son kart yüzen navbar'ın altında kalmasın diye listeye bir öğe

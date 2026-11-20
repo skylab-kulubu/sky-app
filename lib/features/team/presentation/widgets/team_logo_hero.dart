@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Ekip logosunu, karttan detay sayfasına uçabilmesi için [Hero] ile sarar.
-///
-/// `EventCoverHero` ile aynı düzen: etiket ve uçuş yolu tek yerde, kart ve
-/// detay sayfası aynı widget'ı kullanıyor.
+/// Ekip logosunu karttan detaya uçabilmesi için [Hero] ile sarar
+/// (`EventCoverHero` ile aynı düzen).
 class TeamLogoHero extends StatelessWidget {
   const TeamLogoHero({super.key, required this.slug, required this.child});
 

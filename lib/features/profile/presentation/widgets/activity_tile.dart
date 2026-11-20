@@ -8,23 +8,14 @@ import 'package:sky_app/core/widgets/icon_circle.dart';
 import 'package:sky_app/features/profile/data/models/activity.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-/// Profildeki aktivite satırı: solda renkli ikon dairesi, sağda başlık, kısa
-/// zaman etiketi ve iki satır açıklama. Kart zemini yok, sayfa zemini
-/// üzerinde düz durur.
-///
-/// Ana sayfadaki haber satırına **benzer** ama onun widget'ı değil: haberde
-/// kapak görseli ve detay sayfasına geçiş var, burada ikon var ve satırın
-/// gideceği bir yer yok. Tipografi kasıtlı olarak aynı, iki listedeki
-/// satırlar aynı ritimde okunsun diye.
-///
-/// Geri bildirim formu olan katılımda açıklamanın altında bir satır daha
-/// var ve satır dokunulabilir ([onTap]).
+/// Aktivite satırı: solda ikon dairesi, sağda başlık, zaman ve iki satır
+/// açıklama. Haber satırıyla aynı tipografi, iki liste aynı ritimde okunsun.
+/// Geri bildirim formu varsa altında bir satır daha ve satır dokunulabilir.
 class ActivityTile extends StatelessWidget {
   const ActivityTile({super.key, required this.item, this.onTap});
 
   final Activity item;
 
-  /// Geri bildirim formlarını açar; formu olmayan satırda `null`.
   final VoidCallback? onTap;
 
   static const double _circleSpacing = AppSizes.bigSpace;
@@ -114,8 +105,7 @@ class ActivityTile extends StatelessWidget {
     );
   }
 
-  /// Başlık ve zaman aynı satırda. Başlık tek satır: iki satıra taşan bir
-  /// başlık o satırı diğerlerinden uzun yapıp listenin ritmini bozuyor.
+  /// Başlık tek satır: taşan başlık listenin ritmini bozuyordu.
   Widget _titleRow(BuildContext context) {
     return Row(
       children: [
@@ -131,9 +121,8 @@ class ActivityTile extends StatelessWidget {
         ),
         const SizedBox(width: AppSizes.midSpace),
         Text(
-          // Kısa biçim ("3g", "2ay"): uzun biçim başlığın yerini yiyor.
-          // Kısa Türkçe biçimde gelecek ile geçmiş aynı yazılıyor ("3g");
-          // henüz başlamamış bir etkinliğe kayıt bu yüzden ayrı etiketleniyor.
+          // Kısa biçimde gelecek ve geçmiş aynı yazılıyor ("3g"); başlamamış etkinliğe
+          // kayıt ayrı etiketleniyor.
           item.dateTime.isAfter(DateTime.now())
               ? 'yakında'
               : timeago.format(item.dateTime, locale: 'tr_short'),

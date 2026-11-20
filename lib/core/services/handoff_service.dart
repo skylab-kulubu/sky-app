@@ -4,15 +4,10 @@ import 'package:sky_app/core/services/api_client.dart';
 import 'package:sky_app/core/services/api_exception.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-/// Uygulamadan bir SKY LAB sitesine girişli geçiş (web handoff).
-///
-/// Uygulama kendi Keycloak access token'ıyla kısa ömürlü bir kod alıyor,
-/// WebView bu kodu **kanıt başlığıyla** tek bir adres olarak açıyor ve
-/// kullanıcı hedef sitede yeniden giriş yapmadan içeri düşüyor.
-///
-/// Sözleşme: `mobile-web-handoff-contract.md` (WEBLAB, 2026-09-23). Uç
-/// Keycloak'ta; 2026-09-24'te canlıya çıktı, eski Hesap Merkezi ucu
-/// (`my.yildizskylab.com/v1/native-handoff`) artık hiç çağrılmıyor.
+/// Uygulamadan bir SKY LAB sitesine girişli geçiş (web handoff): access
+/// token'la kısa ömürlü bir kod alınıyor, WebView onu kanıt başlığıyla açıyor
+/// ve kullanıcı yeniden giriş yapmıyor. Sözleşme:
+/// `mobile-web-handoff-contract.md`; uç Keycloak'ta.
 class HandoffTarget {
   const HandoffTarget._(this.id, this.origin, this.label);
 

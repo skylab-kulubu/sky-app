@@ -8,13 +8,9 @@ import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/icon_circle.dart';
 import 'package:sky_app/features/profile/data/models/certificate.dart';
 
-/// Sertifika listesindeki tek satır: solda ikon dairesi, sağda etkinlik adı
-/// ve altında veren ekip ile tarih, sağda durum. Dokununca işlemler açılıyor.
-///
-/// Düzeni ve tipografisi ayarlardaki hesap satırıyla aynı; tek farkı solundaki
-/// avatarın yerini renkli ikon dairesinin alması. Ortak bir widget'a
-/// çıkarılmadı: hesap satırı tek başına duran bir kart, bu satır ise
-/// [TileGroup] içinde yaşıyor ve kendi zeminini çizmiyor.
+/// Sertifika satırı: ikon dairesi, etkinlik adı, veren ekip ve tarih, durum.
+/// Hesap satırıyla aynı düzen ama ortak widget değil: o tek başına kart, bu
+/// [TileGroup] içinde.
 class CertificateTile extends StatelessWidget {
   const CertificateTile({
     super.key,
@@ -55,8 +51,7 @@ class CertificateTile extends StatelessWidget {
     );
   }
 
-  /// "Geçerli" ya da "İptal"; bilinmeyen durum hiçbir zaman geçerli
-  /// gösterilmiyor.
+  /// "Geçerli" ya da "İptal"; bilinmeyen durum geçerli gösterilmiyor.
   Widget _status(BuildContext context) {
     final (label, color) = switch (certificate.status) {
       CertificateStatus.valid => ('Geçerli', AppColors.green),

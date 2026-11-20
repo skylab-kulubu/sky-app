@@ -13,11 +13,8 @@ import 'package:sky_app/features/calendar/data/services/event_palette_service.da
 import 'package:sky_app/features/calendar/presentation/pages/event_detail/event_detail_page.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_cover_hero.dart';
 
-/// Yaklaşan etkinlik satırı: solda kapak görseli, sağda tür, ad, tarih/saat
-/// ve konum.
-///
-/// Dokununca Etkinlikler sekmesindeki kartla aynı geçişle detay sayfasını
-/// açar: kapak görseli [Hero] ile uçar, sayfa üstüne biner.
+/// Yaklaşan etkinlik satırı; dokununca Etkinlikler'deki kartla aynı geçişle
+/// (kapak [Hero] ile) detayı açar.
 class UpcomingEventTile extends StatefulWidget {
   const UpcomingEventTile({super.key, required this.event});
 
@@ -37,9 +34,8 @@ class _UpcomingEventTileState extends State<UpcomingEventTile> {
   @override
   void initState() {
     super.initState();
-    // Detay sayfasının zemini kapağın renklerinden kuruluyor; hesap satır
-    // göründüğü anda başlıyor ki sayfa açıldığında hazır olsun.
-    // Sunucu renkleri gönderdiyse hesaplanacak bir şey yok.
+    // Detayın zemini kapak renklerinden; satır görünür görünmez hesaplanıyor ki
+    // sayfa açılınca hazır olsun. Sunucu renkleri geldiyse gerek yok.
     if (event.coverColors.isEmpty) {
       unawaited(EventPaletteService.resolve(event.coverImageUrl));
     }
@@ -117,8 +113,6 @@ class _UpcomingEventTileState extends State<UpcomingEventTile> {
     );
   }
 
-  /// Etkinlikler sekmesindeki kartla aynı dil: vurgu rengi yalnızca ikonda,
-  /// metin nötr kalıyor.
   Widget _metaRow(
     BuildContext context, {
     required String icon,

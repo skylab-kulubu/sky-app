@@ -1,12 +1,10 @@
 import 'package:sky_app/core/services/core_api.dart';
 import 'package:sky_app/features/calendar/data/models/event_session.dart';
 
-/// Etkinlik programı (core): günler ve oturumlar. Okuma herkese açık;
-/// yazma etkinliği düzenleyebilenlere (sahip ekibin lideri, GECEKODU'da
-/// üyeler, YK/ADMIN), silme liderlere ve YK/ADMIN'e.
+/// Etkinlik programı: günler ve oturumlar. Okuma herkese açık; yazma
+/// düzenleyebilenlere, silme liderlere ve YK/ADMIN'e.
 class ScheduleService {
-  /// Etkinliğin programı: tarihe göre sıralı günler, her birinin saate göre
-  /// sıralı oturumları (iptaller dahil).
+  /// Tarihe göre sıralı günler ve saate göre sıralı oturumları (iptaller dahil).
   Future<List<ScheduleDay>> fetchSchedule(String eventId) async {
     final days = CoreApi.list(
       await CoreApi.get('/events/$eventId/days'),

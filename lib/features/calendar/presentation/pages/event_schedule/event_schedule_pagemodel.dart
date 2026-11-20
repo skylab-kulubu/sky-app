@@ -7,8 +7,7 @@ abstract class EventSchedulePagemodel extends State<EventSchedulePage> {
   ApiException? error;
   bool isLoading = true;
 
-  /// Bir şey kaydedildi ya da silindi mi; sayfa kapanırken dönülüyor ki
-  /// detay sayfası programı yenilesin.
+  /// Sayfa kapanırken dönülüyor ki detay programı yenilesin.
   bool changed = false;
 
   late final bool canDelete =

@@ -3,13 +3,8 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 
-/// Liste satırlarını tek bir kart içinde toplar ve aralarına ayraç koyar.
-///
-/// Ayarlar, hesap ve sertifika sayfalarının ortak kabuğu.
-///
-/// Ayraçlar dışarıdan verilmez: satırlar koşullu çizildiğinde (boş gelen bir
-/// alan gizlendiğinde) grubun başında ya da sonunda boşta ayraç kalmasın diye
-/// burada üretilir.
+/// Satırları tek kartta toplayıp aralarına ayraç koyar. Ayraçlar burada
+/// üretiliyor ki koşullu gizlenen satırlarda boşta ayraç kalmasın.
 class TileGroup extends StatelessWidget {
   const TileGroup({
     super.key,

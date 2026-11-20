@@ -1,7 +1,5 @@
-/// SkyCMS'teki bir haber (`News` koleksiyonu).
-///
-/// Slug CMS'te başlıktan otomatik üretiliyor ve değişmiyor; haber
-/// bağlantıları (deep link, #44) bununla kurulacak.
+/// SkyCMS'teki bir haber (`news` koleksiyonu). Slug başlıktan üretiliyor ve
+/// değişmiyor; haber bağlantıları bununla kuruluyor.
 class NewsItem {
   const NewsItem({
     required this.slug,
@@ -23,7 +21,6 @@ class NewsItem {
   /// [bodyText] kullanılmalı.
   final String body;
 
-  /// Kapak görselinin adresi; boş olabilir.
   final String heroImage;
   final List<String> tags;
   final String author;

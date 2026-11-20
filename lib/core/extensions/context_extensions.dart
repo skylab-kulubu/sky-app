@@ -49,7 +49,6 @@ extension ThemeExtension on BuildContext {
 /// sabit kalır; zemin, metin ve ayraç gibi açık/koyu temada farklılaşan
 /// her şey buradan okunur.
 extension AppColorExtension on BuildContext {
-  /// Sayfa zemini.
   Color get backgroundColor => theme.scaffoldBackgroundColor;
 
   /// Kart, tile ve sheet zemini.
@@ -67,18 +66,14 @@ extension AppColorExtension on BuildContext {
   /// En soluk metin ve ikonlar (trailing chevron gibi).
   Color get textTertiary => colorScheme.outline;
 
-  /// Ayraç ve ince kenarlıklar.
   Color get dividerColor => theme.dividerColor;
 
   /// Vurgu rengi; açık temada markanın koyu tonuna düşer.
   Color get accentColor => colorScheme.primary;
 
-  /// [accentColor] zemini üzerindeki metin ve ikon.
-  ///
-  /// Vurgu rengi temaya göre açık lila ile koyu mor arasında gidip geldiği
-  /// için üstündeki içerik de yön değiştirir: koyu temada koyu, açık temada
-  /// beyaz. Bu yüzden her iki temada beyaz kalan [AppColors.onAccent]
-  /// buranın yerine kullanılamaz.
+  /// [accentColor] zemini üzerindeki içerik. Vurgu temaya göre açık/koyu
+  /// değiştiği için bu da değişiyor; iki temada beyaz kalan
+  /// [AppColors.onAccent] yerine kullanılamaz.
   Color get onAccentColor => colorScheme.onPrimary;
 }
 

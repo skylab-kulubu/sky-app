@@ -67,12 +67,6 @@ class _SettingsPageState extends SettingsPagemodel {
                 ),
                 onTap: onAppearanceTap,
               ),
-              // SettingsTile(
-              //   icon: AppIcons.permissions,
-              //   iconColor: AppColors.green,
-              //   title: 'İzinler',
-              //   onTap: onPermissionsTap,
-              // ),
             ],
           ),
           const SectionHeader('Kaynaklar'),
@@ -118,8 +112,8 @@ class _SettingsPageState extends SettingsPagemodel {
     );
   }
 
-  /// Geliştirici künyesi. Giriş sayfasındaydı; oraya her açılışta bakılıyor
-  /// ama bilgi aranarak bulunacak türden, o yüzden ayarların sonunda.
+  /// Geliştirici künyesi; aranarak bulunacak bir bilgi, o yüzden ayarların
+  /// sonunda.
   Widget _credit() {
     return Padding(
       padding: AppPaddings.credit,

@@ -25,21 +25,18 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  /// Navbar'ın kartların üstüne binmemesi için liste sonuna bırakılan boşluk.
+  /// Navbar kartların üstüne binmesin diye liste sonundaki boşluk.
   static const double _bottomInset = 120;
 
   static const double _sectionSpacing = 32;
   static const double _titleSpacing = 12;
 
-  /// "QR'ı Göster" butonu kartı bununla çeviriyor.
   final SkyPassCardController _cardController = SkyPassCardController();
 
-  /// Eşleme sürerken ve kart yerine dönerken "Öğrenci Kartını Eşle" butonu
-  /// yerinde kalıyor; profil arkada yenilense de geçiş kart dönünce oluyor.
+  /// Eşleme sürerken ve kart yerine dönerken buton yerinde kalıyor.
   bool _isLinkRevealPending = false;
 
-  /// Overlay kapanırken kartın yerine uçma süresi (`NfcScanOverlay`'in
-  /// kapanış geçişi).
+  /// Overlay kapanırken kartın yerine uçma süresi.
   static const Duration _cardReturnDuration = Duration(milliseconds: 500);
 
   static const Duration _buttonFadeDuration = Duration(milliseconds: 450);
@@ -48,9 +45,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
 
-    // Çıkışta kullanıcı temizleniyor ve sayfa hemen yeniden çiziliyor, ama
-    // `/auth`'a yönlendirme bir sonraki karede gerçekleşiyor. O kare boyunca
-    // çizilecek veri yok; `user!` burada patlıyordu.
+    // Çıkışta kullanıcı temizleniyor ama `/auth`'a yönlendirme bir sonraki
+    // karede; o kare boyunca çizilecek veri yok (`user!` patlıyordu).
     if (user == null) return const SizedBox.shrink();
 
     final subtitle = user.teamsDisplay.isNotEmpty
@@ -70,7 +66,6 @@ class _ProfilePageState extends State<ProfilePage> {
               skyNumber: user.skyNumber,
               subtitle: subtitle,
               controller: _cardController,
-              // Öğrenci kartı eşliyse ön yüzde YTÜ yıldızı.
               showStudentCardMark: user.studentCardLinked,
             ),
           ),
@@ -86,9 +81,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  /// QR kartın arka yüzünde; "QR'ı Göster" ayrı bir sayfa açmıyor, kartı
-  /// çeviriyor. Karta dokunmakla aynı iş, keşfedilmesi kolay olsun diye.
-  /// Kapıda giriş alma navbar'ın yanındaki yönetim menüsünde.
+  /// "QR'ı Göster" kartı çeviriyor (karta dokunmakla aynı iş, keşfedilsin
+  /// diye). Kapıda giriş alma yönetim menüsünde.
   Widget _quickActions(BuildContext context, User user, String subtitle) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,9 +94,8 @@ class _ProfilePageState extends State<ProfilePage> {
             onTap: () => context.push('/profile/certificates'),
           ),
         ),
-        // Kart eşliyse eşleme bir kez yapıldığı için buton yok; yerinde
-        // "QR Okut" (oturumdaki QR'la kendi yoklamasını verme). Öğrenci
-        // kartı kapalıyken ([AppFeatures.studentCard]) hep "QR Okut".
+        // Eşlenmiş kartta buton yerine "QR Okut"; öğrenci kartı kapalıyken
+        // ([AppFeatures.studentCard]) hep "QR Okut".
         Expanded(
           child: AnimatedSwitcher(
             duration: _buttonFadeDuration,
@@ -139,7 +132,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  /// NFC durumunu kontrol eder ve uygunsa okutma overlay'ini açar.
   Future<void> _onStudentCardTap(
     BuildContext context, {
     required String userName,
@@ -173,12 +165,10 @@ class _ProfilePageState extends State<ProfilePage> {
         return;
       }
 
-      // Eşleme bitene kadar buton yerinde kalıyor; kart yerine dönünce
-      // yumuşakça "QR Okut"a dönüşüyor.
+      // Buton kart yerine dönene kadar kalıyor, sonra "QR Okut"a dönüşüyor.
       setState(() => _isLinkRevealPending = true);
       final userProvider = context.read<UserProvider>();
 
-      // NFC açık — Hero animasyonlu dikey overlay'i aç; eşleme orada.
       final linked = await NfcScanOverlay.show(
         context,
         userName: userName,
@@ -187,7 +177,6 @@ class _ProfilePageState extends State<ProfilePage> {
         onLinked: userProvider.reloadProfile,
       );
 
-      // Kart yerine dönerken (overlay'in kapanış süresi) buton beklesin.
       if (linked) await Future<void>.delayed(_cardReturnDuration);
       if (!mounted) return;
       setState(() => _isLinkRevealPending = false);

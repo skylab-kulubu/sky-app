@@ -29,8 +29,7 @@ class AppBarActions extends StatelessWidget {
   final Color? backgroundColor;
   final Color? iconColor;
 
-  /// Şimdilik sayfalar hazır olmadığı için verilmiyor; verilmezse dokunma
-  /// görsel olarak çalışır ama bir şey yapmaz.
+  /// Verilmezse dokunma görsel olarak çalışır ama bir şey yapmaz.
   final void Function(String icon)? onIconTap;
 
   static const Duration _duration = Duration(milliseconds: 350);
@@ -51,21 +50,16 @@ class AppBarActions extends StatelessWidget {
         (_inset + _borderWidth) * 2;
   }
 
-  /// Kapsayıcının dış ölçüsü: içerik + iç boşluk + kenarlık.
-  /// [_row] ile birebir aynı sabitlerden türediği için kayma olamaz.
-  /// İkon yokken 0 — aksi halde boş bir hap görünürdü.
+  /// Dış genişlik; [widthFor] ile aynı sabitlerden türüyor. İkon yokken 0,
+  /// yoksa boş bir hap görünürdü.
   double get _width => widthFor(icons.length);
 
   /// Hap'ın dış yüksekliği; yanına hizalanan öğeler (arama kutusu) aynı
   /// boyda dursun diye açık.
   static const double height = _buttonSize + (_inset + _borderWidth) * 2;
 
-  /// Kenarlık yalnızca açık temada görünür: orada hap ile beyaz zemin
-  /// arasındaki fark çok az kalıyor ve sınırı belirginleştiriyor. Koyu temada
-  /// hap zaten siyah zeminden ayrıştığı için çizgi fazladan duruyor.
-  ///
-  /// Zemini dışarıdan verilen hap'larda da çizgi yok; o durumda rengi veren
-  /// sayfa kendi kontrastını kuruyor.
+  /// Kenarlık yalnızca açık temada: hap beyaz zeminden zor ayrışıyor. Zemini
+  /// dışarıdan verilen hap'ta çizgi yok; kontrastı sayfa kuruyor.
   Color _borderColor(BuildContext context) {
     // İkon yokken hap sıfır genişliğe iniyor ama kenarlık yine çiziliyor ve
     // yerinde ince dikey bir çizgi kalıyor.
@@ -73,9 +67,8 @@ class AppBarActions extends StatelessWidget {
     return themeBorderColor(context);
   }
 
-  /// Tema zemininde duran hap'ın kenarlık rengi. Yanına konan ve hap'la
-  /// aynı dili konuşması gereken öğeler (arama kutusu) de bunu kullanıyor;
-  /// açık temada biri çizgili biri çizgisiz durunca uyumsuz görünüyorlardı.
+  /// Tema zeminindeki hap'ın kenarlığı; yanındaki öğeler (arama kutusu) aynı
+  /// çizgiyi kullansın diye açık.
   static Color themeBorderColor(BuildContext context) {
     if (context.theme.brightness == Brightness.dark) return Colors.transparent;
     return context.dividerColor;

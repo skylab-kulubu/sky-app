@@ -1,25 +1,16 @@
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/extensions/date_time_extensions.dart';
-import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/services/core_api.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/profile/data/models/activity.dart';
 import 'package:sky_app/features/profile/data/models/feedback_link.dart';
 
-/// Kullanıcının son aktiviteleri.
-///
-/// Backend'de ayrı bir aktivite geçmişi yok; liste kullanıcının kendi
-/// biletlerinden (`/v1/tickets/me`) ve yarışmacı kayıtlarından
-/// (`/v1/competitors/me`) türetiliyor:
-///
-/// - Bilet → etkinliğe kayıt. Girişte okutulduysa kayıt yerine katılım;
-///   geri bildirim postası gittiyse formların bağlantıları da (`feedback`).
-/// - Yarışmacı kaydı → sıra, puan ya da kazanma bilgisi.
+/// Kullanıcının aktiviteleri. Ayrı bir geçmiş ucu yok; liste biletlerden
+/// (`/v1/tickets/me`: kayıt, katılım, geri bildirim formları) ve yarışmacı
+/// kayıtlarından (`/v1/competitors/me`) türetiliyor.
 class ActivityService {
-  /// Yeniden eskiye sıralı aktiviteler.
-  ///
-  /// İki istekten biri düşerse [ApiException] fırlatıyor; yarım bir liste
+  /// Yeniden eskiye. İki istekten biri düşerse hata fırlatıyor; yarım liste
   /// "aktiviten bu kadar" gibi okunurdu.
   Future<List<Activity>> fetchMyActivities() async {
     final results = await Future.wait([
@@ -41,8 +32,8 @@ class ActivityService {
     return activities;
   }
 
-  /// Bilette kayıt tarihi yok; kayıt, etkinliğin başlangıç tarihiyle
-  /// listeleniyor. Katılımda ise okutmanın gerçek zamanı var.
+  /// Bilette kayıt tarihi yok; kayıt etkinliğin başlangıcıyla, katılım okutmanın
+  /// zamanıyla listeleniyor.
   Activity? _fromTicket(Map<String, dynamic> json) {
     final event = _event(json['event']);
     if (event == null) return null;

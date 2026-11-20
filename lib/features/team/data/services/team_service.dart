@@ -11,14 +11,11 @@ import 'package:sky_app/features/team/data/models/team_member.dart';
 class TeamService {
   final Dio _dio = ApiClient.instance.dio;
 
-  /// CMS en fazla 100 kayıt döndürüyor; kulüpte ekip sayısı bunun çok
-  /// altında, sayfalama gerekmiyor.
+  /// CMS en fazla 100 kayıt dönüyor; ekip sayısı çok altında.
   static const int _pageLimit = 100;
 
-  /// SkyCMS'teki ekipler. Giriş gerektirmiyor.
-  ///
-  /// Koleksiyon anahtarı küçük harf (`teams`; CMS inscribed'a geçtiğinden
-  /// beri `Teams` 404). Yanıt zarfsız: `{items, total, offset, limit}`.
+  /// SkyCMS'teki ekipler (`teams`, küçük harf), girişsiz. Yanıt zarfsız:
+  /// `{items, total, offset, limit}`.
   Future<List<Team>> fetchTeams() async {
     final body = await _getJson(
       '/api/cms/collections/teams',
@@ -40,21 +37,15 @@ class TeamService {
         .toList(growable: false);
   }
 
-  /// Tek ekip, düzenleme için taze hâliyle.
-  ///
-  /// Liste yanıtı herkese 60 sn önbelleğe alınabiliyor; düzenlemeye eski
-  /// sürümle başlanırsa kayıt 409 alır. Token'la yapılan istek CMS'te
-  /// önbelleğe alınmıyor.
+  /// Tek ekip, düzenleme için taze. Liste yanıtı 60 sn önbellekte olabiliyor,
+  /// eski sürümle kayıt 409 alırdı; token'lı istek önbelleğe girmiyor.
   Future<Team> fetchTeam(String slug) async {
     final body = await _getJson('/api/cms/collections/teams/$slug');
     return Team.fromJson(body);
   }
 
-  /// Ekibi CMS'e kaydeder ve kaydedilmiş hâlini (yeni sürümüyle) döner.
-  ///
-  /// Yetki CMS'te: token'ın `skyapp` client'ında `cms:access` rolü olmalı ve
-  /// kullanıcı ekibin `LIDERLER` grubunda bulunmalı. Hatalar [ApiException] olarak fırlıyor;
-  /// `statusCode` 409 ise kayıt arada başkası tarafından değiştirilmiş.
+  /// Ekibi CMS'e kaydedip yeni sürümüyle döner. Yetki: `skyapp`'te
+  /// `cms:access` ve ekibin lideri olmak; 409 kayıt arada değişmiş.
   Future<Team> updateTeam(Team team) async {
     final Response<dynamic> response;
     try {
@@ -76,12 +67,8 @@ class TeamService {
     return Team.fromJson(body);
   }
 
-  /// Ekibin herkese açık üyeleri, liderler önce (core
-  /// `/v1/teams/{team}/members`).
-  ///
-  /// Hata fırlatmıyor, boş liste dönüyor: üyeler detay sayfasında isteğe
-  /// bağlı bir bölüm. Ekip Keycloak'ta herkese açık değilse
-  /// (`public_listing`) core 404 dönüyor; bu bir arıza değil, bölüm
+  /// Herkese açık üyeler, liderler önce (`/v1/teams/{team}/members`). Hata
+  /// fırlatmıyor: ekip `public_listing` değilse core 404 dönüyor, bölüm
   /// görünmüyor.
   Future<List<TeamMember>> fetchMembers(String teamKey) async {
     try {
@@ -102,8 +89,7 @@ class TeamService {
           return a.isLeader ? -1 : 1;
         });
     } on ApiException catch (e) {
-      // 404 beklenen durum (ekip herkese açık değil); loglanmıyor ki gerçek
-      // hatalar arasında gürültü olmasın.
+      // 404 beklenen durum; gerçek hatalar arasında gürültü olmasın.
       if (e.type != ApiErrorType.notFound) {
         log('Ekip üyeleri alınamadı ($teamKey): $e');
       }

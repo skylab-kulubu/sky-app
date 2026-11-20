@@ -51,30 +51,23 @@ class AppColors {
   /// içerik. Temadan bağımsız: her iki temada da beyaz kalır.
   static const onAccent = Color(0xFFFFFFFF);
 
-  /// Etkinlik detayında kapak renklerinin üstüne bindiği koyu taban. Sayfa
-  /// her iki temada da koyu kalıyor — kapaktan gelen renk açık bir zemine
-  /// karıştırıldığında soluyor ve etkinliğin kimliği kayboluyor.
-  ///
-  /// Saf siyah değil: renk lekeleri altında taban ne kadar koyuysa sayfa o
-  /// kadar ölü görünüyor.
+  /// Etkinlik detayının koyu tabanı. Sayfa iki temada da koyu: kapak rengi açık
+  /// zeminde soluyor. Saf siyah değil; lekelerin altında sayfa ölü görünüyordu.
   static const coverBackdropBase = Color(0xFF1C1C21);
 
-  /// [coverBackdropBase] üzerindeki içerik. Zemin temadan bağımsız koyu
-  /// olduğu için bu renkler de `context` erişimcilerinden okunmaz.
+  /// [coverBackdropBase] üzerindeki içerik; zemin temadan bağımsız olduğu için
+  /// `context` erişimcilerinden okunmuyor.
   static const onCover = onAccent;
   static final onCoverMuted = onAccent.withValues(alpha: 0.74);
   static final onCoverFaint = onAccent.withValues(alpha: 0.55);
   static final onCoverDivider = onAccent.withValues(alpha: 0.15);
   static final onCoverSurface = onAccent.withValues(alpha: 0.14);
 
-  /// Tam ekran overlay'lerin (NFC okutma) arkasındaki karartma. Modal
-  /// karartma temadan bağımsız koyu kalır: açık temada beyaza gitseydi hem
-  /// öndeki kart zeminden ayrışmaz hem de "arkadaki sayfa devre dışı"
-  /// hissi kaybolurdu. Opaklığı karartmayı çizen widget veriyor.
+  /// NFC overlay'inin karartması. Açık temada da koyu: arkadaki sayfa devre dışı
+  /// görünmeli. Opaklığı karartmayı çizen widget veriyor.
   static const scrim = Color(0xFF000000);
 
-  /// [scrim] üzerindeki metin. Zemin temadan bağımsız koyu olduğu için bu
-  /// renk de `context` erişimcilerinden okunmaz.
+  /// [scrim] üzerindeki metin.
   static final onScrim = onAccent.withValues(alpha: 0.90);
 
   // Status & Icon Colors
@@ -88,7 +81,6 @@ class AppColors {
   static const red = Color(0xFFE74C3C);
   static const darkOrange = Color(0xFFF39C12);
 
-  /// Giriş sayfasındaki alt başlığın gökkuşağı geçişi. Vurgu renklerinden
-  /// kuruluyor, temadan bağımsız: iki temada da aynı canlılıkta okunuyor.
+  /// Giriş sayfasındaki alt başlığın geçişi; iki temada da aynı.
   static const brandGradient = <Color>[secondaryBlue, purple, pink, darkOrange];
 }

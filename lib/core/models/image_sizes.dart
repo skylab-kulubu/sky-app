@@ -1,7 +1,5 @@
-/// Core'un bir görsel için ürettiği küçük boyutlar (`sizes`,
-/// `coverImageSizes`, `profilePictureSizes`): `card` 400 px, `page`
-/// 1200 px. Listede [card], detayda [page], tam ekranda asıl adres
-/// kullanılıyor. Adresler yanıttan olduğu gibi alınıyor, kurulmuyor.
+/// Core'un görsel için ürettiği küçük boyutlar: `card` 400 px (liste),
+/// `page` 1200 px (detay). Adresler yanıttan olduğu gibi alınıyor.
 class ImageSizes {
   const ImageSizes({this.card = '', this.page = ''});
 
@@ -26,6 +24,5 @@ class ImageSizes {
   /// Küçük boyut yoksa asıl adrese düşülüyor (eski kayıtlar, SVG).
   String cardOr(String original) => card.isNotEmpty ? card : original;
 
-  /// Detay boyutu yoksa asıl adres.
   String pageOr(String original) => page.isNotEmpty ? page : original;
 }

@@ -9,9 +9,8 @@ import 'package:sky_app/core/widgets/settings_tile.dart';
 import 'package:sky_app/core/widgets/tile_group.dart';
 import 'package:sky_app/features/profile/data/models/feedback_link.dart';
 
-/// Katılınan etkinliğin geri bildirim formları. Core'un sırasıyla:
-/// oturumların formları önce, etkinliğin formu en sonda. Doldurulanlar da
-/// listede kalıyor (bağlantı yine açılıyor). Seçilen formu döner.
+/// Katılınan etkinliğin geri bildirim formları, core'un sırasıyla (oturumlar
+/// önce, etkinlik sonda). Doldurulanlar da listede; seçileni döner.
 class FeedbackSheet extends StatelessWidget {
   const FeedbackSheet({
     super.key,

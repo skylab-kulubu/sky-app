@@ -4,7 +4,6 @@ abstract class ShellPagemodel extends State<ShellPage> {
   final TextEditingController searchController = TextEditingController();
   final FocusNode searchFocusNode = FocusNode();
 
-  /// Etkinlikler sekmesindeki arama kutusu açık mı.
   bool isSearchOpen = false;
 
   /// Core'a göre giriş alınabilecek yaklaşan bir etkinlik var mı
@@ -47,11 +46,8 @@ abstract class ShellPagemodel extends State<ShellPage> {
     }
   }
 
-  /// Navbar'ın yanındaki yönetim menüsünün satırları; kullanıcının yetkisi
-  /// olan işler. Boşsa menü butonu hiç görünmüyor.
-  ///
-  /// Yetkiler backend'in kurallarının uygulamadaki karşılıkları (bkz.
-  /// `User`); asıl kontrol yine backend'de.
+  /// Yönetim menüsünün satırları: kullanıcının yetkisi olan işler (kurallar
+  /// `User`'da, asıl kontrol backend'de). Boşsa menü butonu görünmüyor.
   List<NavMenuAction> adminActions(BuildContext context) {
     final user = context.watch<UserProvider>().user;
     if (user == null) return const [];
@@ -111,7 +107,6 @@ abstract class ShellPagemodel extends State<ShellPage> {
     await EventDetailPage.open(context, event);
   }
 
-  /// Arama metni doğrudan provider'a gidiyor; liste yazdıkça süzülüyor.
   void _onSearchChanged() {
     context.read<EventProvider>().setSearchQuery(searchController.text);
   }
@@ -128,12 +123,9 @@ abstract class ShellPagemodel extends State<ShellPage> {
     setState(() => isSearchOpen = false);
   }
 
-  /// Sekme değişince açık arama kapanıyor; geri dönüldüğünde liste tam ve
-  /// başlık yerinde olmalı.
-  ///
-  /// `build` içinden çağrılıyor, bu yüzden kapatma bir sonraki kareye
-  /// bırakılıyor: temizlik provider'ı bilgilendiriyor ve build sırasında
-  /// bildirim hata veriyor.
+  /// Etkinlikler sekmesinden çıkılınca açık arama kapanıyor. `build`'den
+  /// çağrıldığı için bir sonraki kareye bırakılıyor: provider'ın bildirimi
+  /// build sırasında hata veriyor.
   void closeSearchIfLeftCalendar(String location) {
     if (!isSearchOpen || location.startsWith('/calendar')) return;
 

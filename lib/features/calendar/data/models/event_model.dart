@@ -12,7 +12,6 @@ enum EventPhase {
   /// başvuru tarihi geçmiş.
   closed,
 
-  /// Etkinlik bitti.
   ended,
 
   /// Henüz yayınlanmamış; yalnızca düzenleyebilenler görüyor.
@@ -33,16 +32,13 @@ class EventModel {
   final String formUrl;
   final bool active;
 
-  /// Etkinliği düzenleyen ekip: Keycloak grup adı (`MOBILAB`, `GECEKODU`).
-  /// Yetkiler bu ekibe göre veriliyor.
+  /// Sahip ekip: Keycloak grup adı (`MOBILAB`, `GECEKODU`); yetkiler buna göre.
   final String ownerTeam;
 
-  /// Kulüp yönetiminin grupları; etkinlikleri kulübün kendisi adına.
   static const Set<String> _clubWideTeams = {'YK', 'DK'};
 
-  /// Arayüzde gösterilen sahip: YK ve DK'nin etkinlikleri kulübün kendisi
-  /// adına düzenlendiği için "SKY LAB" yazıyor; yetki hesapları yine
-  /// [ownerTeam]'e bakıyor.
+  /// YK ve DK'nin etkinlikleri kulüp adına olduğu için "SKY LAB" yazıyor;
+  /// yetki hesapları yine [ownerTeam]'e bakıyor.
   String get ownerLabel =>
       _clubWideTeams.contains(ownerTeam) ? 'SKY LAB' : ownerTeam;
 
@@ -74,15 +70,12 @@ class EventModel {
     this.registrationClosed = false,
   });
 
-  /// Etkinliğin LinkedIn gönderisi; düzenleme formu için.
   final String linkedin;
 
   /// Bağlı olduğu sezonun id'si; sezona bağlanmamışsa boş.
   final String seasonId;
 
-  // Aşağıdakiler arayüzde gösterilmiyor ama düzenlemede geri gönderiliyor:
-  // core'da güncelleme (PUT/PATCH) bütün alanları yazıyor, gönderilmeyen
-  // alan sıfırlanıyor.
+  // Aşağıdakiler arayüzde gösterilmiyor; düzenlemede aynen geri gönderiliyor.
 
   /// Kapak görselinin medya id'si; kapak yoksa boş.
   final String coverImageId;
@@ -96,44 +89,37 @@ class EventModel {
   final String attendanceRule;
   final double? attendanceRatio;
 
-  /// Bu etkinlikte kapıda okutma yetkisi verilen kullanıcıların id'leri
-  /// (panelde "Kapı görevlileri"). Güncellemede gönderilmiyor; core
-  /// gönderilmeyen listeyi olduğu gibi bırakıyor.
+  /// Kapı görevlilerinin id'leri; güncellemede gönderilmiyor, core listeyi
+  /// olduğu gibi bırakıyor.
   final List<String> doorStaffIds;
 
-  /// Core'un kapak yüklenirken hesapladığı zemin renkleri (`coverColors`,
-  /// uygulamadaki `CoverColorExtractor`'ın Go karşılığı). Boşsa renkler
-  /// cihazda hesaplanıyor.
+  /// Core'un yüklemede hesapladığı zemin renkleri (`CoverColorExtractor`'ın Go
+  /// karşılığı); boşsa cihazda hesaplanıyor.
   final List<Color> coverColors;
 
-  /// Kapağın küçük boyutları; listede [coverCardUrl], detayda
-  /// [coverPageUrl]. Renk paleti ve kimlik için asıl adres
+  /// Kapağın küçük boyutları; renk paleti ve kimlik için asıl adres
   /// ([coverImageUrl]) kullanılıyor.
   final ImageSizes coverImageSizes;
 
-  /// Core'un etkinlik durumu (ADR 0066): `draft`, `published`,
-  /// `cancelled`. Alan gelmezse (eski yanıt) yayında sayılıyor.
+  /// Core'un etkinlik durumu: `draft`, `published`, `cancelled`. Alan gelmezse
+  /// yayında sayılıyor.
   final String status;
 
-  /// İptal edilen etkinlikte core'un verdiği sebep; yoksa boş.
   final String cancelReason;
 
-  /// Core'un hesapladığı başvuru durumu (`registrationOpen`): yayında,
-  /// bitmemiş, elle kapatılmamış ve son tarihi geçmemiş. Alan gelmezse
-  /// (eski yanıt) `null`; o zaman [active]'e bakılıyor.
+  /// Core'un hesapladığı başvuru durumu: yayında, bitmemiş, elle kapatılmamış
+  /// ve son tarihi geçmemiş. Eski yanıtta `null`; o zaman [active]'e bakılıyor.
   final bool? registrationOpen;
 
-  /// Başvurular elle kapatılmış mı (`registrationClosed`); düzenleme
-  /// formundaki "Başvurular açık" anahtarı bunun tersi.
+  /// Elle kapatılmış mı; formdaki "Başvurular açık" anahtarı bunun tersi.
   final bool registrationClosed;
 
   bool get isDraft => status == 'draft';
 
   bool get isCancelled => status == 'cancelled';
 
-  /// Etkinlik bitti mi; core'un `active` hesabındaki kuralın aynısı: bitiş
-  /// `endDate`, yoksa başlangıçtan [_undatedEndsAfter] sonra. Tarihsiz
-  /// etkinlik hiç bitmez.
+  /// Core'un `active` kuralıyla aynı: bitiş `endDate`, yoksa başlangıçtan
+  /// [_undatedEndsAfter] sonra. Tarihsiz etkinlik hiç bitmiyor.
   bool get hasEnded {
     final end = endDateTime ?? startDateTime?.add(_undatedEndsAfter);
     return end != null && !end.isAfter(DateTime.now());
@@ -141,11 +127,8 @@ class EventModel {
 
   static const Duration _undatedEndsAfter = Duration(hours: 24);
 
-  /// Başvuru açısından etkinliğin durumu; detay sayfasındaki durum satırı
-  /// ve katılım butonu buna göre yazılıyor.
-  ///
-  /// Açık mı sorusunu core'un `registrationOpen`'ı cevaplıyor; kapalı
-  /// olmasının nedenini ayırt etmek için durum ve tarih ayrıca okunuyor.
+  /// Başvuruya göre durum; detaydaki durum satırı ve katılım butonu bundan.
+  /// Açık mı sorusunu core'un `registrationOpen`'ı cevaplıyor.
   EventPhase get phase {
     if (isCancelled) return EventPhase.cancelled;
     if (isDraft) return EventPhase.draft;
@@ -157,7 +140,6 @@ class EventModel {
 
   String get coverPageUrl => coverImageSizes.pageOr(coverImageUrl);
 
-  /// Core `EventResponse`'u (`/v1/events`).
   factory EventModel.fromJson(Map<String, dynamic> json) {
     return EventModel(
       linkedin: json['linkedin'] as String? ?? '',
@@ -196,9 +178,8 @@ class EventModel {
 
   static const String _cdnBase = 'https://cdn.yildizskylab.com/';
 
-  /// Core kapak adresini tam CDN URL'si olarak veriyor; eski kayıtlarda
-  /// kalmış göreli bir depolama anahtarı (`images/<uuid>`) gelirse CDN'e
-  /// bağlanıyor.
+  /// Core tam CDN adresi veriyor; eski kayıtlardaki göreli anahtar
+  /// (`images/<uuid>`) CDN'e bağlanıyor.
   static String _absoluteImageUrl(String? value) {
     if (value == null || value.isEmpty) return '';
     if (value.startsWith('http')) return value;
@@ -220,11 +201,8 @@ class EventModel {
 
   DateTime? get endDateTime => _parse(endDate);
 
-  /// Bitişi henüz geçmemiş etkinlikler "yaklaşan" sayılır.
-  ///
-  /// Başlangıç değil bitiş baz alınıyor; aksi hâlde birden çok gün süren bir
-  /// etkinlik daha devam ederken listeden düşerdi. Tarih okunamıyorsa etkinlik
-  /// listelenmez — belirsiz bir kaydı yaklaşan gibi göstermek yanıltıcı olur.
+  /// Bitişi geçmemiş etkinlikler "yaklaşan"; başlangıç baz alınsaydı çok günlük
+  /// etkinlik sürerken düşerdi. Tarih okunamıyorsa listelenmiyor.
   bool get isUpcoming {
     final reference = endDateTime ?? startDateTime;
     if (reference == null) return false;
@@ -272,7 +250,6 @@ class EventModel {
       '${date.hour.toString().padLeft(2, '0')}:'
       '${date.minute.toString().padLeft(2, '0')}';
 
-  /// Etkinlik birden fazla güne yayılıyor mu.
   bool get isMultiDay {
     final start = startDateTime;
     final end = endDateTime;
@@ -282,10 +259,8 @@ class EventModel {
         start.day != end.day;
   }
 
-  /// Detay sayfasındaki okunur tarih: "14 Ağustos Cuma".
-  ///
-  /// Birden çok güne yayılan etkinlikte aralık veriliyor ("14 – 16 Ağustos
-  /// 2026"); gün adı o durumda anlamını yitiriyor.
+  /// Detaydaki okunur tarih: "14 Ağustos Cuma"; çok günlükte aralık ("14 – 16
+  /// Ağustos 2026"), gün adı orada anlamsız.
   String get formattedDayLabel {
     final start = startDateTime;
     if (start == null) return '';
@@ -303,8 +278,8 @@ class EventModel {
         '${_weekdays[start.weekday - 1]}';
   }
 
-  /// "10:00 – 18:00". Bitiş saati yoksa ya da etkinlik günlere yayılıyorsa
-  /// yalnızca başlangıç saati; aralık o durumda yanıltıcı olurdu.
+  /// "10:00 – 18:00". Bitiş yoksa ya da etkinlik günlere yayılıyorsa yalnız
+  /// başlangıç; aralık yanıltıcı olurdu.
   String get formattedTimeRange {
     final start = startDateTime;
     if (start == null) return '';

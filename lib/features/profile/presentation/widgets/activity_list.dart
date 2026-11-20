@@ -19,12 +19,8 @@ import 'package:sky_app/features/profile/presentation/providers/activity_provide
 import 'package:sky_app/features/profile/presentation/widgets/activity_tile.dart';
 import 'package:sky_app/features/profile/presentation/widgets/feedback_sheet.dart';
 
-/// Profildeki "Aktivitelerim" bölümünün içeriği: liste, yükleniyor, boş ve
-/// hata durumları.
-///
-/// Profil sayfası stateless kalsın diye yükleme tetiği burada. Boş ve hata
-/// durumları ana sayfadaki yaklaşan etkinlik bölümüyle aynı satır düzeninde:
-/// ikon, [ActivityTile]'daki daire genişliğinde bir alana ortalanıyor.
+/// "Aktivitelerim" bölümü: liste, yükleniyor, boş ve hata. Profil sayfası
+/// stateless kalsın diye yükleme tetiği burada.
 class ActivityList extends StatefulWidget {
   const ActivityList({super.key, required this.userId});
 
@@ -83,9 +79,8 @@ class _ActivityListState extends State<ActivityList> {
     );
   }
 
-  /// Formlardan birini seçtirip açar. SKYFORMS formu uygulama içinde,
-  /// hesapla açılıyor; davet kodu adresin sorgusunda olduğu için yol olduğu
-  /// gibi geçiyor. Kapanınca liste yenileniyor: doldurulan form işaretlensin.
+  /// Formlardan birini seçtirip açar; kapanınca liste yenileniyor ki doldurulan
+  /// form işaretlensin.
   Future<void> _onFeedbackTap(Activity activity) async {
     final link = await FeedbackSheet.show(
       context,

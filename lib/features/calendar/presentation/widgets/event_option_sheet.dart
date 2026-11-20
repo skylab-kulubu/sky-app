@@ -7,9 +7,8 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/settings_tile.dart';
 import 'package:sky_app/core/widgets/tile_group.dart';
 
-/// Seçeneklerden birini seçtiren sheet (sahip ekip, sezon). Görünüm
-/// sheet'iyle aynı düzen: başlık ve satırlar, seçilide tik. Seçilen sırayı
-/// döner; vazgeçilirse `null`.
+/// Seçeneklerden birini seçtiren sheet (sahip ekip, sezon); seçilen sırayı
+/// döner, vazgeçilirse `null`.
 class EventOptionSheet extends StatelessWidget {
   const EventOptionSheet({
     super.key,

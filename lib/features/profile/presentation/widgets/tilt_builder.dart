@@ -3,17 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
-/// Cihazın eğimini ölçüp açı olarak veren yapıcı.
+/// Cihazın eğimini açı olarak verir; `Transform` kurmuyor ki kullanan taraf
+/// eğimi kendi dönüşüyle tek matriste birleştirsin.
 ///
-/// Kendi `Transform`'unu kurmaz, açıyı [builder]'a devreder: kullanan taraf
-/// eğimi kendi dönüşüyle **tek bir matriste** birleştirebilsin diye. İki ayrı
-/// `Transform` iç içe geçtiğinde perspektif katsayıları da çarpılıyor ve kart
-/// dönerken aşırı büyüyordu.
-///
-/// Açı **mutlak eğimden değil**, yavaşça kayan bir referans duruştan sapmayla
-/// hesaplanır: telefon sabit tutulduğunda kart yavaşça düz konuma dönüyor,
-/// yalnızca hareket ettikçe kıpırdıyor. Mutlak eğim kullanılsaydı telefonu
-/// doğal açısıyla (öne yatık) tutan herkeste kart sürekli yamuk dururdu.
+/// Açı mutlak eğimden değil, yavaşça kayan bir referans duruştan sapma:
+/// telefon sabitken kart düze dönüyor. Mutlak eğimde öne yatık tutan herkeste
+/// kart yamuk dururdu.
 class TiltBuilder extends StatefulWidget {
   const TiltBuilder({super.key, required this.builder});
 
@@ -25,20 +20,17 @@ class TiltBuilder extends StatefulWidget {
   /// okumayı zorlaştırmamalı.
   static const double _maxTilt = 0.10;
 
-  /// [_maxTilt] açısına karşılık gelen ivme farkı (m/s²). Yer çekiminin bir
-  /// bölümü: telefonu birkaç derece çevirmek efekti sonuna kadar götürsün
-  /// diye küçük.
+  /// [_maxTilt]'e karşılık gelen ivme farkı (m/s²); birkaç derece yetsin diye
+  /// küçük.
   static const double _tiltRange = 2.6;
 
-  /// Referans duruşun ölçümü izleme hızı. Küçük değer = kart eğik konumda
-  /// daha uzun kalıyor (buradaki katsayı ~3 saniyelik bir dönüş demek).
+  /// Referans duruşun ölçümü izleme hızı (~3 saniyelik dönüş).
   static const double _baselineFollow = 0.006;
 
   /// Çizilen açının hedefe yaklaşma hızı; ivmeölçer gürültüsünü süzüyor.
   static const double _smoothing = 0.12;
 
-  /// Bundan küçük değişimler gözle görülmüyor; kare harcamamak için
-  /// yok sayılıyor.
+  /// Gözle görülmeyen değişimler kare harcamasın.
   static const double _minStep = 0.0005;
 
   @override
@@ -54,8 +46,7 @@ class _TiltBuilderState extends State<TiltBuilder> {
 
   Offset _tilt = Offset.zero;
 
-  /// Erişilebilirlik ayarı. Ölçüm geldiğinde `MediaQuery` okumak yerine
-  /// burada tutuluyor: `context`'e bağımlılık build dışında kurulmamalı.
+  /// `MediaQuery` build dışında okunmamalı; değer burada tutuluyor.
   bool _reduceMotion = false;
 
   @override
@@ -77,8 +68,7 @@ class _TiltBuilderState extends State<TiltBuilder> {
   }
 
   void _listen() {
-    // Sensörü olmayan platformlarda (web, masaüstü) akış hata veriyor;
-    // efekt sessizce kapanıyor, kart düz kalıyor.
+    // Sensörsüz platformlarda (web, masaüstü) akış hata veriyor; kart düz kalıyor.
     _subscription =
         accelerometerEventStream(
           samplingPeriod: SensorInterval.uiInterval,

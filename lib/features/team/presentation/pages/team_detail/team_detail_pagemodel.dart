@@ -7,12 +7,10 @@ abstract class TeamDetailPagemodel extends State<TeamDetailPage> {
   /// Ekibin herkese açık üyeleri; ekip herkese açık değilse boş kalıyor.
   List<TeamMember> members = const [];
 
-  /// Provider'daki güncel hâl; düzenleme kaydedilince sayfa kendiliğinden
-  /// yenileniyor. Listede yoksa (yenileme sırasında) açılıştaki hâl.
+  /// Provider'daki güncel hâl; listede yoksa (yenileme sırasında) açılıştaki.
   Team get team =>
       context.watch<TeamProvider>().teamBySlug(widget.team.slug) ?? widget.team;
 
-  /// Düzenleme butonu yalnızca ekibin liderlerine (`cms:access` ile).
   bool get canEdit =>
       context.watch<UserProvider>().user?.canEditTeam(widget.team.key) ?? false;
 
@@ -36,7 +34,6 @@ abstract class TeamDetailPagemodel extends State<TeamDetailPage> {
 
   void onEditPressed() => TeamEditPage.open(context, widget.team.slug);
 
-  /// Başvuru formu, kısa link üzerinden (`skyl.app/<ekip>`).
   void onJoinPressed() {
     WebviewService.openLink(
       context,

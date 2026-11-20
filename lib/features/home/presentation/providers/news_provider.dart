@@ -33,9 +33,8 @@ class NewsProvider extends ChangeNotifier {
 
   Future<void> refresh() => _load();
 
-  /// Oluşturulan ya da güncellenen haberi listeye yansıtır. Yeni haber başa
-  /// ekleniyor: CMS oluşturma tarihi döndürmediği için sıralama yok, en son
-  /// eklenenin en üstte görünmesi beklenen davranış.
+  /// Oluşturulan ya da güncellenen haberi listeye yansıtır. CMS oluşturma
+  /// tarihi döndürmediği için yeni haber başa ekleniyor.
   void upsert(NewsItem item) {
     final exists = _news.any((n) => n.slug == item.slug);
     _news = exists

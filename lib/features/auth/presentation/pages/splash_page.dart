@@ -76,11 +76,8 @@ class _SplashPageState extends State<SplashPage> {
     );
   }
 
-  /// Sunucuya ulaşılamadığında gösterilir.
-  ///
-  /// Oturum silinmediği için tekrar denemek yeterli; kullanıcı yeniden giriş
-  /// yapmak zorunda değil. Yine de kalıcı bir arızada ekranda kilitlenmesin
-  /// diye giriş ekranına dönüş yolu bırakıldı.
+  /// Sunucuya ulaşılamadığında. Oturum silinmediği için tekrar denemek yetiyor;
+  /// kalıcı arızada kilitlenmesin diye girişe dönüş yolu da var.
   Widget _offline(BuildContext context) {
     return Padding(
       padding: AppPaddings.authContent,

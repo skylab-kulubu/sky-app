@@ -28,16 +28,8 @@ import 'package:sky_app/features/team/presentation/widgets/team_tag_chip.dart';
 part 'team_detail_pagemodel.dart';
 
 /// Ekibin ayrıntıları: logo, hakkında, konular, teknolojiler, çalışmalar ve
-/// herkese açıksa üyeler. Altta, ekip üye alıyorsa başvuru formunu açan
-/// "Ekibe Katıl".
-///
-/// Yerleşim ve geçiş etkinlik detayıyla aynı: kartın logosu [Hero] ile
-/// sayfanın kapağına uçuyor, kapak kaydırdıkça küçülüyor, ad üst çubukta
-/// beliriyor. Farkı zemin; burada logodan renk türetilmiyor, sayfa temanın
-/// düz zemininde duruyor.
-///
-/// Boş bölümler hiç çizilmiyor: CMS'te çoğu ekip yalnızca kısa açıklamayı
-/// doldurmuş durumda.
+/// herkese açıksa üyeler; altta "Ekibe Katıl". Yerleşim etkinlik detayıyla
+/// aynı, zemin temanın. Boş bölümler çizilmiyor.
 class TeamDetailPage extends StatefulWidget {
   const TeamDetailPage({super.key, required this.team});
 
@@ -46,8 +38,7 @@ class TeamDetailPage extends StatefulWidget {
   static const Duration _openDuration = Duration(milliseconds: 450);
   static const Duration _closeDuration = Duration(milliseconds: 350);
 
-  /// Sayfayı carousel'deki karttan açar. Kök navigator: yoksa sayfa navbar'ın
-  /// altında kalıyor.
+  /// Kök navigator'da açar; yoksa navbar'ın altında kalıyor.
   static Future<void> open(BuildContext context, Team team) {
     return Navigator.of(context, rootNavigator: true).push(
       PageRouteBuilder<void>(
@@ -73,8 +64,6 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
   static const double _workLineHeight = 1.45;
   static const double _memberAvatarSize = 40;
 
-  /// Çubuktaki başlığın belirmeye başladığı kaydırma mesafesi (kapağın
-  /// altından itibaren) ve tamamen görünür olana kadar geçen mesafe.
   static const double _headingRevealOffset = 36.0;
   static const double _headingRevealDistance = 40.0;
 
@@ -86,9 +75,8 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
 
   @override
   Widget build(BuildContext context) {
-    // İçerik butonun arkasına uzanmıyor, üstünde bitiyor (düzenleme
-    // sayfasıyla aynı). Arkasına uzandığında son satırlar karartmanın
-    // altında kalıyor ve liste sonunda büyük bir boşluk gerekiyordu.
+    // İçerik butonun üstünde bitiyor; arkasına uzanınca son satırlar karartmanın
+    // altında kalıyordu.
     return Scaffold(
       backgroundColor: context.backgroundColor,
       body: Column(
@@ -103,9 +91,7 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
     );
   }
 
-  /// Üstte sabit çubuk: geri butonu ve sayfadaki ad buraya ulaşınca beliren
-  /// ortalanmış başlık. Sağda paylaş yok; başlık ortada kalsın diye geri
-  /// butonu kadar boşluk bırakılıyor.
+  /// Geri butonu ve sayfadaki ad buraya ulaşınca beliren başlık.
   Widget _topHeader(BuildContext context) {
     const gap = SizedBox(width: AppSizes.midSpace);
 
@@ -171,7 +157,6 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
       MediaQuery.sizeOf(context).width -
       (AppPaddings.mainPaddingHorizontal.left * 2);
 
-  /// Kare kapak; kaydırıldıkça yeri sabit kalıp yüksekliği büzülüyor.
   Widget _pinnedCover(BuildContext context) {
     final coverSize = _coverSize(context);
 
@@ -189,10 +174,8 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
             // değişmesin.
             child: ColoredBox(
               color: context.elevatedColor,
-              // Logo, kapak büzülürken küçülmesin: çizim alanı kapağın o anki
-              // yüksekliğine değil genişliğine göre kare tutuluyor, taşan
-              // kısım ortadan kırpılıyor. Genişlik kaydırmada sabit, Hero
-              // uçuşunda ise kutuyla birlikte büyüyor.
+              // Logo kapak büzülürken küçülmesin: alan genişliğe göre kare tutuluyor,
+              // taşan kısım ortadan kırpılıyor.
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final side = constraints.maxWidth;
@@ -230,8 +213,8 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
     return ListView(
       controller: scrollController,
       padding: AppPaddings.mainPaddingHorizontal.copyWith(
-        // Kapağın altındaki boşluk üstündekiyle aynı; etkinlik detayındaki
-        // gibi büyük bırakıldığında ad kapaktan kopuk, çok aşağıda duruyordu.
+        // Kapağın altındaki boşluk üstündekiyle aynı; büyük bırakılınca ad kapaktan
+        // kopuk duruyordu.
         top: AppSizes.bigSpace + _coverSize(context) + AppSizes.bigSpace,
         bottom: AppPaddings.mainPaddingAll.bottom,
       ),
@@ -242,8 +225,7 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
             fontWeight: FontWeight.bold,
           ),
         ),
-        // Bölüm başlıklarının kendi üst boşluğu ve altında ayraç var; araya
-        // ayrıca boşluk konmuyor.
+        // Bölüm başlıklarının kendi üst boşluğu ve ayracı var.
         if (team.aboutText.isNotEmpty) ...[
           _sectionHeader(context, 'Hakkında'),
           _body(context, team.aboutText),
@@ -269,9 +251,8 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
     );
   }
 
-  /// Bölüm başlığı: etkinlik detayındakiyle aynı biçim (boşluk, kademe,
-  /// ağırlık, altında ayraç). Renkleri temadan; o sayfanın zemini temadan
-  /// bağımsız koyu, bu sayfanınki değil.
+  /// Etkinlik detayındakiyle aynı biçim; renkler temadan (o sayfa koyu, bu
+  /// değil).
   Widget _sectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSizes.bigSpace),
@@ -312,7 +293,6 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
     );
   }
 
-  /// Çalışma kartı: varsa görsel, altında başlık, açıklama ve etiketler.
   Widget _work(BuildContext context, TeamWork work) {
     return Container(
       padding: AppPaddings.eventCard,
@@ -332,8 +312,7 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
               ),
             ),
           Padding(
-            // İçerik boşluğunun üst payı görselle metin arası için; görsel
-            // yoksa üstte fazladan boşluk bırakıyordu, alt payla eşitleniyor.
+            // Görsel yoksa üst pay alt payla eşitleniyor.
             padding: work.image.isNotEmpty
                 ? AppPaddings.eventCardContent
                 : AppPaddings.eventCardContent.copyWith(
@@ -370,9 +349,8 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
     );
   }
 
-  /// Üyeler bölümü. Yüklenirken ya da ekip herkese açık değilse (boş liste)
-  /// bölüm hiç görünmüyor; yükleniyor göstergesi koymak, çoğu ekipte hiç
-  /// gelmeyecek bir bölümü vaat etmek olurdu.
+  /// Yüklenirken ya da ekip herkese açık değilse bölüm hiç görünmüyor; çoğu
+  /// ekipte gelmeyecek bir bölümü vaat etmemek için.
   List<Widget> _members(BuildContext context) {
     if (members.isEmpty) return const [];
 
@@ -447,8 +425,7 @@ class _TeamDetailPageState extends TeamDetailPagemodel {
     );
   }
 
-  /// Katılım butonu altta sabit. Ekip üye alıyorsa başvuru formunu açıyor;
-  /// almıyorsa pasif ve "Başvurular Kapalı" yazıyor.
+  /// Ekip üye alıyorsa başvuru formunu açıyor, almıyorsa pasif.
   Widget _joinBar() {
     final recruiting = team.isRecruiting;
 

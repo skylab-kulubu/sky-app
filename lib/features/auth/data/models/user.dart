@@ -12,14 +12,11 @@ class User {
   final String skyNumber;
   final bool emailVerified;
 
-  /// Keycloak realm rolleri. Yetki için **kullanılmıyor**: core ve CMS
-  /// yalnızca [groups]'a bakıyor. Bilgi amaçlı duruyor.
+  /// Keycloak realm rolleri; yalnız bilgi için. Yetki [groups]'tan hesaplanıyor.
   final List<String> realmRoles;
 
-  /// Keycloak grup yolları (`/UYELER/ARGE/MOBILAB/LIDERLER`). Yalnızca
-  /// JWT'de var. Ekip üyeliği ve bütün yetkiler bunlardan hesaplanıyor;
-  /// core (`internal/authz`) ve CMS de aynı kaynağa bakıyor, böylece
-  /// uygulamanın gösterdiği ile backend'in izin verdiği aynı kalıyor.
+  /// Keycloak grup yolları (`/UYELER/ARGE/MOBILAB/LIDERLER`), yalnızca JWT'de.
+  /// Bütün yetkiler bunlardan; core ve CMS de aynı kaynağa bakıyor.
   final List<String> groups;
 
   /// Token'ı alan client'ın (`azp`, uygulamada `skyapp`) rolleri. CMS
@@ -28,9 +25,8 @@ class User {
 
   bool get _hasCmsAccess => cmsRoles.contains('cms:access');
 
-  /// Haber oluşturup düzenleyebilir mi: CMS `cms:access` rolüyle birlikte
-  /// YK/DK/ADMIN grubunu istiyor. Bu kararı CMS veriyor; core'daki "DK salt
-  /// okur" kuralı burayı değiştirmiyor.
+  /// Haber oluşturup düzenleyebilir mi: CMS `cms:access` ile YK/DK/ADMIN grubu
+  /// istiyor. Kararı CMS veriyor; core'un "DK salt okur" kuralı buraya girmiyor.
   bool get canManageNews => _hasCmsAccess && isPrivileged;
 
   /// Ekibin CMS sayfasını düzenleyebilir mi: `cms:access` ve o ekibin lider
@@ -94,11 +90,8 @@ class User {
     );
   }
 
-  /// Core `GET /v1/users/me` yanıtından kurar.
-  ///
-  /// Yanıtta rol bilgisi bulunmadığı için [realmRoles] boş kalır; roller
-  /// yalnızca JWT'de olduğundan bu nesne tek başına değil, [mergeWith] ile
-  /// JWT'den gelen nesnenin üzerine uygulanmalıdır.
+  /// Core `GET /v1/users/me` yanıtından kurar. Yanıtta rol olmadığı için tek
+  /// başına değil, [mergeWith] ile JWT'den gelen nesnenin üzerine uygulanmalı.
   factory User.fromJson(Map<String, dynamic> data) {
     final firstName = data['firstName'] as String? ?? '';
     final lastName = data['lastName'] as String? ?? '';
@@ -124,11 +117,9 @@ class User {
     );
   }
 
-  /// JWT'den gelen nesnenin üzerine profil API'sinden geleni uygular.
-  ///
-  /// Roller ve [emailVerified] JWT'de kalır (API bunları döndürmüyor);
-  /// diğer alanlarda API kazanır, ama boş gelen bir alan JWT'deki değeri
-  /// silmez.
+  /// JWT'den gelen nesnenin üzerine profil API'sinden geleni uygular. Roller
+  /// ve [emailVerified] JWT'de kalıyor; diğer alanlarda API kazanıyor ama boş
+  /// gelen alan JWT'deki değeri silmiyor.
   User mergeWith(User profile) {
     String pick(String fromProfile, String fromJwt) =>
         fromProfile.trim().isNotEmpty ? fromProfile : fromJwt;
@@ -150,17 +141,14 @@ class User {
       schoolEmail: pick(profile.schoolEmail, schoolEmail),
       faculty: pick(profile.faculty, faculty),
       profilePictureUrl: pick(profile.profilePictureUrl, profilePictureUrl),
-      // JWT'de karşılığı yok; profil API'si neyse o.
       profilePictureSizes: profile.profilePictureSizes,
       linkedin: pick(profile.linkedin, linkedin),
-      // JWT'de karşılığı yok; profil API'si neyse o.
       studentCardLinked: profile.studentCardLinked,
     );
   }
 
-  /// Etkinlik sahibi olarak seçilebilen ekipler (YK/ADMIN için).
-  /// `ownerTeam` Keycloak grup adıyla eşleşmeli; core yetkiyi o gruba göre
-  /// veriyor.
+  /// Etkinlik sahibi olarak seçilebilen ekipler (YK/ADMIN için); değerler
+  /// Keycloak grup adı, core yetkiyi o gruba göre veriyor.
   static const List<String> _eventOwnerTeams = [
     'AIRLAB',
     'ALGOLAB',
@@ -175,12 +163,9 @@ class User {
     'DK',
   ];
 
-  /// Kullanıcının grupları, arayüzde gösterilecek adlarıyla: her grup
-  /// yolunun en derin anlamlı parçası. Yalnızca `/UYELER/...` yolları
-  /// sayılıyor: `/ROLLER/FORMS-ACCESS` gibi rol grupları ekip değil.
-  /// Kapsayıcılar (`UYELER`, `ARGE`, `IGT`, `ORGANIZASYON`), rol alt
-  /// grupları (`LIDERLER`) ve teknik `ADMIN` gösterilmiyor.
-  /// `/UYELER/ARGE/MOBILAB/LIDERLER` → `MOBILAB`.
+  /// Kullanıcının ekipleri: her `/UYELER/...` yolunun en derin anlamlı parçası
+  /// (`/UYELER/ARGE/MOBILAB/LIDERLER` → `MOBILAB`). `/ROLLER/...` rol grupları,
+  /// kapsayıcılar ve lider alt grupları sayılmıyor.
   List<String> get teams => {
     for (final parts in _groupPaths)
       if (parts.firstOrNull == _membersRoot)
@@ -201,8 +186,6 @@ class User {
 
   String get teamsDisplay => teams.isEmpty ? '' : teams.join(' • ');
 
-  /// Grup yollarının parçaları; `/UYELER/ARGE/MOBILAB/LIDERLER` →
-  /// `[UYELER, ARGE, MOBILAB, LIDERLER]`.
   Iterable<List<String>> get _groupPaths => groups.map(_partsOf);
 
   static List<String> _partsOf(String path) =>
@@ -210,10 +193,9 @@ class User {
 
   static const Set<String> _leaderSubgroups = {'LIDERLER', 'KOORDINATORLER'};
 
-  /// Core'un yetkili kökleri (`internal/authz/privileged_roots.go`,
-  /// `AUTHZ_PRIVILEGED_ROOTS`): yalnızca bu yolların kendisi ve altı
-  /// yetkili. Ağacın başka yerindeki aynı adlı grup
-  /// (`/UYELER/ARGE/WEBLAB/ADMIN`) yetki vermiyor.
+  /// Core'un yazabilen yetkili kökleri (`AUTHZ_PRIVILEGED_ROOTS`). Yalnızca bu
+  /// yollar ve altı; başka yerdeki aynı adlı grup (`/UYELER/ARGE/WEBLAB/ADMIN`)
+  /// yetki vermiyor.
   static const List<String> _writerRoots = [
     '/ADMIN',
     '/YK',
@@ -239,9 +221,8 @@ class User {
   bool get canWriteAsPrivileged =>
       groups.any((path) => _isUnder(path, _writerRoots));
 
-  /// Lideri ya da koordinatörü olduğu ekipler; grup yolunda lider alt
-  /// grubunun hemen üstündeki parça. Yetkili köklerin altındaki yollar
-  /// core'da ekip sayılmıyor.
+  /// Lideri ya da koordinatörü olduğu ekipler. Yetkili köklerin altındaki
+  /// yollar core'da ekip sayılmıyor.
   Set<String> get leaderTeams => {
     for (final path in groups)
       if (!_isUnder(path, _writerRoots) && !_isUnder(path, _readerRoots))
@@ -254,15 +235,9 @@ class User {
   bool isInGroup(String name) =>
       _groupPaths.any((parts) => parts.contains(name));
 
-  /// Etkinlik oluştururken seçilebilecek sahip ekipler; core kurallarının
-  /// uygulamadaki karşılığı (`core-backend/internal/authz/policy.go`):
-  ///
-  /// - YK/ADMIN: bütün ekipler (DK salt okur).
-  /// - Lider/koordinatör: lideri olduğu ekipler.
-  /// - GECEKODU'da düz üyeler de oluşturabiliyor.
-  ///
-  /// Boşsa kullanıcı etkinlik oluşturamaz. Asıl kontrol backend'de; bu liste
-  /// yalnızca butonu ve seçenekleri belirliyor.
+  /// Etkinlik oluştururken seçilebilecek sahip ekipler (core
+  /// `internal/authz/policy.go`): YK/ADMIN bütün ekipler, lider kendi ekipleri,
+  /// GECEKODU'da düz üyeler de. Boşsa kullanıcı etkinlik oluşturamaz.
   List<String> get eventOwnerOptions {
     if (canWriteAsPrivileged) return List.of(_eventOwnerTeams);
 
@@ -276,26 +251,21 @@ class User {
 
   bool get canCreateEvent => eventOwnerOptions.isNotEmpty;
 
-  /// Verilen ekibin etkinliğini düzenleyebilir mi. Core'da güncelleme,
-  /// oluşturmayla aynı kurala bağlı (GECEKODU'da üyeler dahil).
+  /// Core'da güncelleme, oluşturmayla aynı kurala bağlı.
   bool canEditEvent(String ownerTeam) =>
       ownerTeam.isNotEmpty &&
       (canWriteAsPrivileged ||
           leaderTeams.contains(ownerTeam) ||
           (ownerTeam == _everyMemberCanCreateTeam && isInGroup(ownerTeam)));
 
-  /// Silme her ekipte yalnızca liderlere ve YK/ADMIN'e açık; GECEKODU
-  /// üyeleri düzenleyebiliyor ama silemiyor.
+  /// GECEKODU üyeleri düzenleyebiliyor ama silemiyor.
   bool canDeleteEvent(String ownerTeam) =>
       ownerTeam.isNotEmpty &&
       (canWriteAsPrivileged || leaderTeams.contains(ownerTeam));
 
-  /// Verilen etkinlikte kapıda okutabilir mi; core `allowDoorCheckIn`'in
-  /// uygulamadaki karşılığı: YK/ADMIN, etkinliğin sahip ekibinin lideri
-  /// ya da koordinatörü, ya da etkinliğin kapı görevlisi.
-  ///
-  /// Grubunda `team_door_scan=true` olan ekiplerin üyeleri de core'da
-  /// okutabiliyor ama bu ayar token'a yansımıyor; uygulama onları bilemiyor.
+  /// Kapıda okutabilir mi (core `allowDoorCheckIn`): YK/ADMIN, sahip ekibin
+  /// lideri ya da etkinliğin kapı görevlisi. `team_door_scan` açık ekiplerin
+  /// üyeleri token'da görünmüyor; onlar `/v1/door/events`'ten anlaşılıyor.
   bool canCheckIn({
     required String ownerTeam,
     List<String> doorStaffIds = const [],
@@ -304,7 +274,6 @@ class User {
       (ownerTeam.isNotEmpty && leaderTeams.contains(ownerTeam)) ||
       (id.isNotEmpty && doorStaffIds.contains(id));
 
-  /// Kullanıcı adının gösterim hâli; arayüzde hep `@` ile yazılıyor.
   String get usernameDisplay =>
       preferredUsername.isEmpty ? '' : '@$preferredUsername';
 }

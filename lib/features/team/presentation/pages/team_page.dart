@@ -19,11 +19,8 @@ import 'package:sky_app/features/team/presentation/widgets/team_summary_row.dart
 
 part 'team_pagemodel.dart';
 
-/// Ekip sekmesi: AR-GE ekiplerinin yatay kaydırılan kartları.
-///
-/// Ortadaki kart tam boyda; yandakiler kenarlardan görünüyor, perspektifle
-/// içe dönük ve bir tık küçük duruyor. Kaydırdıkça bu değerler kartın
-/// ortaya olan uzaklığına göre sürekli değişiyor.
+/// AR-GE ekiplerinin yatay carousel'i: ortadaki kart tam boy, yandakiler
+/// perspektifle içe dönük ve küçük; kaydırdıkça uzaklığa göre değişiyor.
 class TeamPage extends StatefulWidget {
   const TeamPage({super.key});
 
@@ -54,8 +51,7 @@ class _TeamPageState extends TeamPagemodel {
 
   Widget _carousel(List<Team> teams) {
     return Padding(
-      // Altta yüzen navbar'ın payı ve onunla içerik arasında ayrıca boşluk;
-      // yalnızca navbar payı bırakıldığında kart navbar'a değiyordu.
+      // Navbar payına ek boşluk; yoksa kart navbar'a değiyordu.
       padding: const EdgeInsets.only(
         top: AppSizes.bigSpace,
         bottom: AppSizes.navBarClearance + AppSizes.largeSpace,
@@ -67,9 +63,8 @@ class _TeamPageState extends TeamPagemodel {
             child: _summaryRow(teams),
           ),
           const SizedBox(height: AppSizes.bigSpace),
-          // Kart ve noktalar tek grup olarak dikeyde ortalanıyor. Kart
-          // kalan alanın tamamını alıp içinde ortalandığında boşluk kartın
-          // altına da düşüyor, noktalar karttan kopuk duruyordu.
+          // Kart ve noktalar tek grup olarak ortalanıyor; ayrı ortalanınca noktalar
+          // karttan kopuk duruyordu.
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -105,8 +100,7 @@ class _TeamPageState extends TeamPagemodel {
     );
   }
 
-  /// Kaçıncı ekipte olunduğunu gösteren noktalar; aktif olan hap şeklinde
-  /// uzuyor. Kaydırma sırasında iki nokta arasında akıcı geçiyor.
+  /// Hangi ekipte olunduğunu gösteren noktalar; aktif olan hap gibi uzuyor.
   Widget _pageIndicator(int count) {
     return AnimatedBuilder(
       animation: pageController,
@@ -135,8 +129,8 @@ class _TeamPageState extends TeamPagemodel {
     );
   }
 
-  /// Kartın oranından gelen yüksekliği; alan yetmezse (kısa ekran) noktaların
-  /// payı düşülmüş alana sığacak kadar.
+  /// Oranın verdiği yükseklik; kısa ekranda noktaların payı düşülmüş alana
+  /// sığacak kadar.
   double _cardHeight(BoxConstraints constraints) {
     final cardWidth =
         constraints.maxWidth * TeamPagemodel._viewportFraction -
@@ -152,9 +146,8 @@ class _TeamPageState extends TeamPagemodel {
       itemCount: teams.length,
       itemBuilder: (context, index) => AnimatedBuilder(
         animation: pageController,
-        // Kart kaydırmadan etkilenmiyor; her karede baştan kurulmasın.
-        // Yükseklik dışarıda belirlendi; oran yalnızca kısa ekranda
-        // genişliği daraltıyor.
+        // Kart kaydırmadan etkilenmiyor, her karede kurulmasın; oran yalnız kısa
+        // ekranda genişliği daraltıyor.
         child: Center(
           child: Padding(
             padding: TeamPagemodel._cardGap,
@@ -169,10 +162,8 @@ class _TeamPageState extends TeamPagemodel {
     );
   }
 
-  /// Kartın ortaya uzaklığına göre dönüş ve küçülme.
-  ///
-  /// Dönüş ekseni kartın ortaya bakan kenarı değil ortası; kenardan
-  /// döndürüldüğünde yandaki kart ortadakinin altına giriyordu.
+  /// Dönüş ekseni kartın ortası; kenardan dönünce yandaki kart ortadakinin
+  /// altına giriyordu.
   Widget _transformed(int index, Widget child) {
     final distance = (pageOffset - index).clamp(-1.0, 1.0);
     final scale = 1 - distance.abs() * TeamPagemodel._sideScaleLoss;

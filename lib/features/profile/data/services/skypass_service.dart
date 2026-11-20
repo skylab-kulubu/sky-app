@@ -5,20 +5,15 @@ import 'package:sky_app/features/profile/data/models/skypass_token.dart';
 class SkyPassService {
   SkyPassService._();
 
-  /// Son alınan kod ve kime ait olduğu. Kart çevrildikçe ve profil yeniden
-  /// açıldıkça her seferinde yeni kod istenmesin diye, süresi dolmadıkça bu
-  /// kullanılıyor. Sahibi tutuluyor ki çıkış yapıp başka hesapla girildiğinde
-  /// önceki kişinin kodu gösterilmesin.
+  /// Son alınan kod; dolmadıkça yeniden istenmiyor. Sahibi tutuluyor ki başka
+  /// hesapla girilince öncekinin kodu görünmesin.
   static SkyPassToken? _current;
   static String? _currentOwner;
   static Future<SkyPassToken>? _pending;
 
-  /// Kodun bu kadar süresi kalmışsa yenisi alınıyor; görevli okuturken kod
-  /// elinde dolmasın.
+  /// Bu kadar süresi kalan kod yenileniyor; görevli okuturken dolmasın.
   static const Duration refreshMargin = Duration(seconds: 10);
 
-  /// [owner]'ın (SKY numarası) geçerli kodunu döndürür; yoksa ya da dolmak
-  /// üzereyse yenisini alır. Hatalar `ApiException` olarak fırlıyor.
   static Future<SkyPassToken> token({required String owner}) {
     final current = _current;
     if (current != null &&
@@ -38,8 +33,7 @@ class SkyPassService {
     return _current = token;
   }
 
-  /// Öğrenci kartının UID'sini hesaba bağlar (varsa eskisinin yerine).
-  /// Kart başka bir hesaba bağlıysa core 409 dönüyor.
+  /// UID'yi hesaba bağlar; kart başka hesaba bağlıysa 409.
   static Future<void> bindCard(String uid) async {
     await CoreApi.post('/skypass/card-bind', body: {'uid': uid});
   }

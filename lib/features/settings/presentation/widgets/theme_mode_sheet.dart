@@ -25,8 +25,7 @@ class ThemeModeSheet extends StatelessWidget {
     );
   }
 
-  /// Kullanıcıya gösterilecek etiket. Ayarlar satırındaki güncel değer de
-  /// buradan okunuyor, böylece iki yer birbirinden ayrışmıyor.
+  /// Etiket; ayarlar satırındaki değer de buradan okunuyor, iki yer ayrışmasın.
   static String labelOf(ThemeMode mode) => switch (mode) {
     ThemeMode.system => 'Sistem',
     ThemeMode.light => 'Açık',
@@ -65,8 +64,7 @@ class ThemeModeSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSizes.bigSpace),
-            // Ayarlar sayfasındaki satırların aynısı; seçili olanın sağında
-            // ok yerine işaret var, diğerlerinde sağ taraf boş.
+            // Seçili satırın sağında işaret, diğerlerinde boş.
             TileGroup(
               children: [
                 for (final mode in ThemeMode.values)

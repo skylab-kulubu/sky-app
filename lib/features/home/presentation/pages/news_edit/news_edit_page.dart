@@ -27,15 +27,11 @@ import 'package:sky_app/features/home/presentation/providers/news_provider.dart'
 
 part 'news_edit_pagemodel.dart';
 
-/// Haber oluşturma ve düzenleme. `cms:access` rolü olana açılıyor; kayıt
-/// CMS'e gidiyor, liste ve açık detay sayfası provider üzerinden güncelleniyor.
-///
-/// Görsel galeriden seçilip core'a yükleniyor (`POST /v1/media`), CMS'e
-/// adresi yazılıyor (CMS alanı bir URL). Silme yok (CMS'te endpoint yok).
+/// Haber oluşturma ve düzenleme; kayıt CMS'e gidiyor. Görsel core'a
+/// yükleniyor (`POST /v1/media`), CMS'e adresi yazılıyor. Silme yok.
 class NewsEditPage extends StatefulWidget {
   const NewsEditPage({super.key, this.item});
 
-  /// Düzenlenen haber; oluşturmada `null`.
   final NewsItem? item;
 
   static Future<void> open(BuildContext context, {NewsItem? item}) {

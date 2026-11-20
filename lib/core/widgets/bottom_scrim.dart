@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 
 /// Yüzen bir alt çubuğun (navbar, katılım butonu) arkasından geçen içeriği
-/// yumuşatan alt gradyan.
-///
-/// Zemin rengi temadan geliyor: koyu temada siyaha, açık temada beyaza
-/// gidiyor. Sabit siyah verilseydi açık temada içeriğin üstüne koyu bir
-/// bant binerdi.
+/// yumuşatan alt gradyan. Renk temadan; sabit siyah açık temada koyu bir
+/// bant bırakırdı.
 ///
 /// [Positioned] döndürdüğü için doğrudan bir [Stack]'in çocuğu olmalı.
 class BottomScrim extends StatelessWidget {

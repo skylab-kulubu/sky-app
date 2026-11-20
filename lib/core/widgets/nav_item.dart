@@ -5,14 +5,11 @@ import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 
-/// Navbar öğesi.
+/// Navbar öğesi: seçiliyken ikonun yanında label'lı bir hap, değilken yalnız
+/// ikon. Label `Align.widthFactor` ile açıldığı için genişlik metinden
+/// bağımsız, elle hesaplanmıyor.
 ///
-/// Seçiliyken ikonun yanında label'ı da gösteren bir hap'a dönüşür; seçili
-/// değilken yalnızca ikon kalır. Geçiş, label'ın yatayda açılıp kapanmasıyla
-/// olur — genişlik elle hesaplanmadığı için metin uzunluğundan bağımsızdır.
-///
-/// [showLabel] kapalıyken seçili öğe de yalnızca ikon kalır; hap'ın zemini
-/// yine belirir ama genişlik değişmez (navbar'ın yanında menü butonu varken).
+/// [showLabel] kapalıyken seçili öğe de yalnız ikon (yanında menü butonu varken).
 class NavItem extends StatelessWidget {
   const NavItem({
     super.key,
@@ -88,8 +85,6 @@ class NavItem extends StatelessWidget {
     );
   }
 
-  /// [Align.widthFactor] 0'dan 1'e giderken label yatayda açılır. Boyut her
-  /// karede değiştiği için geçiş, tek karelik sıçrama yerine akıcı olur.
   Widget _label(BuildContext context, double t) {
     return ClipRect(
       child: Align(

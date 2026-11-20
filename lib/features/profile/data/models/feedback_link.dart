@@ -1,9 +1,7 @@
-/// Biletin geri bildirim formu bağlantısı (`GET /v1/tickets/me` →
-/// `feedback[]`, core `docs/event-feedback.md`).
-///
-/// Core bunu yalnızca girişi okutulmuş ve geri bildirim postası gitmiş
-/// biletlerde veriyor; adres kişiye özel davet kodunu taşıyor
-/// (`…?davet=<kod>`), o yüzden olduğu gibi açılmalı.
+/// Biletin geri bildirim formu (`GET /v1/tickets/me` → `feedback[]`, core
+/// `docs/event-feedback.md`). Yalnızca girişi okutulmuş ve geri bildirim
+/// postası gitmiş biletlerde var; adres kişiye özel davet kodunu taşıyor
+/// (`…?davet=<kod>`), olduğu gibi açılmalı.
 class FeedbackLink {
   const FeedbackLink({
     required this.url,
@@ -12,7 +10,6 @@ class FeedbackLink {
     this.sessionId,
   });
 
-  /// Formun kişiye özel adresi.
   final String url;
 
   /// Oturumun başlığı; etkinliğin formunda etkinliğin adı.
@@ -21,7 +18,6 @@ class FeedbackLink {
   /// Oturumun formuysa oturum id'si; etkinliğin formunda `null`.
   final String? sessionId;
 
-  /// Forms bu davetle bir cevap bildirdi mi.
   final bool answered;
 
   /// Adresi `https` olmayan ya da eksik öğe atlanıyor.

@@ -21,9 +21,7 @@ import 'package:sky_app/features/calendar/presentation/widgets/event_option_shee
 
 part 'schedule_session_form_pagemodel.dart';
 
-/// Bir güne oturum ekler ya da oturumu düzenler: başlık, konuşmacı, tür,
-/// saatler ve (düzenlemede) iptal. Kaydedilir ya da silinirse `true` ile
-/// kapanıyor.
+/// Güne oturum ekler ya da düzenler; kaydedilir ya da silinirse `true`.
 class ScheduleSessionFormPage extends StatefulWidget {
   const ScheduleSessionFormPage({
     super.key,
@@ -35,11 +33,10 @@ class ScheduleSessionFormPage extends StatefulWidget {
 
   final EventDay day;
 
-  /// Yeni oturumun önerilen başlangıcı (günün son oturumunun bitişi).
+  /// Önerilen başlangıç: günün son oturumunun bitişi.
   final DateTime initialStart;
   final bool canDelete;
 
-  /// Düzenlenen oturum; yeni oturum için `null`.
   final EventSession? session;
 
   static Future<bool> open(

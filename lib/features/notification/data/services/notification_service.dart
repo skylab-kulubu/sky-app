@@ -1,10 +1,7 @@
 import 'package:sky_app/features/notification/data/models/notification_model.dart';
 
-/// Bildirim listesi.
-///
-/// Backend'de henüz bildirim endpoint'i yok; o gelene kadar liste boş ve
-/// sayfa boş durumunu gösteriyor. Sahte veri konmuyor, kullanıcı gerçek
-/// sanmasın diye. Bağlantı işi için bkz. GitHub issue (bildirimler/push).
+/// Bildirim listesi. Backend'de uç olmadığı için boş (#45); kullanıcı gerçek
+/// sanmasın diye sahte veri yok.
 class NotificationService {
   static final List<NotificationModel> list = [];
 }

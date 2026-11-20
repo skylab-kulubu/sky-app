@@ -32,17 +32,13 @@ import 'package:sky_app/features/profile/data/services/nfc_service.dart';
 
 part 'door_scanner_pagemodel.dart';
 
-/// Kapı okuyucusu: görevli etkinliği ve oturumu seçip katılımcıların
-/// SkyPass QR'ını okutuyor, giriş core'a oturum bazında yazılıyor
-/// (`POST /v1/sessions/{id}/check-in/skypass`).
-///
-/// Yalnızca kapı yetkisi olan etkinlikler listeleniyor ([User.canCheckIn]).
-/// Okuyucu her okutmadan sonra açık kalıyor; sonuç kısa süre altta görünüp
-/// kayboluyor.
+/// Kapı okuyucusu: görevli etkinliği ve oturumu seçip katılımcıların SkyPass
+/// QR'ını okutuyor (`POST /v1/sessions/{id}/check-in/skypass`). Okuyucu her
+/// okutmadan sonra açık kalıyor, sonuç kısa süre görünüyor.
 class DoorScannerPage extends StatefulWidget {
   const DoorScannerPage({super.key});
 
-  /// Tam ekran açar (navbar'ın altında kalmasın diye kök navigator'da).
+  /// Kök navigator'da tam ekran açar.
   static Future<void> open(BuildContext context) {
     return Navigator.of(
       context,
@@ -187,7 +183,6 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
     );
   }
 
-  /// QR ile öğrenci kartı arasında seçim; iki eşit hap.
   Widget _modeSwitch() {
     Widget option(DoorMode value, String icon, String label) {
       final selected = mode == value;

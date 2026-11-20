@@ -4,11 +4,8 @@ import 'package:sky_app/core/services/handoff_service.dart';
 import 'package:sky_app/features/auth/data/models/user.dart';
 import 'package:sky_app/features/auth/data/services/auth_service.dart';
 
-/// Oturumun durumu.
-///
-/// `user != null` tek başına yetmiyordu: "oturum yok" ile "sunucuya
-/// ulaşılamadı" aynı şeye düşüyor ve çevrimdışı açılan uygulama kullanıcıyı
-/// giriş ekranına atıyordu.
+/// Oturumun durumu. `user != null` yetmiyordu: "oturum yok" ile "sunucuya
+/// ulaşılamadı" ayrılmazsa çevrimdışı açılan uygulama girişe atıyordu.
 enum AuthStatus {
   /// İlk oturum kontrolü sürüyor.
   loading,
@@ -30,7 +27,6 @@ class UserProvider extends ChangeNotifier {
   User? get user => _user;
   AuthStatus get status => _status;
 
-  /// İlk oturum kontrolü tamamlandı mı.
   bool get isInitialized => _status != AuthStatus.loading;
 
   Future<bool> login() async {
@@ -69,9 +65,7 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Kayıtlı oturumu yenileyip kullanıcıyı kurar.
-  ///
-  /// Splash'te ve çevrimdışı ekranındaki "tekrar dene"de çağrılıyor.
+  /// Kayıtlı oturumu yenileyip kullanıcıyı kurar (splash ve "tekrar dene").
   Future<void> tryAutoLogin() async {
     _status = AuthStatus.loading;
     notifyListeners();
@@ -83,10 +77,8 @@ class UserProvider extends ChangeNotifier {
     await _applyOutcome(await _authService.handleWebCallback(code));
   }
 
-  /// Çevrimdışı takılan kullanıcı için çıkış yolu.
-  ///
-  /// Keycloak'a gitmiyor (bağlantı zaten yok); yalnızca yerel oturumu silip
-  /// giriş ekranına düşürüyor.
+  /// Çevrimdışı takılan kullanıcı için çıkış: Keycloak'a gitmeden yerel oturumu
+  /// silip girişe düşürür.
   Future<void> discardSession() async {
     await _authService.clearSession();
     _user = null;

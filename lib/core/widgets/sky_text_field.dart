@@ -4,11 +4,7 @@ import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 
-/// Formlardaki metin alanı: kenarlıksız, tile zemininde (ekip düzenleme,
-/// etkinlik oluşturma).
-///
-/// Ayarlar sayfasındaki satır gruplarıyla aynı yüzeyde duruyor ki formlar,
-/// uygulamanın geri kalanından ayrı bir tasarım gibi görünmesin.
+/// Formlardaki kenarlıksız metin alanı; ayar gruplarıyla aynı tile zemininde.
 class SkyTextField extends StatelessWidget {
   const SkyTextField({
     super.key,

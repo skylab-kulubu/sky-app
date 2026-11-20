@@ -19,8 +19,7 @@ class AppPaddings {
   /// AppBar leading'inin sol kenar boşluğu; actions'ınkiyle simetrik.
   static const appBarLeading = EdgeInsets.only(left: 16);
 
-  /// AppBar actions'ının sağ kenar boşluğu. Başlığın soldaki
-  /// `titleSpacing` (16) değeriyle simetrik olsun diye aynı.
+  /// AppBar actions'ının sağ boşluğu; soldaki `titleSpacing` (16) ile simetrik.
   static const appBarActions = EdgeInsets.only(right: 16);
 
   /// AppBar'daki arama kutusunun metin boşluğu. Dikeyde boşluk yok; metin
@@ -35,35 +34,22 @@ class AppPaddings {
     top: 10,
   );
 
-  /// SkyPass kartının iç boşluğu.
   static const skyPassCard = EdgeInsets.all(20);
 
-  /// SkyPass'in arka yüzündeki QR'ın beyaz zemini ile deseni arasındaki
-  /// boşluk (QR'ın sessiz bölgesi).
+  /// QR'ın sessiz bölgesi: beyaz zemin ile desen arası.
   static const skyPassQr = EdgeInsets.all(8);
 
   /// Ayarlar satırının iç boşluğu. Satır yüksekliğini metin değil ikon
   /// dairesi belirlediği için dikeyde dar: 36 + 2×8 = 52.
   static const settingsTile = EdgeInsets.symmetric(horizontal: 16, vertical: 8);
 
-  /// Etiket + değer satırının iç boşluğu (hesap bilgileri, sertifikalar).
-  /// İkon dairesi olmadığı için yüksekliği metin belirliyor; [settingsTile]
-  /// kadar daraltılırsa satır sıkışık görünüyor.
+  /// Etiket + değer satırı (hesap bilgileri, sertifikalar). İkon dairesi
+  /// olmadığından [settingsTile]'dan ferah; o kadar dar olunca sıkışıyor.
   static const infoTile = EdgeInsets.symmetric(horizontal: 16, vertical: 12);
 
-  /// Ayarların en üstündeki hesap satırının iç boşluğu. Avatarı diğer
-  /// satırların ikon dairesinden büyük; satır bilinçli olarak onlardan uzun
-  /// duruyor, listenin başındaki kullanıcı kimliği sıradan bir ayar değil.
+  /// Hesap satırı; avatarı büyük olduğu için diğer satırlardan bilerek uzun.
   static const accountTile = EdgeInsets.symmetric(horizontal: 16, vertical: 10);
 
-  /// Hesap sayfasının başındaki avatar + ad bloğu. Yatayda [sectionHeader]
-  /// ile hizalı kalsın diye 4.
-  static const accountHeader = EdgeInsets.only(left: 4, right: 4, bottom: 4);
-
-  /// Hesap sayfasının altındaki bilgilendirme notu.
-  static const accountNote = EdgeInsets.only(left: 4, right: 4, top: 20);
-
-  /// Hesap sayfasındaki ekip rozeti.
   /// Sheet başlığı: solda kapatma butonu, ortada başlık.
   static const sheetHeader = EdgeInsets.fromLTRB(4, 8, 4, 8);
 
@@ -76,9 +62,8 @@ class AppPaddings {
   /// Ayarların en altındaki "Developed by" künyesi.
   static const credit = EdgeInsets.only(top: 36, bottom: 8);
 
-  /// Etkinlik kartının iç boşluğu; kapak görselinin dört yanında kart
-  /// zemininden bir çerçeve kalmasını sağlıyor. Köşe rozetleri görselin
-  /// dışına taştığı için bu boşluk onlara da yer açıyor.
+  /// Etkinlik kartının iç boşluğu; kapağın çevresinde çerçeve bırakıp köşe
+  /// rozetlerine yer açıyor.
   static const eventCard = EdgeInsets.all(12);
 
   /// Etkinlik kartında görselin altındaki metin bloğunun ek boşluğu; metin
@@ -96,15 +81,12 @@ class AppPaddings {
   /// kendi kenar boşluğu zaten var, satır onu ikinci kez eklemiyor.
   static const activityTile = EdgeInsets.symmetric(vertical: 8);
 
-  /// Ayarlar bölüm başlığının boşluğu.
   static const sectionHeader = EdgeInsets.only(left: 4, top: 24, bottom: 8);
 
-  /// NFC okutma overlay'inde ekranın altında duran durum metninin, güvenli
-  /// alanın üstünde bıraktığı pay. Merkezdeki kart yukarı çekilirken metnin
-  /// altında kalmasını sağlayacak kadar geniş.
+  /// NFC overlay'inin alttaki durum metni; yukarı çekilen kart metnin üstüne
+  /// binmesin diye geniş.
   static const nfcStatus = EdgeInsets.only(bottom: 56);
 
-  /// Navbar hap'ının, öğelerini saran iç boşluğu.
   static const navBarContent = EdgeInsets.all(8);
 
   /// Navbar öğesinin iç boşluğu. Dikey değer, ikon boyutuyla birlikte

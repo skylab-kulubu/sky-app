@@ -4,13 +4,9 @@ import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/widgets/sky_text_field.dart';
 
-/// Kontenjanı soran dialog; girilen sayıyı döner (boş ya da 0 = sınırsız),
-/// vazgeçilirse `null`.
-///
-/// Metin alanının controller'ı dialogun kendi state'inde. Çağıran tarafta
-/// tutulup `showDialog` dönünce silindiğinde, dialog kapanma animasyonu
-/// sürerken alan hâlâ çizildiği için "used after being disposed" hatası
-/// veriyordu.
+/// Kontenjanı soran dialog (boş ya da 0 = sınırsız); vazgeçilirse `null`.
+/// Controller dialogun kendi state'inde: dışarıda tutulunca kapanma
+/// animasyonunda "used after being disposed" hatası veriyordu.
 class EventCapacityDialog extends StatefulWidget {
   const EventCapacityDialog({super.key, required this.initialValue});
 
@@ -51,8 +47,7 @@ class _EventCapacityDialogState extends State<EventCapacityDialog> {
           fontWeight: FontWeight.w600,
         ),
       ),
-      // Formlardaki alanın aynısı; dialog zaten tile renginde olduğu için
-      // zemini bir tık yükseltilmiş.
+      // Dialog tile renginde; alanın zemini bir tık yükseltilmiş.
       content: SkyTextField(
         controller: _controller,
         autofocus: true,

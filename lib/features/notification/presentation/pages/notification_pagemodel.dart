@@ -6,11 +6,8 @@ abstract class NotificationPagemodel extends State<NotificationPage> {
 
   List<NotificationModel> get notifications => NotificationService.list;
 
-  /// Bildirimi açar ve okundu olarak işaretler.
-  ///
-  /// API olmadığı için işaretleme şimdilik doğrudan
-  /// [NotificationService.list] üzerinde yapılıyor; API bağlandığında
-  /// bunun yerine servise "okundu" isteği gidecek.
+  /// Bildirimi açar ve okundu işaretler. API yokken doğrudan listede; API
+  /// gelince servise "okundu" isteği gidecek.
   void openNotification(int index) {
     final item = notifications[index];
 

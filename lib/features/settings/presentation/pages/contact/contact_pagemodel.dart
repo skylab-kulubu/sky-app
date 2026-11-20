@@ -11,11 +11,8 @@ abstract class ContactPagemodel extends State<ContactPage> {
   static const String _linkedInUrl =
       'https://www.linkedin.com/company/ytuskylab/';
 
-  /// Mail uygulamasını hazır konuyla açar. Gövdenin altına platform
-  /// ekleniyor; bir sorun bildirildiğinde ilk sorulan şey bu.
-  ///
-  /// Cihazda mail uygulaması yoksa adres panoya kopyalanıyor; kullanıcı
-  /// eli boş kalmasın.
+  /// Mail uygulamasını hazır konuyla açar; gövdenin altına platform ekleniyor.
+  /// Mail uygulaması yoksa adres panoya kopyalanıyor.
   Future<void> onEmailTap() async {
     final body = '\n\n---\nPlatform: ${_platformName()}';
     // `queryParameters` boşlukları `+` yapıyor ve bazı mail uygulamaları

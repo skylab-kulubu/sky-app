@@ -5,15 +5,9 @@ import 'package:sky_app/core/services/api_client.dart';
 import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/features/home/data/models/news_item.dart';
 
-/// SkyCMS `News` koleksiyonu.
-///
-/// Okuma girişsiz. Yazma için token'ın `skyapp` client'ında `cms:access`
-/// rolü ve YK/DK/ADMIN grubu gerekiyor (`User.canManageNews`); bu
-/// kullanıcılar bütün haberleri oluşturup düzenleyebiliyor. Silme
-/// endpoint'i yok.
-///
-/// Koleksiyon anahtarı küçük harf (`news`; 28 Eylül'de CMS inscribed'a
-/// geçti, `News` artık 404). Yanıtlar `{data: ...}` zarfında değil.
+/// SkyCMS `news` koleksiyonu (anahtar küçük harf; `News` 404). Okuma girişsiz;
+/// yazma `skyapp` client'ında `cms:access` ve YK/DK/ADMIN grubu istiyor
+/// (`User.canManageNews`). Silme ucu yok, yanıtlar zarfsız.
 class NewsService {
   final Dio _dio = ApiClient.instance.dio;
 

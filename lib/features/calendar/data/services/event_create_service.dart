@@ -6,7 +6,6 @@ import 'package:sky_app/core/services/media_service.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/data/models/season.dart';
 
-/// Formdan gelen etkinlik bilgileri; oluşturma ve düzenlemede aynı.
 class EventDraft {
   const EventDraft({
     required this.name,
@@ -34,25 +33,19 @@ class EventDraft {
   /// 0 sınırsız.
   final int capacity;
 
-  /// Başvurular elle kapatıldı mı; kapalıyken kimse kendi başvurusunu
-  /// yapamıyor (core `409 registration_closed`). Forms'tan gelen cevaplar
-  /// yine bilet yazıyor.
+  /// Kapalıyken kimse kendi başvurusunu yapamıyor (`409 registration_closed`);
+  /// Forms'tan gelen cevaplar yine bilet yazıyor.
   final bool registrationClosed;
 
   /// Yeni yüklenen kapağın medya id'si; `null` ise kapak değişmiyor.
   final String? coverImageId;
 }
 
-/// Etkinlik oluşturma, düzenleme ve silmenin ağ işleri (core `/v1`):
-/// sezon listesi, kapak yükleme, kayıt, sezona bağlama, güncelleme, silme.
-///
-/// Yetki core'da (`internal/authz`): sahip ekipte lider (GECEKODU'da üye)
-/// ya da YK/ADMIN olmayan kullanıcının isteği 403 ile reddediliyor.
-/// Sezona bağlama yalnızca YK/ADMIN'e açık.
+/// Etkinlik oluşturma, düzenleme ve silmenin ağ işleri. Yetki core'da;
+/// sezona bağlama yalnızca YK/ADMIN'e açık.
 class EventCreateService {
   final MediaService _media = MediaService();
 
-  /// Bütün sezonlar; girişsiz okunuyor.
   Future<List<Season>> fetchSeasons() async {
     final body = await CoreApi.get('/seasons');
     return CoreApi.list(body, what: 'sezon listesi')
@@ -61,20 +54,13 @@ class EventCreateService {
         .toList(growable: false);
   }
 
-  /// Kapak görselini yükler ve medya id'sini döner.
-  ///
-  /// Amaç `event_cover`: core görseli yeniden kodluyor, kart ve sayfa
-  /// boyutlarını üretiyor. Etkinliğe bağlanmayan yükleme 24 saat sonra
-  /// düşüyor, kaydedilen kapak core'un kaydına bağlı olduğu için kalıyor.
+  /// Kapağı `event_cover` amacıyla yükler: core yeniden kodlayıp boyutları
+  /// üretiyor. Etkinliğe bağlanmayan yükleme 24 saat sonra düşüyor.
   Future<String> uploadCover(XFile image) async =>
       (await _media.uploadImage(image, purpose: 'event_cover')).id;
 
-  /// Etkinliği oluşturur; [seasonId] verilirse sezona da bağlar ve son
-  /// hâlini döner.
-  ///
-  /// Sezon oluşturma isteğinde gitmiyor, ayrı bir çağrıyla bağlanıyor ve bu
-  /// yalnızca YK/ADMIN'e açık. Bağlama düşerse etkinlik yine oluşmuş
-  /// oluyor; o durumda sezonsuz hâli dönüyor.
+  /// Oluşturur; [seasonId] verilirse ayrı çağrıyla sezona da bağlar (YK/ADMIN).
+  /// Bağlama düşerse etkinlik sezonsuz hâliyle dönüyor.
   Future<EventModel> createEvent(EventDraft draft, {String? seasonId}) async {
     final body = await CoreApi.post('/events', body: _payload(draft));
     final created = EventModel.fromJson(
@@ -89,11 +75,8 @@ class EventCreateService {
     }
   }
 
-  /// Etkinliği günceller ve güncel hâlini döner.
-  ///
-  /// Core güncellemede bütün alanları yazıyor; formda olmayanlar
-  /// ([original]'dan sıralama, ödül, katılım kuralı) aynen geri gönderiliyor
-  /// ki silinmesin. Kapak değişmediyse mevcut kapak id'si gidiyor.
+  /// Formda olmayan alanlar ([original]'dan sıralama, ödül, katılım kuralı)
+  /// aynen geri gönderiliyor; kapak değişmediyse mevcut kapak id'si.
   Future<EventModel> updateEvent(EventModel original, EventDraft draft) async {
     final coverImageId =
         draft.coverImageId ??
@@ -122,11 +105,10 @@ class EventCreateService {
     return EventModel.fromJson(CoreApi.object(body, what: 'etkinlik'));
   }
 
-  /// Etkinliği siler (204). Core biletleri, yoklamaları ve sertifikaları da
-  /// birlikte siliyor.
+  /// Etkinliği siler (204). Core yalnız taslağı siliyor; yayındakinde
+  /// `409 event_not_draft` (YK/ADMIN hariç).
   Future<void> deleteEvent(String id) => CoreApi.delete('/events/$id');
 
-  /// Tarihler UTC, RFC 3339.
   static Map<String, dynamic> _payload(EventDraft draft) => {
     'name': draft.name,
     'location': draft.location,

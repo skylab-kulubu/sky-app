@@ -16,8 +16,6 @@ class QuickActionButton extends StatelessWidget {
   final String icon;
   final String label;
 
-  /// Sayfaları henüz yok; verilmezse dokunma görsel olarak çalışır ama
-  /// bir şey yapmaz.
   final VoidCallback? onTap;
 
   @override

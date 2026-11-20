@@ -1,9 +1,7 @@
-/// Core API'nin tarih biçimi: saat dilimli RFC 3339
-/// (`2026-09-20T15:00:00Z`).
+/// Core'un tarih biçimi: saat dilimli RFC 3339 (`2026-09-20T15:00:00Z`).
 ///
-/// Gönderirken UTC'ye çevriliyor; okurken yerel saate. `DateTime.parse`
-/// `Z` ile biten değeri UTC döndürüyor ve saat alanları öyle okunursa
-/// Türkiye'de üç saat geri görünüyor; [ApiDateTime.parse] bunu önlüyor.
+/// Gönderirken UTC'ye, okurken yerel saate çevriliyor: `DateTime.parse` `Z`'li
+/// değeri UTC bıraktığı için saatler üç saat geri görünüyordu.
 extension ApiDateTime on DateTime {
   String toApiString() => toUtc().toIso8601String();
 

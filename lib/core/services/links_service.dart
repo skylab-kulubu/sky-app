@@ -3,8 +3,7 @@ import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/models/link_item.dart';
 
 class LinksService {
-  /// Kulübün ana web sitesi. Hem [groups] içinde hem de ayarlar sayfasından
-  /// doğrudan kullanıldığı için ayrıca isimlendirildi.
+  /// Kulübün ana web sitesi; ayarlar sayfası da doğrudan kullanıyor.
   static const LinkItem website = LinkItem(
     name: 'SKY LAB',
     description: 'Resmi web sitesi',
@@ -13,8 +12,7 @@ class LinksService {
     url: 'https://yildizskylab.com',
   );
 
-  /// AR-GE ekiplerinin sitesi. Ekiplere alım yalnızca buradan yapılıyor;
-  /// ekip detayındaki "Ekibe Katıl" da bunu açıyor.
+  /// AR-GE ekiplerinin sitesi.
   static const LinkItem arge = LinkItem(
     name: 'Ekipler',
     description: 'Kulüp ekiplerini keşfet',

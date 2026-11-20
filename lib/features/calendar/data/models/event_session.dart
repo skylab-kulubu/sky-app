@@ -9,8 +9,7 @@ String _clock(DateTime d) =>
     '${d.hour.toString().padLeft(2, '0')}:'
     '${d.minute.toString().padLeft(2, '0')}';
 
-/// Etkinlik takvimindeki gün (core `EventDay`). Etkinliğin programı günlere,
-/// günler oturumlara ayrılıyor.
+/// Program günü (core `EventDay`); günler oturumlara ayrılıyor.
 class EventDay {
   const EventDay({
     required this.id,
@@ -54,8 +53,7 @@ class EventDay {
   };
 }
 
-/// Bir gündeki tek oturum (konuşma, atölye …). Yoklama oturum başına
-/// alınıyor.
+/// Gündeki tek oturum (konuşma, atölye …); yoklama oturum başına.
 class EventSession {
   const EventSession({
     required this.id,
@@ -118,7 +116,6 @@ class EventSession {
 
   String get typeLabel => types[sessionType] ?? sessionType;
 
-  /// Şu an bu oturumun saatleri içinde miyiz.
   bool get isNow {
     final start = startTime;
     final end = endTime;
@@ -135,8 +132,8 @@ class EventSession {
     return end == null ? _clock(start) : '${_clock(start)} – ${_clock(end)}';
   }
 
-  /// Oluşturma ve güncelleme gövdesi; core güncellemede bütün alanları
-  /// yazıyor, formda olmayanlar da (açıklama, sıra) aynen gönderiliyor.
+  /// Core oturumu güncellerken bütün alanları yazıyor; formda olmayanlar
+  /// (açıklama, sıra) da aynen gönderiliyor.
   Map<String, dynamic> toJson() => {
     'eventDayId': dayId,
     'title': title,

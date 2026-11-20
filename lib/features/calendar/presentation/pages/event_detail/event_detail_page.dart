@@ -34,16 +34,11 @@ import 'package:sky_app/features/calendar/presentation/widgets/event_cover_hero.
 
 part 'event_detail_pagemodel.dart';
 
-/// Etkinliğin tüm ayrıntılarını gösteren sayfa.
+/// Etkinlik detayı; listedeki karttan açılıyor, kapak [Hero] ile uçuyor.
 ///
-/// Listedeki karttan açılır: kapak görseli [Hero] ile kartın yerinden
-/// buraya uçar, sayfanın geri kalanı üstüne biner. Kök navigator'a push
-/// edildiği için navbar'ın altında kalmaz.
-///
-/// **Sayfa temadan bağımsız koyu.** Zemini kapak görselinin baskın rengi
-/// belirliyor; o renk açık bir zemine karıştırıldığında soluyor ve etkinliğin
-/// kimliği kayboluyordu. Bu yüzden buradaki renkler `context` erişimcilerinden
-/// değil, [AppColors]'ın `onCover*` sabitlerinden okunuyor.
+/// **Sayfa temadan bağımsız koyu.** Zemini kapağın baskın rengi; açık zeminde
+/// bu renk soluyordu. Renkler `context`'ten değil [AppColors]'ın `onCover*`
+/// sabitlerinden.
 class EventDetailPage extends StatefulWidget {
   const EventDetailPage({super.key, required this.event});
 
@@ -53,24 +48,20 @@ class EventDetailPage extends StatefulWidget {
   static const Duration _openDuration = Duration(milliseconds: 450);
   static const Duration _closeDuration = Duration(milliseconds: 350);
 
-  /// Sayfayı bir listeden açar.
-  ///
-  /// Geçiş burada tanımlı: hem Etkinlikler sekmesindeki kart hem ana
-  /// sayfadaki yaklaşan etkinlik satırı aynı hareketi kullanıyor. Açan
-  /// tarafın tek sorumluluğu, kapağını [EventCoverHero] ile sarmak.
+  /// Sayfayı bir listeden açar. Geçiş burada; açan tarafın tek işi kapağını
+  /// [EventCoverHero] ile sarmak.
   static Future<void> open(BuildContext context, EventModel event) {
     return Navigator.of(
       context,
-      // Listeler shell'in içinde; kök navigator olmadan detay sayfası
-      // navbar'ın altında açılır.
+      // Listeler shell'in içinde; kök navigator olmadan detay navbar'ın altında
+      // açılırdı.
       rootNavigator: true,
     ).push(
       PageRouteBuilder<void>(
         transitionDuration: _openDuration,
         reverseTransitionDuration: _closeDuration,
         pageBuilder: (_, _, _) => EventDetailPage(event: event),
-        // Sayfanın kendisi yumuşakça biniyor; kapak görseli onun üstünde
-        // Hero olarak kendi yolunu uçuyor.
+        // Sayfa yumuşakça biniyor; kapak onun üstünde Hero olarak uçuyor.
         transitionsBuilder: (_, animation, _, child) {
           return FadeTransition(
             opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
@@ -91,13 +82,11 @@ class _EventDetailPageState extends EventDetailPagemodel {
 
   static const double _descriptionLineHeight = 1.6;
 
-  /// Başlık iki satıra taştığında satırlar birbirine yapışmasın diye.
   static const double _titleLineHeight = 1.25;
 
   static const Duration _tintFade = Duration(milliseconds: 450);
 
-  /// Zemindeki renk lekelerinin yerleşimi. Konumlar sabit, renkler kapaktan
-  /// geldiği için her etkinlikte farklı bir dağılım çıkıyor.
+  /// Leke konumları sabit; renkler kapaktan geldiği için her etkinlikte farklı.
   static const List<GlowSpot> _glowSpots = [
     (center: Alignment(-0.7, -1.0), radius: 1.15, opacity: 0.70),
     (center: Alignment(1.0, -0.45), radius: 0.95, opacity: 0.55),
@@ -109,8 +98,6 @@ class _EventDetailPageState extends EventDetailPagemodel {
   /// yoğunluğuna yakın kalsın diye.
   static const double _scrimTint = 0.18;
 
-  /// Çubuktaki başlığın belirmeye başladığı kaydırma mesafesi (kapağın
-  /// altından itibaren) ve tamamen görünür olana kadar geçen mesafe.
   static const double _headingRevealOffset = 36.0;
   static const double _headingRevealDistance = 40.0;
 
@@ -135,8 +122,8 @@ class _EventDetailPageState extends EventDetailPagemodel {
               ),
             ],
           ),
-          // Karartma zeminin alt rengine gidiyor; tema rengine gitseydi
-          // butonun ardında ayrı bir bant gibi dururdu.
+          // Karartma zeminin alt rengine gidiyor; tema rengi butonun ardında bant gibi
+          // dururdu.
           BottomScrim(color: _tinted(_scrimTint)),
         ],
       ),
@@ -144,7 +131,6 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Sayfanın zemini: koyu taban ve üstüne dağılmış kapak renkleri.
   Widget _backdrop() {
     final tints = backdropTints;
 
@@ -155,9 +141,8 @@ class _EventDetailPageState extends EventDetailPagemodel {
           // Palet görsel çözüldükten sonra geliyor; renk aniden belirmesin.
           opacity: tints.isEmpty ? 0 : 1,
           duration: _tintFade,
-          // Lekeler tam ekran gradyan; renkler yerleştikten sonra hiç
-          // değişmiyorlar. Sınır olmadan sayfanın her yeniden çiziminde
-          // (açılış animasyonu boyunca her kare) baştan hesaplanıyorlar.
+          // Lekeler tam ekran gradyan ve yerleştikten sonra değişmiyor; sınır olmadan
+          // açılış animasyonunun her karesinde yeniden hesaplanıyorlardı.
           child: RepaintBoundary(
             child: ColorGlow(colors: tints, spots: _glowSpots),
           ),
@@ -166,8 +151,7 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Kapak rengini verilen oranda koyu tabanla karıştırır. Renk henüz
-  /// çözülmediyse düz taban döner.
+  /// Kapak rengini verilen oranda koyu tabanla karıştırır; renk yoksa düz taban.
   Color _tinted(double strength) {
     if (backdropTints.isEmpty) return AppColors.coverBackdropBase;
 
@@ -177,8 +161,6 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Üstteki sabit, şeffaf başlık çubuğu. Geri butonu ve yalnızca sayfadaki başlık
-  /// buraya ulaştığında beliren ortalanmış başlık içerir.
   Widget _topHeader(BuildContext context) {
     const gap = SizedBox(width: AppSizes.midSpace);
 
@@ -247,14 +229,12 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Kapak kare: etkinlik afişleri genelde kare ya da dikey hazırlanıyor,
-  /// yatay bir kutuda çoğu kırpılıyor.
+  /// Kapak kare: afişler çoğu zaman kare ya da dikey, yatay kutuda kırpılıyor.
   double _coverSize(BuildContext context) =>
       MediaQuery.sizeOf(context).width -
       (AppPaddings.mainPaddingHorizontal.left * 2);
 
-  /// Kapak görseli kaydırıldıkça üst iki köşesi ve yeri sabit kalır, yüksekliği
-  /// büzülerek küçülür.
+  /// Kaydırıldıkça kapağın yeri sabit kalıyor, yüksekliği büzülüyor.
   Widget _pinnedCover(BuildContext context) {
     final coverSize = _coverSize(context);
 
@@ -308,14 +288,12 @@ class _EventDetailPageState extends EventDetailPagemodel {
           const SizedBox(height: AppSizes.midSpace),
           _typeRow(context),
         ],
-        // Gruplar arası boşluk bölüm başlıklarının üst boşluğuyla aynı
-        // (AppPaddings.sectionHeader, 24); grup içi satırlar bigSpace.
+        // Gruplar arası boşluk bölüm başlıklarının üst boşluğuyla aynı (24).
         const SizedBox(height: AppSizes.largeSpace),
         _dateBlock(context),
         const SizedBox(height: AppSizes.bigSpace),
         _statusRow(context),
-        // Bölüm başlıklarının kendi üst boşluğu var (AppPaddings.sectionHeader),
-        // araya ayrıca boşluk konmuyor; altındaki ayraçtan sonrası ayrı.
+        // Bölüm başlıklarının kendi üst boşluğu var; araya ayrıca boşluk konmuyor.
         if (event.location.isNotEmpty) ...[
           _sectionHeader(context, 'Konum'),
           const SizedBox(height: AppSizes.bigSpace),
@@ -375,7 +353,6 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Etkinlik türü, başlığın hemen altında ince bir satır olarak.
   Widget _typeRow(BuildContext context) {
     return Row(
       children: [
@@ -399,7 +376,6 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Tarih ve saat: üstte gün, altında saat aralığı.
   Widget _dateBlock(BuildContext context) {
     return _infoBlock(
       context,
@@ -409,9 +385,8 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Etkinliğin başvuruya göre durumu; katılım butonunun sayfa içindeki
-  /// karşılığı, kullanıcının aşağı inmeden görmesi için. İptal edilen
-  /// etkinlikte sebep de altında yazıyor.
+  /// Başvuru durumu; kullanıcı aşağı inmeden görsün diye. İptalde sebep de
+  /// altında.
   Widget _statusRow(BuildContext context) {
     final (icon, color, text) = switch (event.phase) {
       EventPhase.open => (
@@ -472,8 +447,7 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// İkon + iki katlı metin: üstte asıl bilgi, altında onu tamamlayan
-  /// ikincil satır.
+  /// İkon + iki katlı metin: üstte asıl bilgi, altında ikincil satır.
   Widget _infoBlock(
     BuildContext context, {
     required String icon,
@@ -513,9 +487,8 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Bölüm başlığı: ayarlar sayfasındaki biçimin aynısı (boşluk, kademe,
-  /// ağırlık), altında bir de ayraç. Rengi farklı, çünkü bu sayfanın zemini
-  /// temadan bağımsız koyu.
+  /// Bölüm başlığı: ayarlar sayfasıyla aynı biçim ve altında ayraç; renk farklı,
+  /// zemin temadan bağımsız koyu.
   Widget _sectionHeader(
     BuildContext context,
     String title, {
@@ -555,8 +528,7 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Günler ve oturumları. Birden fazla gün varsa her günün başlığı
-  /// yazılıyor; tek günde gerek yok, tarih zaten yukarıda.
+  /// Birden fazla gün varsa her günün başlığı yazılıyor.
   Widget _schedule(BuildContext context) {
     final days = schedule.where((e) => e.sessions.isNotEmpty).toList();
     final showDayTitles = days.length > 1;
@@ -588,7 +560,7 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Solda saat, sağda başlık ve konuşmacı. İptal edilen oturum üstü çizili.
+  /// Solda saat, sağda başlık ve konuşmacı; iptal edilen oturum üstü çizili.
   Widget _sessionRow(BuildContext context, EventSession session) {
     final cancelled = session.cancelled;
     final start = session.startTime;
@@ -653,11 +625,8 @@ class _EventDetailPageState extends EventDetailPagemodel {
     );
   }
 
-  /// Katılım butonu sayfanın altında sabit duruyor; açıklama uzun olduğunda
-  /// kullanıcının sonuna kadar kaydırması gerekmesin diye.
-  ///
-  /// Renkleri açıkça veriliyor: butonun varsayılanları temaya bağlı, sayfa
-  /// ise temadan bağımsız koyu.
+  /// Katılım butonu altta sabit, uzun açıklamada sona kaydırmak gerekmesin.
+  /// Renkler açıkça veriliyor: sayfa temadan bağımsız koyu.
   Widget _joinBar(BuildContext context) {
     final enabled = event.phase == EventPhase.open;
 
@@ -666,15 +635,14 @@ class _EventDetailPageState extends EventDetailPagemodel {
       child: SkyButton(
         text: joinButtonLabel,
         isLoading: isJoining,
-        // Pasif zemin opak: yarı saydam bırakılınca altındaki renkli zemin
-        // sızıyor ve buton silik değil, delik gibi görünüyor.
+        // Pasif zemin opak: yarı saydamken renkli zemin sızıp buton delik gibi
+        // görünüyordu.
         backgroundColor: enabled
             ? AppColors.primaryColor
             : Color.alphaBlend(AppColors.onCoverSurface, _tinted(_scrimTint)),
         textColor: enabled
             ? AppColors.skyPassForeground
             : AppColors.onCoverFaint,
-        // Başvuru alınmayan etkinlikte (bitmiş, iptal, taslak) buton pasif.
         onPressed: enabled ? onJoinPressed : null,
       ),
     );

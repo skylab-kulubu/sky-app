@@ -32,19 +32,12 @@ import 'package:sky_app/features/calendar/presentation/widgets/event_option_shee
 
 part 'event_create_pagemodel.dart';
 
-/// Yetkili kullanıcının (lider, GECEKODU üyesi, YK/ADMIN) etkinlik
-/// oluşturduğu ve düzenlediği sayfa. Sonucu [EventFormResult] olarak döner;
-/// vazgeçilirse `null`.
-///
-/// Düzenleme modunda kapak ve kontenjan yok: backend ikisini yalnızca
-/// oluştururken alıyor. Silme yetkisi olana AppBar'da çöp kutusu var.
-///
-/// Ekip düzenleme sayfasıyla aynı form dili: bölüm başlıkları, sade metin
-/// alanları, tarih ve seçenekler için ayarlar satırları.
+/// Etkinlik oluşturma ve düzenleme sayfası (lider, GECEKODU üyesi, YK/ADMIN).
+/// Sonucu [EventFormResult]; vazgeçilirse `null`. Silme yetkisi olana
+/// AppBar'da çöp kutusu.
 class EventCreatePage extends StatefulWidget {
   const EventCreatePage({super.key, this.event});
 
-  /// Düzenlenen etkinlik; oluşturmada `null`.
   final EventModel? event;
 
   static Future<EventFormResult?> open(BuildContext context) => _push(context);
@@ -144,8 +137,7 @@ class _EventCreatePageState extends EventCreatePagemodel {
     );
   }
 
-  /// Ayarlar satırları: değer olarak tarih ve saat; dokununca önce tarih,
-  /// sonra saat seçiliyor.
+  /// Değer olarak tarih ve saat; dokununca önce tarih, sonra saat seçiliyor.
   Widget _dates() {
     return TileGroup(
       children: [
@@ -196,8 +188,8 @@ class _EventCreatePageState extends EventCreatePagemodel {
           onTap: onEditCapacity,
         ),
         _registrationRow(context),
-        // Program ayrı sayfada; yalnızca var olan etkinlikte (günler
-        // etkinliğe bağlanıyor).
+        // Program ayrı sayfada; günler etkinliğe bağlandığı için yalnız kayıtlı
+        // etkinlikte.
         if (isEditing)
           SettingsTile(
             icon: AppIcons.calendarEdit,
@@ -209,8 +201,8 @@ class _EventCreatePageState extends EventCreatePagemodel {
     );
   }
 
-  /// Kapatılınca etkinlik görünmeye devam ediyor ama kimse kendi
-  /// başvurusunu yapamıyor; kontenjan dolunca elle kapatmak için.
+  /// Kapalıyken etkinlik görünüyor ama kimse kendi başvurusunu yapamıyor;
+  /// kontenjan dolunca elle kapatmak için.
   Widget _registrationRow(BuildContext context) {
     return Padding(
       padding: AppPaddings.settingsTile,
@@ -237,12 +229,10 @@ class _EventCreatePageState extends EventCreatePagemodel {
   }
 }
 
-/// Oluşturma/düzenleme sayfasının sonucu.
 class EventFormResult {
   const EventFormResult.saved(EventModel this.event) : deleted = false;
   const EventFormResult.deleted() : event = null, deleted = true;
 
-  /// Oluşturulan ya da güncellenen etkinlik; silindiyse `null`.
   final EventModel? event;
   final bool deleted;
 }

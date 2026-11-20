@@ -9,19 +9,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sky_app/core/widgets/cover_image.dart';
 import 'package:sky_app/features/calendar/data/services/cover_color_extractor.dart';
 
-/// Etkinlik kapaklarından çıkarılan zemin renklerini hesaplar ve saklar.
+/// Kapaklardan çıkarılan zemin renklerini hesaplar ve saklar.
 ///
-/// **Anahtar kapak adresi, etkinlik değil.** Kapak değiştiğinde yeni medya
-/// yeni bir CDN adresi alıyor; böylece eski görselin renkleri kendiliğinden
-/// geçersiz kalıyor, ayrıca silme gerekmiyor.
-///
-/// Renk seçimi [CoverColorExtractor]'da (benzer tonları kümeleyip renkli
-/// bölgeleri öne çıkarıyor); görsel [_sampleWidth] piksel genişliğe
-/// küçültülerek çözülüyor. Hesap ana
-/// iş parçacığında, ama aynı anda tek iş ve her biri bir kare bitişinden
-/// sonra ([_queue]); liste açılırken kareler düşmüyor. Sonuçlar bellekte ve
-/// diskte ([SharedPreferences]) tutuluyor: bir kapağın renkleri cihazda bir
-/// kez hesaplanıyor, uygulama yeniden açıldığında tekrar çıkarılmıyor.
+/// **Anahtar kapak adresi:** yeni kapak yeni CDN adresi aldığı için eski
+/// renkler kendiliğinden geçersiz. Hesap ana iş parçacığında ama tek iş ve
+/// her biri bir kare bitişinden sonra ([_queue]); sonuçlar bellekte ve
+/// diskte, her kapak cihazda bir kez hesaplanıyor.
 class EventPaletteService {
   EventPaletteService._();
 
@@ -30,11 +23,10 @@ class EventPaletteService {
   /// Süren hesaplamalar; aynı kapak için gelen ikinci istek bunu bekliyor.
   static final Map<String, Future<List<Color>>> _pending = {};
 
-  /// Görselin çözüleceği genişlik. Verilmezse afiş tam çözünürlükte
-  /// (çoğu zaman 2000 piksel) çözülüyor; çok küçüğünde renkler soluyor.
+  /// Afiş tam çözünürlükte (çoğu zaman 2000 px) çözülmesin; daha küçüğünde
+  /// renkler soluyor.
   static const int _sampleWidth = 120;
 
-  /// Zemin için seçilecek en fazla renk.
   static const int _maxColors = 5;
 
   /// Sıradaki hesapları birbirine bağlayan zincir; aynı anda tek iş.
@@ -51,18 +43,12 @@ class EventPaletteService {
 
   static Future<void>? _diskLoad;
 
-  /// Hesaplanmışsa renkleri döndürür, yoksa boş liste. Beklemek istemeyen
-  /// çağıranlar için (sayfa ilk karede doğru renkle açılsın diye).
-  ///
-  /// [known] sunucunun gönderdiği renkler (`EventModel.coverColors`); varsa
-  /// hesap yapılmadan onlar kullanılıyor.
+  /// Hesaplanmışsa renkler, yoksa boş liste; sayfa ilk karede doğru renkle
+  /// açılsın diye. [known] sunucunun renkleri (`EventModel.coverColors`).
   static List<Color> cached(String imageUrl, {List<Color> known = const []}) =>
       known.isNotEmpty ? known : _cache[imageUrl] ?? const [];
 
-  /// Renkleri döndürür; bellekte ya da diskte yoksa hesaplar.
-  ///
-  /// Görsel indirilemez ya da çözülemezse boş liste döner — çağıran taraf
-  /// düz zemine düşer.
+  /// Bellekte ya da diskte yoksa hesaplar; görsel çözülemezse boş liste.
   static Future<List<Color>> resolve(
     String imageUrl, {
     List<Color> known = const [],
@@ -96,8 +82,8 @@ class EventPaletteService {
     }
   }
 
-  /// İşi kuyruğun sonuna ekler ve bir kare bitişini bekletir; hesaplar
-  /// kaydırma ve açılış animasyonlarının arasına dağılıyor.
+  /// İşi kuyruğa ekleyip bir kare bitişini bekletir; hesaplar animasyonların
+  /// arasına dağılıyor.
   static Future<T> _enqueue<T>(Future<T> Function() task) {
     final result = _queue.then((_) async {
       await SchedulerBinding.instance.endOfFrame;
@@ -124,7 +110,6 @@ class EventPaletteService {
     }
   }
 
-  /// Bir [ImageProvider]'ı çözüp [ui.Image]'e ulaşır.
   static Future<ui.Image> _decodeImage(ImageProvider provider) {
     final stream = provider.resolve(ImageConfiguration.empty);
     final completer = Completer<ui.Image>();
@@ -164,8 +149,7 @@ class EventPaletteService {
     return completer.future;
   }
 
-  /// Diskteki renkleri belleğe alır. Okunamazsa (test ortamı, bozuk kayıt)
-  /// sessizce boş başlıyor; renkler yeniden hesaplanır.
+  /// Diskteki renkleri belleğe alır; okunamazsa boş başlıyor.
   static Future<void> _loadDisk() async {
     try {
       final prefs = await SharedPreferences.getInstance();

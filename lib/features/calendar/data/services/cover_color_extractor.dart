@@ -6,15 +6,10 @@ import 'package:flutter/painting.dart' show HSLColor;
 
 /// Kapak görselinden zemin renklerini seçer.
 ///
-/// `palette_generator_master` pikselleri yuvarlayıp en sık görülen birkaç
-/// tonu alıyordu; fotoğraflarda renk onlarca yakın tona dağıldığı için
-/// yeşil, kahve gibi asıl renkler listeye giremiyor, zemin gölge siyahı ve
-/// gökyüzü beyazından griye dönüyordu. Burada benzer tonlar önce
-/// kümeleniyor (k-means), sonra kümeler büyüklükleri **ve** doygunluklarıyla
-/// puanlanıyor: fotoğrafa yayılmış renkli bölgeler öne çıkıyor, siyah-beyaz
-/// uçlar ancak başka renk yoksa kullanılıyor.
-///
-/// Saf Dart; ~120 piksel genişliğindeki bir görselde milisaniyeler sürüyor.
+/// `palette_generator_master` en sık birkaç tonu aldığı için fotoğraflar
+/// griye dönüyordu. Burada benzer tonlar kümeleniyor (k-means) ve kümeler
+/// büyüklük **ve** doygunlukla puanlanıyor; siyah-beyaz uçlar ancak başka renk
+/// yoksa kullanılıyor. ~120 px genişlikte milisaniyeler sürüyor.
 class CoverColorExtractor {
   CoverColorExtractor._();
 
@@ -63,10 +58,9 @@ class CoverColorExtractor {
     return math.sqrt(dr * dr + dg * dg + db * db);
   }
 
-  /// Rengi koyu zemin üstünde parlayacak hâle getirir: ton aynı kalıyor,
-  /// açıklık orta banda çekiliyor, soluk renklere biraz doygunluk ekleniyor.
-  /// Fotoğraftaki kahve ya da haki, zeminde çamur gibi değil sıcak bir ışık
-  /// olarak görünsün diye.
+  /// Rengi koyu zeminde parlayacak hâle getirir: ton aynı, açıklık orta banda,
+  /// soluk renge biraz doygunluk. Kahve ya da haki çamur gibi değil ışık gibi
+  /// görünsün diye.
   static Color _forBackdrop(Color color) {
     final hsl = HSLColor.fromColor(color);
     if (hsl.saturation < 0.08) {
@@ -79,9 +73,8 @@ class CoverColorExtractor {
         .toColor();
   }
 
-  /// Pikselleri kanal başına 32 seviyede sayar; aynı kutudakilerin
-  /// ortalaması o kutunun rengi. Kümeleme piksel yerine kutular üzerinden
-  /// yapılıyor, iş yükü birkaç bin öğeye iniyor.
+  /// Pikselleri kanal başına 32 seviyede sayar; kümeleme kutular üzerinden,
+  /// iş yükü birkaç bin öğeye iniyor.
   static List<_Point> _histogram(ByteData rgba) {
     final sums = <int, _Point>{};
     for (var i = 0; i + 3 < rgba.lengthInBytes; i += 4) {
@@ -208,13 +201,11 @@ class _Cluster {
   final double g;
   final double b;
 
-  /// Görseldeki payı (0–1).
   final double share;
 
   double get _max => math.max(r, math.max(g, b)) / 255;
   double get _min => math.min(r, math.min(g, b)) / 255;
 
-  /// HSL doygunluğu (0–1).
   double get saturation {
     final l = (_max + _min) / 2;
     if (_max == _min) return 0;
@@ -227,9 +218,7 @@ class _Cluster {
   /// Neredeyse siyah ya da neredeyse beyaz.
   bool get isExtreme => lightness < 0.12 || lightness > 0.85;
 
-  /// Zemine ne kadar yakıştığı: pay × doygunluk ağırlığı. Neredeyse siyah
-  /// ve neredeyse beyaz kümeler cezalı; yalnızca başka renk yoksa öne
-  /// geçiyorlar.
+  /// Pay × doygunluk; neredeyse siyah ve beyaz kümeler cezalı.
   double get score {
     var s = share * (0.1 + 1.5 * saturation);
     if (isExtreme) s *= 0.15;

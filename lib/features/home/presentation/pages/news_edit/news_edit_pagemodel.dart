@@ -11,10 +11,8 @@ abstract class NewsEditPagemodel extends State<NewsEditPage> {
 
   List<String> tags = const [];
 
-  /// Galeriden yeni seçilen görsel; kayıtta yükleniyor.
   XFile? image;
 
-  /// Haberin mevcut görseli; kaldırılınca boş.
   String currentImageUrl = '';
 
   bool get hasImage => image != null || currentImageUrl.isNotEmpty;
@@ -65,7 +63,6 @@ abstract class NewsEditPagemodel extends State<NewsEditPage> {
       if (picked == null || !mounted) return;
       setState(() => image = picked);
     } on PlatformException catch (e) {
-      // Galeri izni reddedildiğinde buraya düşüyor.
       log('Görsel seçilemedi: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -91,7 +88,6 @@ abstract class NewsEditPagemodel extends State<NewsEditPage> {
     final author =
         original?.author ?? context.read<UserProvider>().user?.name ?? '';
 
-    // CMS alanı bir URL: yeni görsel önce core'a yükleniyor, adresi yazılıyor.
     final String heroImage;
     final picked = image;
     if (picked == null) {

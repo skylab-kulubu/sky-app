@@ -18,8 +18,8 @@ class ScanResult {
   final String detail;
 }
 
-/// Okuyucunun altındaki sonuç kartı; sonuç yokken ne yapılacağını söyleyen
-/// ipucunu gösteriyor. Kapı okuyucusu ve oturum QR'ı aynı kartı kullanıyor.
+/// Okuyucunun altındaki sonuç kartı; sonuç yokken ipucu. Kapı okuyucusu ve
+/// oturum QR'ı ortak.
 class ScanResultCard extends StatelessWidget {
   const ScanResultCard({
     super.key,
