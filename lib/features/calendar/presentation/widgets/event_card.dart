@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
@@ -30,6 +31,9 @@ class EventCard extends StatefulWidget {
 
 class _EventCardState extends State<EventCard> {
   static const double _descriptionLineHeight = 1.35;
+
+  /// Durum etiketinin zemini: rengin bu kadar saydamı.
+  static const double _statusTint = 0.14;
 
   EventModel get event => widget.event;
 
@@ -114,7 +118,35 @@ class _EventCardState extends State<EventCard> {
             ),
           ),
         ),
+        if (_status case (final label, final color)) ...[
+          const SizedBox(width: AppSizes.midSpace),
+          _statusChip(context, label, color),
+        ],
       ],
+    );
+  }
+
+  /// Taslak yalnız düzenleyebilene listeleniyor; iptal herkese.
+  (String, Color)? get _status {
+    if (event.isDraft) return ('Taslak', AppColors.orange);
+    if (event.isCancelled) return ('İptal', AppColors.red);
+    return null;
+  }
+
+  Widget _statusChip(BuildContext context, String label, Color color) {
+    return Container(
+      padding: AppPaddings.teamChip,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: _statusTint),
+        borderRadius: AppRadiuses.stadiumBorderRadius,
+      ),
+      child: Text(
+        label,
+        style: context.textTheme.labelMedium?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 

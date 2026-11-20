@@ -35,8 +35,15 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       ? _editing!.ownerTeam
       : (ownerOptions.isEmpty ? null : ownerOptions.first);
 
-  bool get canDelete =>
-      isEditing && (_user?.canDeleteEvent(_editing!.ownerTeam) ?? false);
+  /// Core yalnız taslağı sildiriyor (`409 event_not_draft`); YK/ADMIN her
+  /// etkinliği. Yayındaki etkinlik yönetim menüsünden iptal ediliyor.
+  bool get canDelete {
+    final editing = _editing;
+    final user = _user;
+    if (editing == null || user == null) return false;
+    return user.canDeleteEvent(editing.ownerTeam) &&
+        (editing.isDraft || user.canWriteAsPrivileged);
+  }
 
   /// Sezon satırı yalnız YK/ADMIN'de; diğerlerinde etkinlik sezonsuz oluşuyor.
   late final bool canChooseSeason = _user?.canWriteAsPrivileged ?? false;
@@ -52,6 +59,10 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
 
   /// Core'a tersi `registrationClosed` olarak gidiyor.
   bool registrationOpen = true;
+
+  /// Yalnız oluştururken: kapalıysa taslak olarak kaydediliyor ve sonra
+  /// yönetim menüsünden yayınlanıyor.
+  bool publishNow = true;
   bool isSaving = false;
   bool isDeleting = false;
 
@@ -140,51 +151,19 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
     }
   }
 
-  static const List<String> _months = [
-    'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', //
-    'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara',
-  ];
-
-  /// "14 Eyl · 21:00"
-  String dateTimeLabel(DateTime value) {
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${value.day} ${_months[value.month - 1]} · '
-        '${two(value.hour)}:${two(value.minute)}';
-  }
+  String dateTimeLabel(DateTime value) => shortDateTimeLabel(value);
 
   void onRegistrationOpenChanged(bool value) =>
       setState(() => registrationOpen = value);
 
-  /// Önce tarih, sonra saat seçtirir. Tarihte vazgeçilirse bir şey değişmiyor;
-  /// saatte vazgeçilirse gün eski saatle kalıyor.
+  void onPublishNowChanged(bool value) => setState(() => publishNow = value);
+
+  /// Tarihte vazgeçilirse bir şey değişmiyor; saatte vazgeçilirse gün eski
+  /// saatle kalıyor.
   Future<void> onPickDateTime({required bool isStart}) async {
-    final current = isStart ? startDate : endDate;
-    final now = DateTime.now();
-
-    final date = await showDatePicker(
-      context: context,
-      initialDate: current,
-      firstDate: DateTime(now.year - 1),
-      lastDate: DateTime(now.year + 2),
-    );
-    if (date == null || !mounted) return;
-
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(current),
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-        child: child!,
-      ),
-    );
-    if (!mounted) return;
-
-    final hour = time?.hour ?? current.hour;
-    final minute = time?.minute ?? current.minute;
-    _setDateTime(
-      isStart: isStart,
-      value: DateTime(date.year, date.month, date.day, hour, minute),
-    );
+    final value = await pickDateTime(context, isStart ? startDate : endDate);
+    if (value == null || !mounted) return;
+    _setDateTime(isStart: isStart, value: value);
   }
 
   /// Başlangıç değişince bitiş aynı süreyle kayıyor. Bitiş başlangıcın önüne
@@ -285,6 +264,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
         saved = await _service.createEvent(
           draft,
           seasonId: canChooseSeason ? season?.id : null,
+          asDraft: !publishNow,
         );
       }
       if (!mounted) return;
@@ -334,8 +314,12 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
     final editing = _editing;
     if (editing == null) return;
 
-    final confirmed = await _confirmDelete(editing);
-    if (confirmed != true || !mounted) return;
+    final confirmed = await ConfirmDialog.show(
+      context,
+      title: 'Etkinlik silinsin mi?',
+      message: '${editing.name} taslağı silinecek.',
+    );
+    if (!confirmed || !mounted) return;
 
     setState(() => isDeleting = true);
     try {
@@ -350,58 +334,11 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       setState(() => isDeleting = false);
       _showMessage(switch (error.statusCode) {
         403 => 'Bu etkinliği silme yetkin yok.',
-        // Core yayınlanmış ya da bileti olan etkinliği sildirmiyor (`event_not_draft`,
-        // `event_has_tickets`).
-        409 => 'Bu etkinlik artık silinemiyor.',
+        // Bu arada yayınlanmış olabilir (`event_not_draft`).
+        409 => 'Yayındaki etkinlik silinemez; iptal edebilirsin.',
         _ => error.userMessage,
       });
     }
-  }
-
-  Future<bool?> _confirmDelete(EventModel event) {
-    return showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: dialogContext.tileColor,
-        shape: const RoundedRectangleBorder(
-          borderRadius: AppRadiuses.cardBorderRadius,
-        ),
-        title: Text(
-          'Etkinlik silinsin mi?',
-          style: dialogContext.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        content: Text(
-          '${event.name} kalıcı olarak silinecek. Etkinliğe ait kayıtlar, '
-          'yoklamalar ve sertifikalar da silinir. Bu işlem geri alınamaz.',
-          style: dialogContext.textTheme.bodyMedium?.copyWith(
-            color: dialogContext.textSecondary,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(
-              'Vazgeç',
-              style: dialogContext.textTheme.bodyMedium?.copyWith(
-                color: dialogContext.textSecondary,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(
-              'Sil',
-              style: dialogContext.textTheme.bodyMedium?.copyWith(
-                color: AppColors.red,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   void _showMessage(String message) {

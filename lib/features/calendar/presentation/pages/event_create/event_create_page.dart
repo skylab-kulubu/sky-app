@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
-import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/core/services/api_exception.dart';
@@ -27,14 +26,16 @@ import 'package:sky_app/features/calendar/data/models/season.dart';
 import 'package:sky_app/features/calendar/data/services/event_create_service.dart';
 import 'package:sky_app/features/calendar/presentation/pages/event_schedule/event_schedule_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
+import 'package:sky_app/features/calendar/presentation/widgets/confirm_dialog.dart';
+import 'package:sky_app/features/calendar/presentation/widgets/date_time_picker.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_capacity_dialog.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_option_sheet.dart';
 
 part 'event_create_pagemodel.dart';
 
 /// Etkinlik oluşturma ve düzenleme sayfası (lider, GECEKODU üyesi, YK/ADMIN).
-/// Sonucu [EventFormResult]; vazgeçilirse `null`. Silme yetkisi olana
-/// AppBar'da çöp kutusu.
+/// Sonucu [EventFormResult]; vazgeçilirse `null`. Taslağı silebilene AppBar'da
+/// çöp kutusu.
 class EventCreatePage extends StatefulWidget {
   const EventCreatePage({super.key, this.event});
 
@@ -187,7 +188,23 @@ class _EventCreatePageState extends EventCreatePagemodel {
           value: capacity > 0 ? '$capacity kişi' : 'Sınırsız',
           onTap: onEditCapacity,
         ),
-        _registrationRow(context),
+        _switchRow(
+          context,
+          icon: AppIcons.ticket,
+          color: AppColors.green,
+          title: 'Başvurular açık',
+          value: registrationOpen,
+          onChanged: onRegistrationOpenChanged,
+        ),
+        if (!isEditing)
+          _switchRow(
+            context,
+            icon: AppIcons.publish,
+            color: AppColors.purple,
+            title: 'Hemen yayınla',
+            value: publishNow,
+            onChanged: onPublishNowChanged,
+          ),
         // Program ayrı sayfada; günler etkinliğe bağlandığı için yalnız kayıtlı
         // etkinlikte.
         if (isEditing)
@@ -201,27 +218,34 @@ class _EventCreatePageState extends EventCreatePagemodel {
     );
   }
 
-  /// Kapalıyken etkinlik görünüyor ama kimse kendi başvurusunu yapamıyor;
-  /// kontenjan dolunca elle kapatmak için.
-  Widget _registrationRow(BuildContext context) {
+  /// "Başvurular açık": kapalıyken etkinlik görünüyor ama kimse kendi
+  /// başvurusunu yapamıyor. "Hemen yayınla": kapalıysa taslak kaydediliyor.
+  Widget _switchRow(
+    BuildContext context, {
+    required String icon,
+    required Color color,
+    required String title,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
     return Padding(
       padding: AppPaddings.settingsTile,
       child: Row(
         children: [
-          const IconCircle(icon: AppIcons.ticket, color: AppColors.green),
+          IconCircle(icon: icon, color: color),
           const SizedBox(width: AppSizes.bigSpace),
           Expanded(
             child: Text(
-              'Başvurular açık',
+              title,
               style: context.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w400,
               ),
             ),
           ),
           Switch.adaptive(
-            value: registrationOpen,
+            value: value,
             activeTrackColor: context.accentColor,
-            onChanged: isBusy ? null : onRegistrationOpenChanged,
+            onChanged: isBusy ? null : onChanged,
           ),
         ],
       ),

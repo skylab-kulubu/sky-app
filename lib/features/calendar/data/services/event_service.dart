@@ -12,14 +12,31 @@ class EventService {
     return EventModel.fromJson(CoreApi.object(body, what: 'etkinlik'));
   }
 
-  /// Girişsiz istekte core yalnız aktifleri dönüyor. Hata yutulmuyor: "etkinlik
-  /// yok" ile "yüklenemedi" ayrımı [ApiException]'la.
+  /// Girişsiz istekte core yalnız aktifleri dönüyor. `drafts=include` taslakları
+  /// yalnız düzenleyebilene (ve DK'ya) ekliyor, diğerlerinde yok sayılıyor.
+  /// Hata yutulmuyor: "etkinlik yok" ile "yüklenemedi" ayrımı [ApiException]'la.
   Future<List<EventModel>> fetchEvents() async {
-    final body = await CoreApi.get('/events');
+    final body = await CoreApi.get('/events', query: {'drafts': 'include'});
     return CoreApi.list(
       body,
       what: 'etkinlik listesi',
     ).map(EventModel.fromJson).toList(growable: false);
+  }
+
+  /// Kullanıcının bu etkinlikte bileti var mı; 404 yok demek. Başka hatada
+  /// `null`: buton bilinmeyen durumda "Katıl" kalıyor.
+  Future<bool?> hasTicket({
+    required String userId,
+    required String eventId,
+  }) async {
+    try {
+      await CoreApi.get('/tickets/user/$userId/event/$eventId');
+      return true;
+    } on ApiException catch (e) {
+      if (e.statusCode == 404) return false;
+      log('Bilet durumu alınamadı: $e');
+      return null;
+    }
   }
 
   /// Üye başvurusu (201). Core'un 409'ları `code` ile ayrılıyor: kodsuz 409

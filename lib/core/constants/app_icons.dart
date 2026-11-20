@@ -31,6 +31,11 @@ class AppIcons {
   static const String delete = 'trash';
   static const String capacity = 'people';
   static const String refresh = 'refresh';
+  static const String publish = 'send';
+  static const String unpublish = 'eyeSlash';
+  static const String cancelEvent = 'forbidden';
+  static const String undo = 'undoSquare';
+  static const String copy = 'copy';
   static const String share = 'share';
   static const String play = 'play';
 

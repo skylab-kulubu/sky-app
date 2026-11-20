@@ -66,6 +66,7 @@ class EventModel {
     this.coverImageSizes = ImageSizes.none,
     this.status = '',
     this.cancelReason = '',
+    this.cancelNotified = false,
     this.registrationOpen,
     this.registrationClosed = false,
   });
@@ -106,6 +107,10 @@ class EventModel {
   final String status;
 
   final String cancelReason;
+
+  /// İptal bilet sahiplerine e-postayla bildirildi mi (`cancelNotifiedAt`);
+  /// iptal geri alınırken onlara tekrar haber veriliyor.
+  final bool cancelNotified;
 
   /// Core'un hesapladığı başvuru durumu: yayında, bitmemiş, elle kapatılmamış
   /// ve son tarihi geçmemiş. Eski yanıtta `null`; o zaman [active]'e bakılıyor.
@@ -171,6 +176,7 @@ class EventModel {
       coverImageSizes: ImageSizes.fromJson(json['coverImageSizes']),
       status: json['status'] as String? ?? '',
       cancelReason: json['cancelReason'] as String? ?? '',
+      cancelNotified: json['cancelNotifiedAt'] != null,
       registrationOpen: json['registrationOpen'] as bool?,
       registrationClosed: json['registrationClosed'] == true,
     );

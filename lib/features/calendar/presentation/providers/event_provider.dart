@@ -20,10 +20,13 @@ class EventProvider extends ChangeNotifier {
   ApiException? get error => _error;
   bool get hasError => _error != null;
 
-  /// Bitişi geçmemiş etkinlikler, en yakın önce; `active` yerine tarih, daha
-  /// öngörülebilir.
+  /// Bitişi geçmemiş yayındaki etkinlikler, en yakın önce; `active` yerine
+  /// tarih, daha öngörülebilir. Taslak ve iptal edilen yalnız Etkinlikler
+  /// sekmesinde, etiketiyle.
   List<EventModel> get upcomingEvents {
-    final upcoming = _events.where((event) => event.isUpcoming).toList();
+    final upcoming = _events
+        .where((e) => e.isUpcoming && !e.isDraft && !e.isCancelled)
+        .toList();
     upcoming.sort((a, b) {
       final aStart = a.startDateTime;
       final bStart = b.startDateTime;

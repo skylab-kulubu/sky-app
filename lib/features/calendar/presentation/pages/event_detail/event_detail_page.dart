@@ -10,6 +10,7 @@ import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/services/links_service.dart';
 import 'package:sky_app/core/widgets/app_bar_actions.dart';
 import 'package:sky_app/core/models/link_item.dart';
@@ -23,6 +24,8 @@ import 'package:sky_app/core/widgets/cover_image.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/data/models/event_session.dart';
+import 'package:sky_app/features/calendar/data/services/event_service.dart';
+import 'package:sky_app/features/calendar/data/services/event_status_service.dart';
 import 'package:sky_app/features/calendar/data/services/schedule_service.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/profile/presentation/providers/activity_provider.dart';
@@ -30,7 +33,11 @@ import 'package:sky_app/features/calendar/data/services/event_palette_service.da
 import 'package:sky_app/features/calendar/presentation/pages/event_create/event_create_page.dart';
 import 'package:sky_app/features/calendar/presentation/pages/event_schedule/event_schedule_page.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
+import 'package:sky_app/features/calendar/presentation/widgets/confirm_dialog.dart';
+import 'package:sky_app/features/calendar/presentation/widgets/event_cancel_dialog.dart';
+import 'package:sky_app/features/calendar/presentation/widgets/event_copy_dialog.dart';
 import 'package:sky_app/features/calendar/presentation/widgets/event_cover_hero.dart';
+import 'package:sky_app/features/calendar/presentation/widgets/event_manage_sheet.dart';
 
 part 'event_detail_pagemodel.dart';
 
@@ -213,10 +220,10 @@ class _EventDetailPageState extends EventDetailPagemodel {
               padding: AppPaddings.appBarActions,
               child: Center(
                 child: AppBarActions(
-                  // Yetkisi olana paylaşın solunda düzenleme.
+                  // Yetkisi olana paylaşın solunda yönetim menüsü.
                   icons: [if (canEdit) AppIcons.settings, AppIcons.share],
                   onIconTap: (icon) => icon == AppIcons.settings
-                      ? onEditPressed()
+                      ? onManagePressed()
                       : onSharePressed(),
                   backgroundColor: AppColors.onCoverSurface,
                   iconColor: AppColors.onCover,
@@ -628,13 +635,14 @@ class _EventDetailPageState extends EventDetailPagemodel {
   /// Katılım butonu altta sabit, uzun açıklamada sona kaydırmak gerekmesin.
   /// Renkler açıkça veriliyor: sayfa temadan bağımsız koyu.
   Widget _joinBar(BuildContext context) {
-    final enabled = event.phase == EventPhase.open;
+    final action = joinButtonAction;
+    final enabled = action != null;
 
     return SafeArea(
       minimum: AppPaddings.mainPaddingAll,
       child: SkyButton(
         text: joinButtonLabel,
-        isLoading: isJoining,
+        isLoading: isJoining || isUpdatingStatus,
         // Pasif zemin opak: yarı saydamken renkli zemin sızıp buton delik gibi
         // görünüyordu.
         backgroundColor: enabled
@@ -643,7 +651,7 @@ class _EventDetailPageState extends EventDetailPagemodel {
         textColor: enabled
             ? AppColors.skyPassForeground
             : AppColors.onCoverFaint,
-        onPressed: enabled ? onJoinPressed : null,
+        onPressed: action,
       ),
     );
   }

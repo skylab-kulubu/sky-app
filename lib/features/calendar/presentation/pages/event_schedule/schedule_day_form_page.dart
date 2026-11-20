@@ -14,7 +14,7 @@ import 'package:sky_app/core/widgets/sky_text_field.dart';
 import 'package:sky_app/core/widgets/tile_group.dart';
 import 'package:sky_app/features/calendar/data/models/event_session.dart';
 import 'package:sky_app/features/calendar/data/services/schedule_service.dart';
-import 'package:sky_app/features/calendar/presentation/widgets/confirm_delete_dialog.dart';
+import 'package:sky_app/features/calendar/presentation/widgets/confirm_dialog.dart';
 
 part 'schedule_day_form_pagemodel.dart';
 

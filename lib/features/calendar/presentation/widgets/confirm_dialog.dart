@@ -3,26 +3,37 @@ import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 
-/// Silme onayı: başlık, ne silineceğini söyleyen metin, "Vazgeç" / "Sil".
-/// Onaylanırsa `true`.
-class ConfirmDeleteDialog extends StatelessWidget {
-  const ConfirmDeleteDialog({
+/// Onay dialogu: başlık, ne olacağını söyleyen metin, "Vazgeç" ve onay
+/// butonu (varsayılanı kırmızı "Sil"). Onaylanırsa `true`.
+class ConfirmDialog extends StatelessWidget {
+  const ConfirmDialog({
     super.key,
     required this.title,
     required this.message,
+    this.confirmLabel = 'Sil',
+    this.confirmColor = AppColors.red,
   });
 
   final String title;
   final String message;
+  final String confirmLabel;
+  final Color confirmColor;
 
   static Future<bool> show(
     BuildContext context, {
     required String title,
     required String message,
+    String confirmLabel = 'Sil',
+    Color confirmColor = AppColors.red,
   }) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => ConfirmDeleteDialog(title: title, message: message),
+      builder: (_) => ConfirmDialog(
+        title: title,
+        message: message,
+        confirmLabel: confirmLabel,
+        confirmColor: confirmColor,
+      ),
     );
     return confirmed ?? false;
   }
@@ -59,9 +70,9 @@ class ConfirmDeleteDialog extends StatelessWidget {
         TextButton(
           onPressed: () => Navigator.pop(context, true),
           child: Text(
-            'Sil',
+            confirmLabel,
             style: context.textTheme.bodyMedium?.copyWith(
-              color: AppColors.red,
+              color: confirmColor,
               fontWeight: FontWeight.w600,
             ),
           ),

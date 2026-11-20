@@ -60,9 +60,17 @@ class EventCreateService {
       (await _media.uploadImage(image, purpose: 'event_cover')).id;
 
   /// Oluşturur; [seasonId] verilirse ayrı çağrıyla sezona da bağlar (YK/ADMIN).
-  /// Bağlama düşerse etkinlik sezonsuz hâliyle dönüyor.
-  Future<EventModel> createEvent(EventDraft draft, {String? seasonId}) async {
-    final body = await CoreApi.post('/events', body: _payload(draft));
+  /// Bağlama düşerse etkinlik sezonsuz hâliyle dönüyor. Durum gönderilmezse
+  /// core yayında oluşturuyor.
+  Future<EventModel> createEvent(
+    EventDraft draft, {
+    String? seasonId,
+    bool asDraft = false,
+  }) async {
+    final body = await CoreApi.post(
+      '/events',
+      body: {..._payload(draft), if (asDraft) 'status': 'draft'},
+    );
     final created = EventModel.fromJson(
       CoreApi.object(body, what: 'oluşturulan etkinlik'),
     );
@@ -105,7 +113,7 @@ class EventCreateService {
     return EventModel.fromJson(CoreApi.object(body, what: 'etkinlik'));
   }
 
-  /// Etkinliği siler (204). Core yalnız taslağı siliyor; yayındakinde
+  /// Etkinliği siler (204; core arşivliyor). Yalnız taslak; yayındakinde
   /// `409 event_not_draft` (YK/ADMIN hariç).
   Future<void> deleteEvent(String id) => CoreApi.delete('/events/$id');
 

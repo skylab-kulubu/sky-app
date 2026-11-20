@@ -142,7 +142,7 @@ abstract class ScheduleSessionFormPagemodel
     final sessionId = widget.session?.id;
     if (sessionId == null) return;
 
-    final confirmed = await ConfirmDeleteDialog.show(
+    final confirmed = await ConfirmDialog.show(
       context,
       title: 'Oturum silinsin mi?',
       message:

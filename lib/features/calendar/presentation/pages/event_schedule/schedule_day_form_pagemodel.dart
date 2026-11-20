@@ -82,7 +82,7 @@ abstract class ScheduleDayFormPagemodel extends State<ScheduleDayFormPage> {
     final dayId = widget.day?.id;
     if (dayId == null) return;
 
-    final confirmed = await ConfirmDeleteDialog.show(
+    final confirmed = await ConfirmDialog.show(
       context,
       title: 'Gün silinsin mi?',
       message:
