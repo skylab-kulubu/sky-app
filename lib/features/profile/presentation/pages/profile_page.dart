@@ -12,6 +12,7 @@ import 'package:sky_app/core/extensions/context_extensions.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
 import 'package:sky_app/features/calendar/presentation/pages/session_check_in/session_check_in_page.dart';
 import 'package:sky_app/features/profile/data/services/nfc_service.dart';
+import 'package:sky_app/features/profile/presentation/providers/activity_provider.dart';
 import 'package:sky_app/features/profile/presentation/widgets/activity_list.dart';
 import 'package:sky_app/features/profile/presentation/widgets/nfc_scan_overlay.dart';
 import 'package:sky_app/features/profile/presentation/widgets/quick_action_button.dart';
@@ -53,33 +54,43 @@ class _ProfilePageState extends State<ProfilePage> {
         ? user.teamsDisplay
         : user.department;
 
-    return ListView(
-      padding: AppPaddings.mainPaddingAll,
-      children: [
-        Hero(
-          tag: 'skypass_card_hero',
-          createRectTween: (begin, end) => RectTween(begin: begin, end: end),
-          child: Material(
-            type: MaterialType.transparency,
-            child: SkyPassCard(
-              name: user.name,
-              skyNumber: user.skyNumber,
-              subtitle: subtitle,
-              controller: _cardController,
-              showStudentCardMark: user.studentCardLinked,
+    return RefreshIndicator.adaptive(
+      onRefresh: () => _onRefresh(user.id),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: AppPaddings.mainPaddingAll,
+        children: [
+          Hero(
+            tag: 'skypass_card_hero',
+            createRectTween: (begin, end) => RectTween(begin: begin, end: end),
+            child: Material(
+              type: MaterialType.transparency,
+              child: SkyPassCard(
+                name: user.name,
+                skyNumber: user.skyNumber,
+                subtitle: subtitle,
+                controller: _cardController,
+                showStudentCardMark: user.studentCardLinked,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: AppSizes.largeSpace),
-        _quickActions(context, user, subtitle),
-        const SizedBox(height: _sectionSpacing),
-        _sectionTitle(context, 'Aktivitelerim'),
-        const SizedBox(height: _titleSpacing),
-        ActivityList(userId: user.id),
-        const SizedBox(height: _bottomInset),
-      ],
+          const SizedBox(height: AppSizes.largeSpace),
+          _quickActions(context, user, subtitle),
+          const SizedBox(height: _sectionSpacing),
+          _sectionTitle(context, 'Aktivitelerim'),
+          const SizedBox(height: _titleSpacing),
+          ActivityList(userId: user.id),
+          const SizedBox(height: _bottomInset),
+        ],
+      ),
     );
   }
+
+  /// Profil (kart eşlemesi, ekipler) ve aktiviteler birlikte yenileniyor.
+  Future<void> _onRefresh(String userId) => Future.wait([
+    context.read<UserProvider>().reloadProfile(),
+    context.read<ActivityProvider>().refresh(userId),
+  ]);
 
   /// "QR'ı Göster" kartı çeviriyor (karta dokunmakla aynı iş, keşfedilsin
   /// diye). Kapıda giriş alma yönetim menüsünde.

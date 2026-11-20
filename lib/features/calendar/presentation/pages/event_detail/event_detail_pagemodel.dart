@@ -20,6 +20,11 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
 
   late EventModel event = widget.event;
 
+  /// Kapağın adresleri bundan okunuyor; yalnız asıl kapak değişince
+  /// güncelleniyor. Yeniden okunan yanıttaki boyut adresleri listedekinden
+  /// farklı olunca görsel baştan yükleniyor ve titriyordu.
+  late EventModel coverSource = widget.event;
+
   final ScheduleService _scheduleService = ScheduleService();
 
   /// Programı herkese gösteriliyor; yüklenemezse bölüm görünmüyor.
@@ -212,13 +217,27 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     }
 
     final updated = result.event;
-    if (updated == null) return;
+    if (updated != null) _applyUpdated(updated);
+  }
 
+  /// Liste eski olabilir (bu arada iptal edilmiş, başvurusu kapanmış); sayfa
+  /// açılınca etkinlik sessizce yeniden okunuyor. Hata olursa eldeki kalıyor.
+  Future<void> _refreshEvent() async {
+    try {
+      final fresh = await _eventService.fetchEvent(event.id);
+      if (mounted) _applyUpdated(fresh);
+    } catch (e) {
+      log('Etkinlik yenilenemedi: $e');
+    }
+  }
+
+  void _applyUpdated(EventModel updated) {
     // Kapak değiştiyse zemin yeni görselin renklerine geçiyor.
     final coverChanged = updated.coverImageUrl != event.coverImageUrl;
     setState(() {
       event = updated;
       if (coverChanged) {
+        coverSource = updated;
         backdropTints = EventPaletteService.cached(
           updated.coverImageUrl,
           known: updated.coverColors,
@@ -247,6 +266,7 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
 
     _loadSchedule();
     _loadTicket();
+    _refreshEvent();
   }
 
   @override
