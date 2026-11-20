@@ -15,9 +15,9 @@ dependencies:
     sdk: flutter
 
   #Storage
-  shared_preferences: 2.5.5
+  shared_preferences: 2.5.6
   flutter_secure_storage: 10.3.0
-  cached_network_image_ce: 4.10.0
+  cached_network_image_ce: 4.13.2
 
   #State Management
   provider: 6.1.5+1
@@ -26,28 +26,28 @@ dependencies:
   go_router: 17.5.0
 
   #UI
-  flutter_svg: 2.3.0
+  flutter_svg: 2.5.0
   timeago: 3.7.1
 
   #Web & External Links
-  dio: 5.11.0
+  dio: 5.11.1
   webview_flutter: 4.14.1
-  url_launcher: 6.3.2
+  url_launcher: 6.3.3
   flutter_custom_tabs: 2.6.0
 
   #Auth
   flutter_appauth: 12.0.2
-  crypto: 3.0.7
+  crypto: 3.0.8
   reicon_flutter: 1.0.1
   animations: 2.2.0
-  share_plus: 13.3.0
+  share_plus: 13.3.1
 
   #Other
-  sensors_plus: 7.1.0
+  sensors_plus: 7.1.1
   flutter_nfc_kit: 3.6.2
-  image_picker: 1.2.3
+  image_picker: 1.2.4
   pretty_qr_code: 3.6.0
-  mobile_scanner: 7.4.2
+  mobile_scanner: 7.5.0
 
 dev_dependencies:
   flutter_test:
