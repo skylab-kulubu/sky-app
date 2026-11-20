@@ -3,6 +3,7 @@ import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:sky_app/features/auth/data/models/user.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:sky_app/core/constants/app_features.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
@@ -100,11 +101,14 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         // Kart eşliyse eşleme bir kez yapıldığı için buton yok; yerinde
-        // "QR Okut" (oturumdaki QR'la kendi yoklamasını verme).
+        // "QR Okut" (oturumdaki QR'la kendi yoklamasını verme). Öğrenci
+        // kartı kapalıyken ([AppFeatures.studentCard]) hep "QR Okut".
         Expanded(
           child: AnimatedSwitcher(
             duration: _buttonFadeDuration,
-            child: !user.studentCardLinked || _isLinkRevealPending
+            child:
+                AppFeatures.studentCard &&
+                    (!user.studentCardLinked || _isLinkRevealPending)
                 ? QuickActionButton(
                     key: const ValueKey('link-card'),
                     icon: AppIcons.studentCard,

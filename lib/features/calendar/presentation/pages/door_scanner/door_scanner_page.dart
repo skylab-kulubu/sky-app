@@ -7,6 +7,7 @@ import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
+import 'package:sky_app/core/constants/app_features.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_radiuses.dart';
@@ -89,8 +90,10 @@ class _DoorScannerPageState extends DoorScannerPagemodel {
               children: [
                 const SectionHeader('Yoklama', isFirst: true),
                 _selectors(),
-                const SizedBox(height: AppSizes.largeSpace),
-                _modeSwitch(),
+                if (AppFeatures.studentCard) ...[
+                  const SizedBox(height: AppSizes.largeSpace),
+                  _modeSwitch(),
+                ],
                 const SizedBox(height: AppSizes.bigSpace),
                 _scannerArea(),
                 const SizedBox(height: AppSizes.bigSpace),

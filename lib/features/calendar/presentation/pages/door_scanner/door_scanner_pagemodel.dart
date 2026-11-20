@@ -37,8 +37,9 @@ abstract class DoorScannerPagemodel extends State<DoorScannerPage> {
   int? sessionTotal;
 
   /// Varsayılan öğrenci kartı: kapıda en hızlı yol, kamera izni de
-  /// istemiyor. QR'a geçilince kamera açılıyor.
-  DoorMode mode = DoorMode.card;
+  /// istemiyor. QR'a geçilince kamera açılıyor. Öğrenci kartı kapalıyken
+  /// ([AppFeatures.studentCard]) yalnız QR.
+  DoorMode mode = AppFeatures.studentCard ? DoorMode.card : DoorMode.qr;
 
   /// NFC okuma ya da kartla giriş isteği sürüyor.
   bool isReadingCard = false;
