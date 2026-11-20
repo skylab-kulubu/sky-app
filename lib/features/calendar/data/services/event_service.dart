@@ -28,16 +28,45 @@ class EventService {
 
   /// Üye başvurusu: giriş yapmış kullanıcıya bilet oluşturur (201).
   ///
-  /// Kullanıcının o etkinlikte zaten bileti varsa core 409 dönüyor; kayıt
-  /// mevcut olduğu için bu da başarı sayılıyor.
-  Future<bool> joinEvent(String eventId) async {
+  /// Core'un 409'ları `code` ile ayrılıyor (`internal/handlers/tickets.go`):
+  /// kodsuz 409 zaten bileti olduğu anlamına geliyor ve başarı sayılıyor;
+  /// `registration_closed` başvuru kapanmış (elle, son tarihle ya da
+  /// etkinlik bitmiş), `event_cancelled` iptal, `event_not_published`
+  /// taslak.
+  Future<JoinResult> joinEvent(String eventId) async {
     try {
       await CoreApi.post('/events/$eventId/applications/me');
-      return true;
+      return JoinResult.joined;
     } on ApiException catch (e) {
-      if (e.statusCode == 409) return true;
       log('Etkinliğe katılma hatası: $e');
-      return false;
+      if (e.statusCode != 409) return JoinResult.failed;
+      return switch (e.code) {
+        null || '' => JoinResult.alreadyJoined,
+        'registration_closed' => JoinResult.registrationClosed,
+        'event_cancelled' => JoinResult.cancelled,
+        _ => JoinResult.failed,
+      };
     }
   }
+}
+
+/// [EventService.joinEvent] sonucu.
+enum JoinResult {
+  joined,
+  alreadyJoined,
+  registrationClosed,
+  cancelled,
+  failed;
+
+  /// Bilet var mı (yeni ya da önceden).
+  bool get hasTicket => this == joined || this == alreadyJoined;
+
+  /// Kullanıcıya gösterilen kısa mesaj.
+  String get message => switch (this) {
+    joined => 'Kaydın başarıyla alındı!',
+    alreadyJoined => 'Bu etkinliğe zaten kaydın var.',
+    registrationClosed => 'Bu etkinliğin başvuruları kapandı.',
+    cancelled => 'Bu etkinlik iptal edildi.',
+    failed => 'Katılım kaydı oluşturulamadı.',
+  };
 }

@@ -5,6 +5,7 @@ import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/core/services/core_api.dart';
 import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/profile/data/models/activity.dart';
+import 'package:sky_app/features/profile/data/models/feedback_link.dart';
 
 /// Kullanıcının son aktiviteleri.
 ///
@@ -12,7 +13,8 @@ import 'package:sky_app/features/profile/data/models/activity.dart';
 /// biletlerinden (`/v1/tickets/me`) ve yarışmacı kayıtlarından
 /// (`/v1/competitors/me`) türetiliyor:
 ///
-/// - Bilet → etkinliğe kayıt. Girişte okutulduysa kayıt yerine katılım.
+/// - Bilet → etkinliğe kayıt. Girişte okutulduysa kayıt yerine katılım;
+///   geri bildirim postası gittiyse formların bağlantıları da (`feedback`).
 /// - Yarışmacı kaydı → sıra, puan ya da kazanma bilgisi.
 class ActivityService {
   /// Yeniden eskiye sıralı aktiviteler.
@@ -64,6 +66,10 @@ class ActivityService {
         icon: AppIcons.checkCircle,
         color: AppColors.green,
         dateTime: checkInTimes.last,
+        feedback: [
+          for (final link in json['feedback'] as List<dynamic>? ?? const [])
+            ?FeedbackLink.fromJson(link),
+        ],
       );
     }
 

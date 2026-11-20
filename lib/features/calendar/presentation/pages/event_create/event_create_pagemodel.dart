@@ -36,13 +36,13 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       ? _editing!.ownerTeam
       : (ownerOptions.isEmpty ? null : ownerOptions.first);
 
-  /// Silme yalnızca liderlere ve YK/DK/ADMIN'e; GECEKODU üyeleri silemiyor.
+  /// Silme yalnızca liderlere ve YK/ADMIN'e; GECEKODU üyeleri silemiyor.
   bool get canDelete =>
       isEditing && (_user?.canDeleteEvent(_editing!.ownerTeam) ?? false);
 
-  /// Etkinliği sezona yalnızca YK/DK/ADMIN bağlayabiliyor; diğerlerinde
-  /// sezon satırı görünmüyor ve etkinlik sezonsuz oluşuyor.
-  late final bool canChooseSeason = _user?.isPrivileged ?? false;
+  /// Sezon satırı yalnızca YK/ADMIN'de görünüyor (DK salt okur);
+  /// diğerlerinde etkinlik sezonsuz oluşuyor.
+  late final bool canChooseSeason = _user?.canWriteAsPrivileged ?? false;
 
   /// Düzenlenen etkinliğin mevcut kapağı; yeni görsel seçilmediyse
   /// önizlemede bu görünüyor.
@@ -53,6 +53,10 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
   late bool isLoadingSeasons = canChooseSeason;
 
   int capacity = 0;
+
+  /// "Başvurular açık" anahtarı; core'a `registrationClosed` olarak tersi
+  /// gidiyor.
+  bool registrationOpen = true;
   bool isSaving = false;
   bool isDeleting = false;
 
@@ -69,6 +73,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
       formUrlController.text = event.formUrl;
       linkedinController.text = event.linkedin;
       capacity = event.capacity;
+      registrationOpen = !event.registrationClosed;
       final start = event.startDateTime;
       final end = event.endDateTime;
       if (start != null) startDate = start;
@@ -157,6 +162,9 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
 
   /// Önce tarih, ardından saat seçtirir. Tarihte vazgeçilirse hiçbir şey
   /// değişmez; saatte vazgeçilirse seçilen gün eski saatle kalır.
+  void onRegistrationOpenChanged(bool value) =>
+      setState(() => registrationOpen = value);
+
   Future<void> onPickDateTime({required bool isStart}) async {
     final current = isStart ? startDate : endDate;
     final now = DateTime.now();
@@ -274,6 +282,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
         formUrl: formUrlController.text.trim(),
         linkedin: linkedinController.text.trim(),
         capacity: capacity,
+        registrationClosed: !registrationOpen,
         coverImageId: coverId,
       );
 
@@ -301,7 +310,7 @@ abstract class EventCreatePagemodel extends State<EventCreatePage> {
     }
   }
 
-  /// Günceller; sezon değiştiyse (yalnızca YK/DK/ADMIN) yeni sezona bağlar.
+  /// Günceller; sezon değiştiyse (yalnızca YK/ADMIN) yeni sezona bağlar.
   /// Bağlama düşerse güncelleme yine geçerli, sezon eski kalıyor.
   Future<EventModel> _updateAndAssign(
     EventModel editing,

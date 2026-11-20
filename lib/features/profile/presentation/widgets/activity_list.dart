@@ -2,14 +2,22 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sky_app/core/constants/app_colors.dart';
 import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/models/link_item.dart';
 import 'package:sky_app/core/services/api_exception.dart';
+import 'package:sky_app/core/services/handoff_service.dart';
+import 'package:sky_app/core/services/webview_service.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
+import 'package:sky_app/core/widgets/handoff_sheet.dart';
+import 'package:sky_app/features/profile/data/models/activity.dart';
+import 'package:sky_app/features/profile/data/models/feedback_link.dart';
 import 'package:sky_app/features/profile/presentation/providers/activity_provider.dart';
 import 'package:sky_app/features/profile/presentation/widgets/activity_tile.dart';
+import 'package:sky_app/features/profile/presentation/widgets/feedback_sheet.dart';
 
 /// Profildeki "Aktivitelerim" bölümünün içeriği: liste, yükleniyor, boş ve
 /// hata durumları.
@@ -64,8 +72,48 @@ class _ActivityListState extends State<ActivityList> {
 
     return Column(
       children: [
-        for (final activity in activities) ActivityTile(item: activity),
+        for (final activity in activities)
+          ActivityTile(
+            item: activity,
+            onTap: activity.feedback.isEmpty
+                ? null
+                : () => _onFeedbackTap(activity),
+          ),
       ],
+    );
+  }
+
+  /// Formlardan birini seçtirip açar. SKYFORMS formu uygulama içinde,
+  /// hesapla açılıyor; davet kodu adresin sorgusunda olduğu için yol olduğu
+  /// gibi geçiyor. Kapanınca liste yenileniyor: doldurulan form işaretlensin.
+  Future<void> _onFeedbackTap(Activity activity) async {
+    final link = await FeedbackSheet.show(
+      context,
+      eventName: activity.title,
+      links: activity.feedback,
+    );
+    if (link == null || !mounted) return;
+
+    await _openFeedback(link);
+    if (!mounted) return;
+    unawaited(context.read<ActivityProvider>().refresh(widget.userId));
+  }
+
+  Future<void> _openFeedback(FeedbackLink link) async {
+    final path = HandoffService.pathOf(HandoffTarget.forms, link.url);
+    if (path != null) {
+      await HandoffSheet.show(context, target: HandoffTarget.forms, path: path);
+      return;
+    }
+    await WebviewService.openLink(
+      context,
+      LinkItem(
+        name: link.title,
+        description: '',
+        icon: AppIcons.form,
+        color: AppColors.purple,
+        url: link.url,
+      ),
     );
   }
 

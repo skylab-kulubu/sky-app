@@ -38,7 +38,7 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
   }
 
   /// Düzenleme butonu yalnızca yetkisi olana (etkinliğin ekibinde lider,
-  /// GECEKODU üyesi ya da YK/DK/ADMIN).
+  /// GECEKODU üyesi ya da YK/ADMIN).
   bool get canEdit =>
       context.watch<UserProvider>().user?.canEditEvent(event.ownerTeam) ??
       false;
@@ -204,17 +204,20 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     if (confirmed != true || !mounted) return;
 
     setState(() => isJoining = true);
-    final joined = await context.read<EventProvider>().joinEvent(event.id);
+    final result = await context.read<EventProvider>().joinEvent(event.id);
     if (!mounted) return;
     setState(() => isJoining = false);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          joined ? 'Kaydın başarıyla alındı!' : 'Katılım kaydı oluşturulamadı.',
-        ),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(result.message)));
+    // Yeni bilet profildeki aktivitelerde görünsün.
+    if (result.hasTicket) {
+      final userId = context.read<UserProvider>().user?.id;
+      if (userId != null) {
+        unawaited(context.read<ActivityProvider>().refresh(userId));
+      }
+    }
   }
 
   Future<bool?> _askConfirmation() {

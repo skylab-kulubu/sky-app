@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:sky_app/features/profile/data/models/feedback_link.dart';
 
 /// Profildeki "Aktivitelerim" listesinin tek öğesi.
 class Activity {
@@ -8,6 +9,7 @@ class Activity {
     required this.icon,
     required this.color,
     required this.dateTime,
+    this.feedback = const [],
   });
 
   /// Aktivitenin konusu: etkinlik, eğitim ya da ekip adı.
@@ -23,4 +25,10 @@ class Activity {
   final Color color;
 
   final DateTime dateTime;
+
+  /// Katıldığı etkinliğin geri bildirim formları; yoksa boş.
+  final List<FeedbackLink> feedback;
+
+  /// Doldurulmamış form sayısı.
+  int get pendingFeedback => feedback.where((link) => !link.answered).length;
 }

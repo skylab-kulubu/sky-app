@@ -8,7 +8,8 @@ enum EventPhase {
   /// Yayında ve bitmemiş: başvuru alınıyor.
   open,
 
-  /// Yayında, bitmemiş ama başvuru kapalı (core'a elle kapatma gelince).
+  /// Yayında, bitmemiş ama başvuru kapalı: elle kapatılmış ya da son
+  /// başvuru tarihi geçmiş.
   closed,
 
   /// Etkinlik bitti.
@@ -69,6 +70,8 @@ class EventModel {
     this.coverImageSizes = ImageSizes.none,
     this.status = '',
     this.cancelReason = '',
+    this.registrationOpen,
+    this.registrationClosed = false,
   });
 
   /// Etkinliğin LinkedIn gönderisi; düzenleme formu için.
@@ -115,6 +118,15 @@ class EventModel {
   /// İptal edilen etkinlikte core'un verdiği sebep; yoksa boş.
   final String cancelReason;
 
+  /// Core'un hesapladığı başvuru durumu (`registrationOpen`): yayında,
+  /// bitmemiş, elle kapatılmamış ve son tarihi geçmemiş. Alan gelmezse
+  /// (eski yanıt) `null`; o zaman [active]'e bakılıyor.
+  final bool? registrationOpen;
+
+  /// Başvurular elle kapatılmış mı (`registrationClosed`); düzenleme
+  /// formundaki "Başvurular açık" anahtarı bunun tersi.
+  final bool registrationClosed;
+
   bool get isDraft => status == 'draft';
 
   bool get isCancelled => status == 'cancelled';
@@ -132,13 +144,12 @@ class EventModel {
   /// Başvuru açısından etkinliğin durumu; detay sayfasındaki durum satırı
   /// ve katılım butonu buna göre yazılıyor.
   ///
-  /// [active] artık elle ayarlanmıyor, core hesaplıyor (yayında ve
-  /// bitmemiş). Kapalı olmasının nedenini ayırt etmek için durum ve tarih
-  /// ayrıca okunuyor.
+  /// Açık mı sorusunu core'un `registrationOpen`'ı cevaplıyor; kapalı
+  /// olmasının nedenini ayırt etmek için durum ve tarih ayrıca okunuyor.
   EventPhase get phase {
     if (isCancelled) return EventPhase.cancelled;
     if (isDraft) return EventPhase.draft;
-    if (active) return EventPhase.open;
+    if (registrationOpen ?? active) return EventPhase.open;
     return hasEnded ? EventPhase.ended : EventPhase.closed;
   }
 
@@ -178,6 +189,8 @@ class EventModel {
       coverImageSizes: ImageSizes.fromJson(json['coverImageSizes']),
       status: json['status'] as String? ?? '',
       cancelReason: json['cancelReason'] as String? ?? '',
+      registrationOpen: json['registrationOpen'] as bool?,
+      registrationClosed: json['registrationClosed'] == true,
     );
   }
 

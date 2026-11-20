@@ -18,6 +18,7 @@ class EventDraft {
     required this.formUrl,
     required this.linkedin,
     required this.capacity,
+    required this.registrationClosed,
     this.coverImageId,
   });
 
@@ -33,6 +34,11 @@ class EventDraft {
   /// 0 sınırsız.
   final int capacity;
 
+  /// Başvurular elle kapatıldı mı; kapalıyken kimse kendi başvurusunu
+  /// yapamıyor (core `409 registration_closed`). Forms'tan gelen cevaplar
+  /// yine bilet yazıyor.
+  final bool registrationClosed;
+
   /// Yeni yüklenen kapağın medya id'si; `null` ise kapak değişmiyor.
   final String? coverImageId;
 }
@@ -41,8 +47,8 @@ class EventDraft {
 /// sezon listesi, kapak yükleme, kayıt, sezona bağlama, güncelleme, silme.
 ///
 /// Yetki core'da (`internal/authz`): sahip ekipte lider (GECEKODU'da üye)
-/// ya da YK/DK/ADMIN olmayan kullanıcının isteği 403 ile reddediliyor.
-/// Sezona bağlama yalnızca YK/DK/ADMIN'e açık.
+/// ya da YK/ADMIN olmayan kullanıcının isteği 403 ile reddediliyor.
+/// Sezona bağlama yalnızca YK/ADMIN'e açık.
 class EventCreateService {
   final MediaService _media = MediaService();
 
@@ -67,7 +73,7 @@ class EventCreateService {
   /// hâlini döner.
   ///
   /// Sezon oluşturma isteğinde gitmiyor, ayrı bir çağrıyla bağlanıyor ve bu
-  /// yalnızca YK/DK/ADMIN'e açık. Bağlama düşerse etkinlik yine oluşmuş
+  /// yalnızca YK/ADMIN'e açık. Bağlama düşerse etkinlik yine oluşmuş
   /// oluyor; o durumda sezonsuz hâli dönüyor.
   Future<EventModel> createEvent(EventDraft draft, {String? seasonId}) async {
     final body = await CoreApi.post('/events', body: _payload(draft));
@@ -110,7 +116,7 @@ class EventCreateService {
     );
   }
 
-  /// Etkinliği sezona bağlar (YK/DK/ADMIN) ve güncel hâlini döner.
+  /// Etkinliği sezona bağlar (YK/ADMIN) ve güncel hâlini döner.
   Future<EventModel> assignSeason(String eventId, String seasonId) async {
     final body = await CoreApi.post('/seasons/$seasonId/events/$eventId');
     return EventModel.fromJson(CoreApi.object(body, what: 'etkinlik'));
@@ -131,6 +137,7 @@ class EventCreateService {
     'formUrl': draft.formUrl,
     'linkedin': draft.linkedin,
     'capacity': draft.capacity,
+    'registrationClosed': draft.registrationClosed,
     'coverImageId': ?draft.coverImageId,
   };
 }

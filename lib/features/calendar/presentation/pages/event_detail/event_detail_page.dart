@@ -25,6 +25,7 @@ import 'package:sky_app/features/calendar/data/models/event_model.dart';
 import 'package:sky_app/features/calendar/data/models/event_session.dart';
 import 'package:sky_app/features/calendar/data/services/schedule_service.dart';
 import 'package:sky_app/features/auth/presentation/providers/user_provider.dart';
+import 'package:sky_app/features/profile/presentation/providers/activity_provider.dart';
 import 'package:sky_app/features/calendar/data/services/event_palette_service.dart';
 import 'package:sky_app/features/calendar/presentation/pages/event_create/event_create_page.dart';
 import 'package:sky_app/features/calendar/presentation/pages/event_schedule/event_schedule_page.dart';

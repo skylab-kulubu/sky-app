@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sky_app/core/constants/app_icons.dart';
 import 'package:sky_app/core/constants/app_paddings.dart';
 import 'package:sky_app/core/constants/app_sizes.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
+import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/icon_circle.dart';
 import 'package:sky_app/features/profile/data/models/activity.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -14,10 +16,16 @@ import 'package:timeago/timeago.dart' as timeago;
 /// kapak görseli ve detay sayfasına geçiş var, burada ikon var ve satırın
 /// gideceği bir yer yok. Tipografi kasıtlı olarak aynı, iki listedeki
 /// satırlar aynı ritimde okunsun diye.
+///
+/// Geri bildirim formu olan katılımda açıklamanın altında bir satır daha
+/// var ve satır dokunulabilir ([onTap]).
 class ActivityTile extends StatelessWidget {
-  const ActivityTile({super.key, required this.item});
+  const ActivityTile({super.key, required this.item, this.onTap});
 
   final Activity item;
+
+  /// Geri bildirim formlarını açar; formu olmayan satırda `null`.
+  final VoidCallback? onTap;
 
   static const double _circleSpacing = AppSizes.bigSpace;
   static const double _titleSpacing = AppSizes.smallSpace;
@@ -25,6 +33,14 @@ class ActivityTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: _row(context),
+    );
+  }
+
+  Widget _row(BuildContext context) {
     return Padding(
       padding: AppPaddings.activityTile,
       child: Row(
@@ -55,6 +71,43 @@ class ActivityTile extends StatelessWidget {
           style: context.textTheme.bodyMedium?.copyWith(
             color: context.textSecondary,
             height: _descriptionLineHeight,
+          ),
+        ),
+        if (item.feedback.isNotEmpty) ...[
+          const SizedBox(height: _titleSpacing),
+          _feedbackLine(context),
+        ],
+      ],
+    );
+  }
+
+  /// Bekleyen form varsa vurgulu, hepsi dolduysa soluk bir teşekkür.
+  Widget _feedbackLine(BuildContext context) {
+    final pending = item.pendingFeedback;
+    final color = pending > 0 ? context.accentColor : context.textTertiary;
+    final text = switch (pending) {
+      0 => 'Geri bildirimin için teşekkürler',
+      1 when item.feedback.length == 1 => 'Geri bildirim formunu doldur',
+      _ => '$pending geri bildirim formu seni bekliyor',
+    };
+
+    return Row(
+      children: [
+        AppIcon(
+          pending > 0 ? AppIcons.form : AppIcons.checkCircle,
+          size: AppSizes.iconSmall,
+          color: color,
+        ),
+        const SizedBox(width: AppSizes.smallSpace),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],

@@ -15,6 +15,7 @@ import 'package:sky_app/core/services/media_service.dart';
 import 'package:sky_app/core/widgets/app_icon.dart';
 import 'package:sky_app/core/widgets/cover_picker.dart';
 import 'package:sky_app/core/widgets/section_header.dart';
+import 'package:sky_app/core/widgets/icon_circle.dart';
 import 'package:sky_app/core/widgets/settings_tile.dart';
 import 'package:sky_app/core/widgets/sky_button.dart';
 import 'package:sky_app/core/widgets/sky_text_field.dart';
@@ -31,7 +32,7 @@ import 'package:sky_app/features/calendar/presentation/widgets/event_option_shee
 
 part 'event_create_pagemodel.dart';
 
-/// Yetkili kullanıcının (lider, GECEKODU üyesi, YK/DK/ADMIN) etkinlik
+/// Yetkili kullanıcının (lider, GECEKODU üyesi, YK/ADMIN) etkinlik
 /// oluşturduğu ve düzenlediği sayfa. Sonucu [EventFormResult] olarak döner;
 /// vazgeçilirse `null`.
 ///
@@ -194,6 +195,7 @@ class _EventCreatePageState extends EventCreatePagemodel {
           value: capacity > 0 ? '$capacity kişi' : 'Sınırsız',
           onTap: onEditCapacity,
         ),
+        _registrationRow(context),
         // Program ayrı sayfada; yalnızca var olan etkinlikte (günler
         // etkinliğe bağlanıyor).
         if (isEditing)
@@ -204,6 +206,33 @@ class _EventCreatePageState extends EventCreatePagemodel {
             onTap: onEditSchedule,
           ),
       ],
+    );
+  }
+
+  /// Kapatılınca etkinlik görünmeye devam ediyor ama kimse kendi
+  /// başvurusunu yapamıyor; kontenjan dolunca elle kapatmak için.
+  Widget _registrationRow(BuildContext context) {
+    return Padding(
+      padding: AppPaddings.settingsTile,
+      child: Row(
+        children: [
+          const IconCircle(icon: AppIcons.ticket, color: AppColors.green),
+          const SizedBox(width: AppSizes.bigSpace),
+          Expanded(
+            child: Text(
+              'Başvurular açık',
+              style: context.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          Switch.adaptive(
+            value: registrationOpen,
+            activeTrackColor: context.accentColor,
+            onChanged: isBusy ? null : onRegistrationOpenChanged,
+          ),
+        ],
+      ),
     );
   }
 }
