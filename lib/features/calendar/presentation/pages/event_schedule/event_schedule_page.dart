@@ -26,7 +26,7 @@ part 'event_schedule_pagemodel.dart';
 /// satırına dokununca gün, oturuma dokununca oturum formu açılıyor.
 ///
 /// Etkinliği düzenleyebilen herkes açabiliyor; silme yalnızca liderlere ve
-/// YK/DK/ADMIN'e ([User.canDeleteEvent]). Yoklama oturum bazında alındığı
+/// YK/ADMIN'e ([User.canDeleteEvent]). Yoklama oturum bazında alındığı
 /// için kapı okuyucusu da buradaki oturumları kullanıyor.
 class EventSchedulePage extends StatefulWidget {
   const EventSchedulePage({super.key, required this.event});

@@ -3,7 +3,7 @@ import 'package:sky_app/features/calendar/data/models/event_session.dart';
 
 /// Etkinlik programı (core): günler ve oturumlar. Okuma herkese açık;
 /// yazma etkinliği düzenleyebilenlere (sahip ekibin lideri, GECEKODU'da
-/// üyeler, YK/DK/ADMIN), silme liderlere ve YK/DK/ADMIN'e.
+/// üyeler, YK/ADMIN), silme liderlere ve YK/ADMIN'e.
 class ScheduleService {
   /// Etkinliğin programı: tarihe göre sıralı günler, her birinin saate göre
   /// sıralı oturumları (iptaller dahil).

@@ -29,7 +29,8 @@ class User {
   bool get _hasCmsAccess => cmsRoles.contains('cms:access');
 
   /// Haber oluşturup düzenleyebilir mi: CMS `cms:access` rolüyle birlikte
-  /// YK/DK/ADMIN grubunu istiyor.
+  /// YK/DK/ADMIN grubunu istiyor. Bu kararı CMS veriyor; core'daki "DK salt
+  /// okur" kuralı burayı değiştirmiyor.
   bool get canManageNews => _hasCmsAccess && isPrivileged;
 
   /// Ekibin CMS sayfasını düzenleyebilir mi: `cms:access` ve o ekibin lider
@@ -157,7 +158,7 @@ class User {
     );
   }
 
-  /// Etkinlik sahibi olarak seçilebilen ekipler (YK/DK/ADMIN için).
+  /// Etkinlik sahibi olarak seçilebilen ekipler (YK/ADMIN için).
   /// `ownerTeam` Keycloak grup adıyla eşleşmeli; core yetkiyi o gruba göre
   /// veriyor.
   static const List<String> _eventOwnerTeams = [
@@ -175,19 +176,25 @@ class User {
   ];
 
   /// Kullanıcının grupları, arayüzde gösterilecek adlarıyla: her grup
-  /// yolunun en derin anlamlı parçası. Kapsayıcılar (`UYELER`, `ARGE`,
-  /// `ORGANIZASYON`), rol alt grupları (`LIDERLER`) ve teknik `ADMIN`
-  /// gösterilmiyor. `/UYELER/ARGE/MOBILAB/LIDERLER` → `MOBILAB`.
+  /// yolunun en derin anlamlı parçası. Yalnızca `/UYELER/...` yolları
+  /// sayılıyor: `/ROLLER/FORMS-ACCESS` gibi rol grupları ekip değil.
+  /// Kapsayıcılar (`UYELER`, `ARGE`, `IGT`, `ORGANIZASYON`), rol alt
+  /// grupları (`LIDERLER`) ve teknik `ADMIN` gösterilmiyor.
+  /// `/UYELER/ARGE/MOBILAB/LIDERLER` → `MOBILAB`.
   List<String> get teams => {
     for (final parts in _groupPaths)
-      if (parts.where((part) => !_leaderSubgroups.contains(part)).lastOrNull
-          case final team?)
-        if (!_hiddenGroups.contains(team)) team,
+      if (parts.firstOrNull == _membersRoot)
+        if (parts.where((part) => !_leaderSubgroups.contains(part)).lastOrNull
+            case final team?)
+          if (!_hiddenGroups.contains(team)) team,
   }.toList();
+
+  static const String _membersRoot = 'UYELER';
 
   static const Set<String> _hiddenGroups = {
     'UYELER',
     'ARGE',
+    'IGT',
     'ORGANIZASYON',
     'ADMIN',
   };
@@ -196,24 +203,51 @@ class User {
 
   /// Grup yollarının parçaları; `/UYELER/ARGE/MOBILAB/LIDERLER` →
   /// `[UYELER, ARGE, MOBILAB, LIDERLER]`.
-  Iterable<List<String>> get _groupPaths => groups.map(
-    (path) => path.split('/').where((part) => part.isNotEmpty).toList(),
-  );
+  Iterable<List<String>> get _groupPaths => groups.map(_partsOf);
 
-  static const Set<String> _privilegedGroups = {'ADMIN', 'YK', 'DK'};
+  static List<String> _partsOf(String path) =>
+      path.split('/').where((part) => part.isNotEmpty).toList();
+
   static const Set<String> _leaderSubgroups = {'LIDERLER', 'KOORDINATORLER'};
 
-  /// YK, DK ya da ADMIN grubunda (ya da alt gruplarında) mı. Core ve CMS'te
-  /// bu kullanıcılar her şeye yetkili.
+  /// Core'un yetkili kökleri (`internal/authz/privileged_roots.go`,
+  /// `AUTHZ_PRIVILEGED_ROOTS`): yalnızca bu yolların kendisi ve altı
+  /// yetkili. Ağacın başka yerindeki aynı adlı grup
+  /// (`/UYELER/ARGE/WEBLAB/ADMIN`) yetki vermiyor.
+  static const List<String> _writerRoots = [
+    '/ADMIN',
+    '/YK',
+    '/UYELER/ADMIN',
+    '/UYELER/YK',
+  ];
+
+  /// Salt okur yetkili kökler (`AUTHZ_PRIVILEGED_READER_ROOTS`): Denetim
+  /// Kurulu her şeyi okuyor, hiçbir şeyi değiştirmiyor.
+  static const List<String> _readerRoots = ['/DK', '/UYELER/DK'];
+
+  static bool _isUnder(String path, List<String> roots) =>
+      roots.any((root) => path == root || path.startsWith('$root/'));
+
+  /// YK, DK ya da ADMIN kökünde (ya da alt gruplarında) mı. Okuma için
+  /// hepsi yetkili; yazma için [canWriteAsPrivileged]'a bakılmalı.
   bool get isPrivileged =>
-      _groupPaths.any((parts) => parts.any(_privilegedGroups.contains));
+      canWriteAsPrivileged ||
+      groups.any((path) => _isUnder(path, _readerRoots));
+
+  /// YK ya da ADMIN kökünde mi: core'da her şeyi değiştirebilenler. DK
+  /// burada yok; DK üyesi aynı zamanda YK'daysa YK üzerinden yazar.
+  bool get canWriteAsPrivileged =>
+      groups.any((path) => _isUnder(path, _writerRoots));
 
   /// Lideri ya da koordinatörü olduğu ekipler; grup yolunda lider alt
-  /// grubunun hemen üstündeki parça.
+  /// grubunun hemen üstündeki parça. Yetkili köklerin altındaki yollar
+  /// core'da ekip sayılmıyor.
   Set<String> get leaderTeams => {
-    for (final parts in _groupPaths)
-      for (var i = 1; i < parts.length; i++)
-        if (_leaderSubgroups.contains(parts[i])) parts[i - 1],
+    for (final path in groups)
+      if (!_isUnder(path, _writerRoots) && !_isUnder(path, _readerRoots))
+        for (final parts in [_partsOf(path)])
+          for (var i = 1; i < parts.length; i++)
+            if (_leaderSubgroups.contains(parts[i])) parts[i - 1],
   };
 
   /// Verilen grubun (ya da alt gruplarından birinin) üyesi mi.
@@ -223,14 +257,14 @@ class User {
   /// Etkinlik oluştururken seçilebilecek sahip ekipler; core kurallarının
   /// uygulamadaki karşılığı (`core-backend/internal/authz/policy.go`):
   ///
-  /// - YK/DK/ADMIN: bütün ekipler.
+  /// - YK/ADMIN: bütün ekipler (DK salt okur).
   /// - Lider/koordinatör: lideri olduğu ekipler.
   /// - GECEKODU'da düz üyeler de oluşturabiliyor.
   ///
   /// Boşsa kullanıcı etkinlik oluşturamaz. Asıl kontrol backend'de; bu liste
   /// yalnızca butonu ve seçenekleri belirliyor.
   List<String> get eventOwnerOptions {
-    if (isPrivileged) return List.of(_eventOwnerTeams);
+    if (canWriteAsPrivileged) return List.of(_eventOwnerTeams);
 
     return {
       ...leaderTeams,
@@ -246,17 +280,18 @@ class User {
   /// oluşturmayla aynı kurala bağlı (GECEKODU'da üyeler dahil).
   bool canEditEvent(String ownerTeam) =>
       ownerTeam.isNotEmpty &&
-      (isPrivileged ||
+      (canWriteAsPrivileged ||
           leaderTeams.contains(ownerTeam) ||
           (ownerTeam == _everyMemberCanCreateTeam && isInGroup(ownerTeam)));
 
-  /// Silme her ekipte yalnızca liderlere ve YK/DK/ADMIN'e açık; GECEKODU
+  /// Silme her ekipte yalnızca liderlere ve YK/ADMIN'e açık; GECEKODU
   /// üyeleri düzenleyebiliyor ama silemiyor.
   bool canDeleteEvent(String ownerTeam) =>
-      ownerTeam.isNotEmpty && (isPrivileged || leaderTeams.contains(ownerTeam));
+      ownerTeam.isNotEmpty &&
+      (canWriteAsPrivileged || leaderTeams.contains(ownerTeam));
 
   /// Verilen etkinlikte kapıda okutabilir mi; core `allowDoorCheckIn`'in
-  /// uygulamadaki karşılığı: YK/DK/ADMIN, etkinliğin sahip ekibinin lideri
+  /// uygulamadaki karşılığı: YK/ADMIN, etkinliğin sahip ekibinin lideri
   /// ya da koordinatörü, ya da etkinliğin kapı görevlisi.
   ///
   /// Grubunda `team_door_scan=true` olan ekiplerin üyeleri de core'da
@@ -265,7 +300,7 @@ class User {
     required String ownerTeam,
     List<String> doorStaffIds = const [],
   }) =>
-      isPrivileged ||
+      canWriteAsPrivileged ||
       (ownerTeam.isNotEmpty && leaderTeams.contains(ownerTeam)) ||
       (id.isNotEmpty && doorStaffIds.contains(id));
 

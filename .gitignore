@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 graphify-out/
+.env
 
 # IntelliJ related
 *.iml
@@ -47,3 +48,5 @@ app.*.map.json
 
 # Claude Code
 .claude/settings.local.json
+# Widget Preview related
+.widget_preview/
