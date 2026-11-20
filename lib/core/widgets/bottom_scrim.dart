@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sky_app/core/extensions/context_extensions.dart';
 
 /// Yüzen bir alt çubuğun (navbar, katılım butonu) arkasından geçen içeriği

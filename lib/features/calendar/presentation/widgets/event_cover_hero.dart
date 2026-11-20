@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Etkinlik kapağını detaya uçabilmesi için [Hero] ile sarar; kapağı gösteren
 /// üç yer de bunu kullanıyor.

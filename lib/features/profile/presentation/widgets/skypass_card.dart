@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:math' hide log;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:sky_app/core/constants/app_assets.dart';

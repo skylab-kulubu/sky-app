@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sky_app/core/widgets/svg_animation_widget.dart';
 import 'package:sky_app/features/auth/presentation/widgets/skylab_animation_logo.dart';
 

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
 /// Cihazın eğimini açı olarak verir; `Transform` kurmuyor ki kullanan taraf

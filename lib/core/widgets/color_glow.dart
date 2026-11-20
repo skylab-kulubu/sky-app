@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Zemine dağılmış tek bir renk parıltısının yeri, yayılımı ve yoğunluğu.
 typedef GlowSpot = ({Alignment center, double radius, double opacity});

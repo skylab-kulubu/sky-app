@@ -11,7 +11,7 @@
 set -e
 
 # Flutter sürümü CI ile aynı kalmalı (.github/workflows/ci.yml FLUTTER_VERSION).
-FLUTTER_VERSION=3.47.1
+FLUTTER_VERSION=3.50.1
 
 cd "$CI_PRIMARY_REPOSITORY_PATH"
 

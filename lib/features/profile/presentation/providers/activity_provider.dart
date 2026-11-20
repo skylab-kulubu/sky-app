@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sky_app/core/services/api_exception.dart';
 import 'package:sky_app/features/profile/data/models/activity.dart';
 import 'package:sky_app/features/profile/data/services/activity_service.dart';

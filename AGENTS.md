@@ -12,7 +12,7 @@ This file is for AI agents working on this project. Read it end to end before wr
 
 The users are club member students. The app provides the membership card (SkyPass), event tracking, club news and access to the club's sub-services.
 
-Flutter 3.47.1 (stable), Dart SDK `>=3.12.0`, Material 3. The font is set once in `theme.dart` via `fontFamily: 'Poppins'` and applies to every text scale; `textTheme` only carries an entry when it needs to say something beyond the font (such as the body text color).
+Flutter 3.50.1 (stable), Dart SDK `>=3.12.0`, Material 3 from the standalone **`material_ui`** package (Flutter 3.50 deprecated `package:flutter/material.dart`): import `package:material_ui/material_ui.dart`, never the old library; localizations come from `GlobalMaterialLocalizations.delegates` in `material_ui`. `go_router` 18 and `animations` 3 are on `material_ui` too; packages that still import the old library (pretty_qr_code, mobile_scanner, cached_network_image) only use widget-layer types here, so no `MaterialUiCompatibilityBridge` is needed — re-check this when adding a package that reads `Theme.of`. The font is set once in `theme.dart` via `fontFamily: 'Poppins'` and applies to every text scale; `textTheme` only carries an entry when it needs to say something beyond the font (such as the body text color).
 
 ---
 
@@ -124,7 +124,7 @@ Features: `auth`, `calendar`, `home`, `notification`, `profile`, `settings`, `te
 | `cached_network_image_ce`  | Network images (`CoverImage`)                                                                              |
 | `dio`                      | All REST calls                                                                                             |
 | `image_picker`             | Event cover and news image (`MediaService.pickImage`, `CoverPicker`; upload errors 413/415/429/503 become Turkish text through `ApiException.userText`) — **native dependency**, iOS needs `NSPhotoLibraryUsageDescription` |
-| `flutter_localizations`    | App locale is Turkish (`main_app.dart`); date/time pickers and system menus are Turkish |
+| `material_ui`              | Material widgets and `GlobalMaterialLocalizations` (app locale is Turkish in `main_app.dart`; date/time pickers and system menus are Turkish) |
 | `webview_flutter`          | Hesap Merkezi and SKYFORMS in-app (`HandoffSheet`), and the `/webview` fallback — **native dependency**; its cookie jar is separate from the login browser, which is why the sites need the web handoff |
 | `flutter_custom_tabs`      | Club sites open in a browser sheet (`WebviewService`): Partial Custom Tabs / `SFSafariViewController` page sheet. They share the Keycloak cookie with the login, so e-skylab sites log the user in automatically — **native dependency** |
 

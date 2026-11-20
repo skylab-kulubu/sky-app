@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:sky_app/features/auth/data/models/user.dart';
 import 'package:go_router/go_router.dart';

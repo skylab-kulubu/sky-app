@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sky_app/core/widgets/svg_animation_widget.dart';
 
 // viewBox 0 0 586 554. Anahtar sırası Framer Motion'ın Object.keys() sırası.
