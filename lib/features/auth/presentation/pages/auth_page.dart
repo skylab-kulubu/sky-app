@@ -111,7 +111,7 @@ class _AuthPageState extends AuthPagemodel {
     return Column(
       children: [
         Text(
-          'Sky Lab',
+          'SKY LAB',
           textAlign: TextAlign.center,
           // Kulübün adı değil, altındaki renkli satır sayfanın vurgusu;
           // bu satır onun üstünde sakin bir künye gibi duruyor.

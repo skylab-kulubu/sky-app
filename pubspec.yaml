@@ -60,6 +60,7 @@ flutter:
     - assets/images/
     - assets/images/teams/
     - assets/fonts/
+    - shorebird.yaml
 
   fonts:
     - family: Poppins

@@ -39,6 +39,8 @@ dart format lib/             # before committing
 flutter pub get
 ```
 
+**Store builds and hotfixes (Shorebird code push, since 2026-11-21):** `shorebird.yaml` (app id, not secret) is in the root and listed under `flutter.assets`. A store build must come from `shorebird release ios` (built locally, then uploaded with Transporter or Xcode with "Manage Version and Build Number" unchecked) — Xcode Cloud builds cannot be patched. Dart-only fixes ship with `shorebird patch ios`; native code, assets, new native packages and Flutter version changes need a new store release. Shorebird's Flutter must match the project's (3.50.1). Free plan: 5,000 patch installs a month.
+
 > Do not run `flutter build ios`. The iOS project is on Swift Package Manager; the build triggers CocoaPods and breaks that setup.
 
 **Tests:** `test/` contains widget and unit tests (event provider, calendar/home pages, models, router, API errors) and CI runs format, analyze and `flutter test` on every PR. Run `flutter test` after changes and keep it green; when a page starts reading a new provider, add a fake of it to that page's test setup (see `test/helpers/`). Do not write new tests unless asked.
