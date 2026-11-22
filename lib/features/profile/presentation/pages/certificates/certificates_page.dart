@@ -18,6 +18,7 @@ import 'package:sky_app/features/profile/data/models/certificate.dart';
 import 'package:sky_app/features/profile/data/services/certificate_service.dart';
 import 'package:sky_app/features/profile/presentation/widgets/certificate_actions_sheet.dart';
 import 'package:sky_app/features/profile/presentation/widgets/certificate_tile.dart';
+import 'package:sky_app/core/widgets/sky_refresh_indicator.dart';
 
 part 'certificates_pagemodel.dart';
 
@@ -41,7 +42,7 @@ class _CertificatesPageState extends CertificatesPagemodel {
           onPressed: () => context.pop(),
         ),
       ),
-      body: RefreshIndicator.adaptive(onRefresh: onRefresh, child: _body()),
+      body: SkyRefreshIndicator(onRefresh: onRefresh, child: _body()),
     );
   }
 

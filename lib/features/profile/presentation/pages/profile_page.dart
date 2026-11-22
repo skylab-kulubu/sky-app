@@ -17,6 +17,7 @@ import 'package:sky_app/features/profile/presentation/widgets/activity_list.dart
 import 'package:sky_app/features/profile/presentation/widgets/nfc_scan_overlay.dart';
 import 'package:sky_app/features/profile/presentation/widgets/quick_action_button.dart';
 import 'package:sky_app/features/profile/presentation/widgets/skypass_card.dart';
+import 'package:sky_app/core/widgets/sky_refresh_indicator.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -54,7 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ? user.teamsDisplay
         : user.department;
 
-    return RefreshIndicator.adaptive(
+    return SkyRefreshIndicator(
       onRefresh: () => _onRefresh(user.id),
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),

@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:sky_app/features/calendar/presentation/providers/event_provider.dart';
+import 'package:sky_app/core/widgets/sky_refresh_indicator.dart';
 
 /// Aşağı çekerek etkinlikleri yenileme; Etkinlikler ve ana sayfa aynı
 /// provider'dan beslendiği için tek widget.
@@ -14,7 +15,7 @@ class EventsRefreshIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator.adaptive(
+    return SkyRefreshIndicator(
       onRefresh: () => _refresh(context),
       child: child,
     );

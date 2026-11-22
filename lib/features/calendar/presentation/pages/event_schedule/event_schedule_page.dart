@@ -19,6 +19,7 @@ import 'package:sky_app/features/calendar/data/models/event_session.dart';
 import 'package:sky_app/features/calendar/data/services/schedule_service.dart';
 import 'package:sky_app/features/calendar/presentation/pages/event_schedule/schedule_day_form_page.dart';
 import 'package:sky_app/features/calendar/presentation/pages/event_schedule/schedule_session_form_page.dart';
+import 'package:sky_app/core/widgets/sky_refresh_indicator.dart';
 
 part 'event_schedule_pagemodel.dart';
 
@@ -58,7 +59,7 @@ class _EventSchedulePageState extends EventSchedulePagemodel {
             onPressed: () => Navigator.of(context).maybePop(),
           ),
         ),
-        body: RefreshIndicator.adaptive(onRefresh: reload, child: _body()),
+        body: SkyRefreshIndicator(onRefresh: reload, child: _body()),
         bottomNavigationBar: SafeArea(
           minimum: AppPaddings.mainPaddingAll,
           child: SkyButton(text: 'Gün Ekle', onPressed: onAddDay),

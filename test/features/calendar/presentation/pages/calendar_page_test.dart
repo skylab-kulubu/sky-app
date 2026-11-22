@@ -98,9 +98,7 @@ void main() {
 
   testWidgets('yenileme sonucu listeye yansır', (tester) async {
     // Kartlar uzun; ikisinin aynı anda çizilmesi için ekran daraltılıp
-    // yükseltiliyor, yoksa ikinci kart hiç kurulmuyor. Çok yükseltmek de
-    // olmuyor: RefreshIndicator'ın eşiği görüntü yüksekliğinin dörtte biri,
-    // sabit uzunluktaki çekme jesti eşiğin altında kalıyor.
+    // yükseltiliyor, yoksa ikinci kart hiç kurulmuyor.
     tester.view.physicalSize = const Size(400, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
