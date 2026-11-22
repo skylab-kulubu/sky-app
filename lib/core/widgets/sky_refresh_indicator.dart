@@ -7,18 +7,15 @@ import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sky_app/core/constants/app_colors.dart';
 
-/// Uygulamanın aşağı çekerek yenileme göstergesi; iOS ve Android'de aynı.
+/// Aşağı çekerek yenileme; çekilince içeriğin üstünde açılan boşluğu
+/// gökkuşağı parıltıları dolduruyor.
 ///
-/// Çekilince AppBar ile içerik arasında açılan boşluğu, etkinlik detayının
-/// zemini gibi gökkuşağı parıltıları dolduruyor. Eşik aşılınca lekeler bir
-/// nefeste parlayıp yaylanarak yeni yerlerine dağılıyor ve titreşim
-/// "bırakabilirsin" diyor; yenileme sürerken rastgele geziniyorlar, iş bitince
-/// boşluk kapanıyor.
+/// Her platform kendi kaydırma fiziğinde kalıyor: iOS'ta çekme mesafesi
+/// listenin taşması, Android'de liste tepede durduğu için taşma
+/// bildirimlerinden sayılıyor (Flutter'ın `RefreshIndicator`'ı gibi).
 ///
-/// İki platformda aynı his için alttaki kaydırılabilirler esnek (bouncing)
-/// physics ile çalışıyor: Android'in varsayılanı kenarda duruyor ve hiç
-/// taşma üretmiyor. [child] yine `AlwaysScrollableScrollPhysics` taşımalı,
-/// yoksa içerik ekranı doldurmadığında çekme başlamıyor.
+/// [child] `AlwaysScrollableScrollPhysics` taşımalı, yoksa içerik ekranı
+/// doldurmadığında çekme başlamıyor.
 class SkyRefreshIndicator extends StatefulWidget {
   const SkyRefreshIndicator({
     super.key,
@@ -35,11 +32,10 @@ class SkyRefreshIndicator extends StatefulWidget {
 
 enum _Phase { idle, armed, refreshing }
 
-/// Bir lekenin bu karedeki yeri ve yarıçapı.
 typedef _PlacedSpot = ({Alignment center, double radius});
 
-/// Bir parıltının yeri ve hareketi. Gezinme her eksende dönem içinde tam
-/// sayı tur atıyor, böylece döngü başa dönerken sıçramıyor.
+/// Gezinme her eksende dönem içinde tam sayı tur atıyor ki döngü başa
+/// dönerken sıçramasın.
 class _Spot {
   _Spot(this.center, this.radius);
 
@@ -52,7 +48,6 @@ class _Spot {
   double phaseY = 0;
   Offset scatter = Offset.zero;
 
-  /// Her eşikte yeni hedef ve hız: dağılma ve gezinme hep aynı olmasın.
   void shuffle(math.Random random, double scatterAmplitude) {
     turnsX = 1 + random.nextInt(3);
     turnsY = 1 + random.nextInt(3);
@@ -67,16 +62,12 @@ class _Spot {
 
 class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
     with TickerProviderStateMixin {
-  /// Bu kadar taşınca bırakmak yenilemeyi başlatıyor. Esnek physics parmağın
-  /// yolunu kısalttığı için taşma, parmağın kat ettiği mesafeden az; 110'da
-  /// fazla çekmek gerekiyordu.
+  /// Dirençten dolayı parmağın yolu bundan uzun.
   static const double _triggerExtent = 80;
 
-  /// Yenileme sürerken içeriğin renk alanına bıraktığı boşluk. Eşikten büyük
-  /// olursa içerik bırakıldığı an aşağı sıçrıyor.
+  /// Eşikten büyük olamaz: içerik bırakıldığı an aşağı sıçrar.
   static const double _holdExtent = _triggerExtent;
 
-  /// Lekelerin yerleştiği alanın yüksekliği; görünüm bu boya göre ayarlandı.
   static const double _fieldHeight = 92;
 
   /// İstek çok hızlı bitse de renklerin gezindiği bir an görünsün.
@@ -86,32 +77,27 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
   static const Duration _wanderPeriod = Duration(seconds: 6);
   static const Duration _wanderFadeDuration = Duration(milliseconds: 400);
   static const Duration _hideDuration = Duration(milliseconds: 320);
+  static const Duration _retractDuration = Duration(milliseconds: 300);
 
-  /// Eşikte lekelerin yerinden en fazla ne kadar kaydığı (Alignment birimi).
+  /// `BouncingScrollPhysics`'in katsayısı; Android'de iOS'la aynı ağırlık.
+  static const double _pullFriction = 0.52;
+
   static const double _scatterAmplitude = 0.6;
 
-  /// Eşikteki parlamanın tepesinde lekelerin büyüme oranı.
   static const double _bloomGrowth = 0.45;
 
-  /// Dağılmanın yayı: hedefi biraz aşıp geri oturuyor, sert değil.
   static const SpringDescription _scatterSpring = SpringDescription(
     mass: 1,
     stiffness: 260,
     damping: 12,
   );
 
-  /// Gezinirken lekelerin yerinden en fazla ne kadar uzaklaştığı.
   static const double _wanderAmplitude = 0.6;
 
-  /// Renklerin tepe yoğunluğu; tam doygun marka renkleri neon gibi duruyordu.
   static const double _glowStrength = 0.8;
 
-  /// Yarıçaplar alanın genişliğine göre ve çekerken sabit: alan pencere gibi
-  /// açılıyor. Boşluğun yüksekliğine bağlıyken lekeler çektikçe şişip birbirine
-  /// fazla biniyor, renkler kahverengimsi bir tona çamurlaşıyordu.
-  ///
-  /// Yedi orta boy leke iki sıra hâlinde sık dizili: az sayıda leke arada
-  /// beyaz boşluk bırakıyordu.
+  /// Yarıçaplar genişliğe göre ve çekerken sabit: boşluğa bağlı olsalar
+  /// lekeler şişip üst üste biner, renkler kahverengiye çamurlaşır.
   final List<_Spot> _spots = [
     _Spot(const Alignment(-1.0, -0.3), 0.46),
     _Spot(const Alignment(-0.65, 0.6), 0.42),
@@ -124,12 +110,9 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
 
   final math.Random _random = math.Random();
 
-  /// Lekelerin renkleri; her yeni çekişte karılıyor. Sabit sırada ilk ve
-  /// son leke aynı (turkuaz) renge düşüyor, büyük sol leke de hep turkuaz
-  /// olduğundan çekişlerin çoğu turkuaz görünüyordu.
+  /// Her çekişte karılıyor; sabit sırada hep aynı renk baskın kalıyor.
   late List<Color> _spotColors = _shuffledColors();
 
-  /// Her renk en az bir kez; artan lekeler rastgele bir renk alıyor.
   List<Color> _shuffledColors() {
     const palette = AppColors.brandGradient;
     final colors = [
@@ -140,10 +123,16 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
     return colors..shuffle(_random);
   }
 
-  /// Ekranın üstünden taşma miktarı; çekerken ve geri yaylanırken değişiyor.
   final ValueNotifier<double> _overscroll = ValueNotifier(0);
 
-  /// Dağılmanın ilerlemesi; yay hedefi aşabildiği için sınırsız.
+  late final AnimationController _pull = AnimationController.unbounded(
+    vsync: this,
+  );
+
+  /// iOS'ta [_overscroll], Android'de [_pull] çalışıyor; diğeri hep sıfır.
+  double get _pullExtent => _overscroll.value + _pull.value;
+
+  /// Yay hedefi aşabildiği için sınırsız.
   late final AnimationController _scatter = AnimationController.unbounded(
     vsync: this,
   );
@@ -156,13 +145,11 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
     duration: _wanderPeriod,
   );
 
-  /// Gezinmenin ne kadar açık olduğu; lekeler yerinden yumuşakça kopuyor.
   late final AnimationController _wanderIn = AnimationController(
     vsync: this,
     duration: _wanderFadeDuration,
   );
 
-  /// Yenileme boyunca 1; bitince 0'a inip renk alanını kapatıyor.
   late final AnimationController _presence = AnimationController(
     vsync: this,
     duration: _hideDuration,
@@ -170,9 +157,15 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
 
   _Phase _phase = _Phase.idle;
 
+  /// Yalnız liste tepede dururken başlayan çekme sayılıyor. Tepeye fırlayıp
+  /// esneyen listeyi yakalamak, esneme zaten taştığı için azıcık çekmeyle
+  /// eşiği aşardı.
+  bool _pullStarted = false;
+
   @override
   void dispose() {
     _overscroll.dispose();
+    _pull.dispose();
     _scatter.dispose();
     _bloom.dispose();
     _wander.dispose();
@@ -187,37 +180,75 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
     }
 
     final metrics = notification.metrics;
-    final previous = _overscroll.value;
+    final previous = _pullExtent;
     _overscroll.value = math.max(0, metrics.minScrollExtent - metrics.pixels);
 
-    // Yeni bir çekiş başlıyor; alan henüz görünmezken renkler karılıyor.
-    if (_phase == _Phase.idle && previous == 0 && _overscroll.value > 0) {
+    if (notification is ScrollStartNotification) {
+      final atRest = (metrics.pixels - metrics.minScrollExtent).abs() < 1;
+      _pullStarted = notification.dragDetails != null && atRest;
+    }
+
+    final isDragging = switch (notification) {
+      ScrollUpdateNotification(:final dragDetails) => dragDetails != null,
+      OverscrollNotification(:final dragDetails) => dragDetails != null,
+      _ => false,
+    };
+
+    if (_pullStarted) _trackPull(notification, isDragging);
+
+    if (_phase == _Phase.idle && previous == 0 && _pullExtent > 0) {
       _spotColors = _shuffledColors();
     }
 
-    final isDragging =
-        notification is ScrollUpdateNotification &&
-        notification.dragDetails != null;
-
     switch (_phase) {
       case _Phase.idle:
-        // Yalnız parmakla çekme kurar; yukarı fırlatılan liste tepeye
-        // çarpıp taşınca yenilemesin.
-        if (isDragging && _overscroll.value >= _triggerExtent) _arm();
+        if (isDragging && _pullStarted && _pullExtent >= _triggerExtent) {
+          _arm();
+        }
       case _Phase.armed:
-        if (isDragging && _overscroll.value < _triggerExtent) {
+        if (isDragging && _pullExtent < _triggerExtent) {
           setState(() => _phase = _Phase.idle);
           _springScatter(0);
         } else if (!isDragging &&
             (notification is ScrollUpdateNotification ||
+                notification is OverscrollNotification ||
                 notification is ScrollEndNotification)) {
-          // Parmak kalktı: liste yaylanarak geri dönüyor.
           unawaited(_refresh());
         }
       case _Phase.refreshing:
         break;
     }
     return false;
+  }
+
+  /// Yalnız Android: iOS'ta liste kendisi taştığı için taşma bildirimi gelmiyor.
+  void _trackPull(ScrollNotification notification, bool isDragging) {
+    if (notification is OverscrollNotification &&
+        isDragging &&
+        notification.overscroll < 0) {
+      final fraction = _pull.value / notification.metrics.viewportDimension;
+      final resistance = _pullFriction * math.pow(1 - fraction, 2);
+      _pull.value += -notification.overscroll * resistance;
+      return;
+    }
+
+    if (_pull.value == 0) return;
+
+    if (notification is ScrollUpdateNotification && isDragging) {
+      final delta = notification.scrollDelta ?? 0;
+      if (delta > 0) _pull.value = math.max(0, _pull.value - delta);
+      return;
+    }
+
+    if (!isDragging) {
+      unawaited(
+        _pull.animateTo(
+          0,
+          duration: _retractDuration,
+          curve: Curves.easeOutCubic,
+        ),
+      );
+    }
   }
 
   void _arm() {
@@ -274,23 +305,28 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final behavior = ScrollConfiguration.of(
-      context,
-    ).copyWith(physics: const BouncingScrollPhysics());
     final animation = Listenable.merge([
       _overscroll,
+      _pull,
       _scatter,
       _bloom,
       _wander,
       _wanderIn,
       _presence,
     ]);
-    final content = NotificationListener<ScrollNotification>(
-      onNotification: _onScroll,
-      child: ScrollConfiguration(behavior: behavior, child: widget.child),
+    final content = NotificationListener<OverscrollIndicatorNotification>(
+      // Android'in kenar esnemesi renk alanıyla çakışmasın.
+      onNotification: (notification) {
+        if (notification.leading && _pullStarted) {
+          notification.disallowIndicator();
+        }
+        return false;
+      },
+      child: NotificationListener<ScrollNotification>(
+        onNotification: _onScroll,
+        child: widget.child,
+      ),
     );
-    // Renkler her karede yeniden çiziliyor; içerik kendi katmanında kalmazsa
-    // yenileme boyunca o da her karede baştan çiziliyordu.
 
     return ClipRect(
       child: AnimatedBuilder(
@@ -298,18 +334,21 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
         builder: (context, child) {
           final overscroll = _overscroll.value;
           final hold = _isHolding ? _holdExtent * _presence.value : 0.0;
-          // Liste geri yaylanırken boşluğu doldurup içeriği renk alanının
-          // altında tutuyor; toplam boşluk taşma ile tutma payının büyüğü.
-          final shift = math.max(0.0, hold - overscroll);
-          final gap = overscroll + shift;
+          // Yenilerken liste geri yaylanırsa boşluğu tutma payı dolduruyor.
+          final shift = math.max(_pull.value, hold - overscroll);
+          final gap = overscroll + math.max(0.0, shift);
 
+          // Gevşek kısıtta SingleChildScrollView içeriği kadar küçülüp
+          // altındaki boşluktan çekilemez.
           return Stack(
+            fit: StackFit.expand,
             children: [
-              if (gap > 0) _glow(context, gap),
+              if (gap > 0 && (_pullStarted || _isHolding)) _glow(context, gap),
               Transform.translate(offset: Offset(0, shift), child: child),
             ],
           );
         },
+        // Renkler her karede çiziliyor; içerik kendi katmanında kalsın.
         child: RepaintBoundary(child: content),
       ),
     );
@@ -318,7 +357,7 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
   Widget _glow(BuildContext context, double gap) {
     final progress = _isHolding
         ? _presence.value
-        : (_overscroll.value / _triggerExtent).clamp(0.0, 1.0);
+        : (_pullExtent / _triggerExtent).clamp(0.0, 1.0);
 
     return Positioned(
       top: 0,
@@ -336,8 +375,6 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
     );
   }
 
-  /// Lekenin bu karedeki yeri ve boyu: eşikteki yaylı dağılma ve parlama ile
-  /// yenileme sırasındaki gezinmenin toplamı.
   _PlacedSpot _placed(_Spot spot) {
     var offset = spot.scatter * _scatter.value;
 
@@ -351,7 +388,6 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
           (_wanderAmplitude * Curves.easeInOut.transform(_wanderIn.value));
     }
 
-    // Tek bir nefes: hızla şişip yavaşça iniyor.
     final bloom = _bloom.isAnimating
         ? math.sin(math.pi * Curves.easeOutQuad.transform(_bloom.value)) *
               _bloomGrowth
@@ -364,8 +400,7 @@ class _SkyRefreshIndicatorState extends State<SkyRefreshIndicator>
   }
 }
 
-/// Parıltı lekelerini düz saydam bindirmeyle çizer. Çarpma ve ekran kipleri
-/// denendi: kesişimler kararıyordu.
+/// Düz saydam bindirme: çarpma ve ekran kiplerinde kesişimler kararıyor.
 class _GlowPainter extends CustomPainter {
   _GlowPainter({
     required this.spots,
@@ -377,17 +412,15 @@ class _GlowPainter extends CustomPainter {
   final List<_PlacedSpot> spots;
   final List<Color> colors;
 
-  /// Lekelerin yerleştiği alanın en küçük yüksekliği. Çekmenin başında alan
-  /// bundan kısa; lekeler yine bu boyda yerleşip yalnız görünen kısmı çiziliyor.
+  /// Alan bundan kısayken de lekeler bu boya göre yerleşiyor; çekerken
+  /// yerlerinden kaymıyorlar.
   final double fieldHeight;
   final double intensity;
 
-  /// Merkez geniş bir düzlük, kenar yavaşça sönüyor (çan eğrisine yakın);
-  /// doğrusal geçişte ortada belirgin bir nokta kalıyordu.
+  /// Çan eğrisine yakın sönüş; doğrusal geçişte merkezde nokta belli oluyor.
   static const List<double> _stops = [0, 0.25, 0.45, 0.65, 0.82, 1];
   static const List<double> _alphas = [1, 0.95, 0.82, 0.58, 0.28, 0];
 
-  /// Tabanın opaklığı; lekelerin altında kalıp yalnız araları dolduruyor.
   static const double _baseAlpha = 0.45;
 
   @override
@@ -402,8 +435,7 @@ class _GlowPainter extends CustomPainter {
       math.max(size.height, fieldHeight),
     );
 
-    // Lekelerin altında aynı renklerle soluk bir taban: lekeler arasında
-    // zeminin (açık temada beyaz) görünmesini engelliyor.
+    // Soluk taban lekelerin arasında zeminin görünmesini engelliyor.
     canvas.drawRect(
       rect,
       Paint()

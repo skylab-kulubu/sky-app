@@ -313,29 +313,18 @@ abstract class EventDetailPagemodel extends State<EventDetailPage> {
     setState(() => backdropTints = tints);
   }
 
-  /// Taslağı düzenleyebilene buton "Yayınla"; bileti olana "Kayıtlısın".
   bool get _publishFromBar => event.isDraft && canEdit;
 
-  bool get _showRegistered =>
+  bool get isRegistered =>
       hasTicket == true &&
       (event.phase == EventPhase.open || event.phase == EventPhase.closed);
 
-  String get joinButtonLabel {
-    if (_publishFromBar) return 'Yayınla';
-    if (_showRegistered) return 'Kayıtlısın';
-    return switch (event.phase) {
-      EventPhase.open => 'Katıl',
-      EventPhase.closed => 'Başvuru Kapalı',
-      EventPhase.ended => 'Etkinlik Bitti',
-      EventPhase.draft => 'Yayında Değil',
-      EventPhase.cancelled => 'İptal Edildi',
-    };
-  }
+  String get joinButtonLabel => _publishFromBar ? 'Yayınla' : 'Katıl';
 
-  /// `null` ise buton pasif.
+  /// `null` ise alt buton gösterilmiyor.
   VoidCallback? get joinButtonAction {
     if (_publishFromBar) return onPublishPressed;
-    if (_showRegistered || event.phase != EventPhase.open) return null;
+    if (isRegistered || event.phase != EventPhase.open) return null;
     return onJoinPressed;
   }
 

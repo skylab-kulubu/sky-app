@@ -56,9 +56,6 @@ class _ExpandableNavBarState extends State<ExpandableNavBar>
   static const double _shadowSpread = 2;
   static const Offset _shadowOffset = Offset(0, 8);
 
-  /// Hap'ın zemini; arkasından geçen içerik çok az seziliyor.
-  static const double _surfaceOpacity = 0.95;
-
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: _duration,
@@ -309,7 +306,7 @@ class _ExpandableNavBarState extends State<ExpandableNavBar>
     final isDark = context.theme.brightness == Brightness.dark;
 
     return BoxDecoration(
-      color: context.tileColor.withValues(alpha: _surfaceOpacity),
+      color: context.tileColor,
       shape: borderRadius == null ? BoxShape.circle : BoxShape.rectangle,
       borderRadius: borderRadius,
       // Kenarlık yalnızca açık temada; koyu temada hap zeminden zaten ayrışıyor.

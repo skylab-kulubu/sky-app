@@ -108,6 +108,9 @@ class _EventDetailPageState extends EventDetailPagemodel {
   static const double _headingRevealOffset = 36.0;
   static const double _headingRevealDistance = 40.0;
 
+  /// Eylem yoksa durumu durum satırı söylüyor; pasif buton gösterilmiyor.
+  bool get _hasJoinBar => joinButtonAction != null;
+
   double get _scrollOffset =>
       scrollController.hasClients ? scrollController.offset : 0.0;
 
@@ -131,10 +134,10 @@ class _EventDetailPageState extends EventDetailPagemodel {
           ),
           // Karartma zeminin alt rengine gidiyor; tema rengi butonun ardında bant gibi
           // dururdu.
-          BottomScrim(color: _tinted(_scrimTint)),
+          if (_hasJoinBar) BottomScrim(color: _tinted(_scrimTint)),
         ],
       ),
-      bottomNavigationBar: _joinBar(context),
+      bottomNavigationBar: _hasJoinBar ? _joinBar(context) : null,
     );
   }
 
@@ -287,7 +290,9 @@ class _EventDetailPageState extends EventDetailPagemodel {
       padding: AppPaddings.mainPaddingHorizontal.copyWith(
         // Kapağın altındaki boşluk üstündekiyle aynı (haber ve ekip detayı gibi).
         top: AppSizes.bigSpace + _coverSize(context) + AppSizes.bigSpace,
-        bottom: AppSizes.navBarClearance,
+        bottom: _hasJoinBar
+            ? AppSizes.navBarClearance
+            : AppSizes.largeSpace + MediaQuery.paddingOf(context).bottom,
       ),
       children: [
         _title(context),
@@ -395,33 +400,35 @@ class _EventDetailPageState extends EventDetailPagemodel {
   /// Başvuru durumu; kullanıcı aşağı inmeden görsün diye. İptalde sebep de
   /// altında.
   Widget _statusRow(BuildContext context) {
-    final (icon, color, text) = switch (event.phase) {
-      EventPhase.open => (
-        AppIcons.checkCircle,
-        AppColors.green,
-        'Başvurular açık',
-      ),
-      EventPhase.closed => (
-        AppIcons.clock,
-        AppColors.orange,
-        'Başvurular kapalı',
-      ),
-      EventPhase.ended => (
-        AppIcons.clock,
-        AppColors.onCoverMuted,
-        'Etkinlik sona erdi',
-      ),
-      EventPhase.draft => (
-        AppIcons.edit,
-        AppColors.orange,
-        'Taslak, henüz yayınlanmadı',
-      ),
-      EventPhase.cancelled => (
-        AppIcons.closeCircle,
-        AppColors.red,
-        'Etkinlik iptal edildi',
-      ),
-    };
+    final (icon, color, text) = isRegistered
+        ? (AppIcons.checkCircle, AppColors.green, 'Kayıtlısın')
+        : switch (event.phase) {
+            EventPhase.open => (
+              AppIcons.checkCircle,
+              AppColors.green,
+              'Başvurular açık',
+            ),
+            EventPhase.closed => (
+              AppIcons.clock,
+              AppColors.orange,
+              'Başvurular kapalı',
+            ),
+            EventPhase.ended => (
+              AppIcons.clock,
+              AppColors.onCoverMuted,
+              'Etkinlik sona erdi',
+            ),
+            EventPhase.draft => (
+              AppIcons.edit,
+              AppColors.orange,
+              'Taslak, henüz yayınlanmadı',
+            ),
+            EventPhase.cancelled => (
+              AppIcons.closeCircle,
+              AppColors.red,
+              'Etkinlik iptal edildi',
+            ),
+          };
     final reason = event.isCancelled ? event.cancelReason.trim() : '';
 
     return Row(
@@ -635,23 +642,14 @@ class _EventDetailPageState extends EventDetailPagemodel {
   /// Katılım butonu altta sabit, uzun açıklamada sona kaydırmak gerekmesin.
   /// Renkler açıkça veriliyor: sayfa temadan bağımsız koyu.
   Widget _joinBar(BuildContext context) {
-    final action = joinButtonAction;
-    final enabled = action != null;
-
     return SafeArea(
       minimum: AppPaddings.mainPaddingAll,
       child: SkyButton(
         text: joinButtonLabel,
         isLoading: isJoining || isUpdatingStatus,
-        // Pasif zemin opak: yarı saydamken renkli zemin sızıp buton delik gibi
-        // görünüyordu.
-        backgroundColor: enabled
-            ? AppColors.primaryColor
-            : Color.alphaBlend(AppColors.onCoverSurface, _tinted(_scrimTint)),
-        textColor: enabled
-            ? AppColors.skyPassForeground
-            : AppColors.onCoverFaint,
-        onPressed: action,
+        backgroundColor: AppColors.primaryColor,
+        textColor: AppColors.skyPassForeground,
+        onPressed: joinButtonAction,
       ),
     );
   }
